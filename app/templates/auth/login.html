@@ -91,7 +91,10 @@ block content %}
         </div>
 
         <div class="text-sm">
-          <a href="#" class="font-medium text-cyan-600 hover:text-cyan-500">
+          <a
+            href="{{ url_for('auth.reset_password_request') }}"
+            class="font-medium text-cyan-600 hover:text-cyan-500"
+          >
             Forgot password?
           </a>
         </div>

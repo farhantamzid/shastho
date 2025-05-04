@@ -1,0 +1,166 @@
+{% extends "hospital_admin/layout.html" %} {% block title %}Admin Request
+Details - Shastho{% endblock %} {% block page_title %}Admin Request Details{%
+endblock %} {% block hospital_admin_content %}
+<div class="mt-4">
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %}
+  <div
+    class="mb-4 rounded-md p-4 {% if category == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}"
+  >
+    {{ message }}
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div
+      class="px-4 py-5 sm:px-6 bg-indigo-50 flex justify-between items-center"
+    >
+      <div>
+        <h3 class="text-lg leading-6 font-medium text-indigo-900">
+          Test/Imaging Admin Application Details
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-indigo-700">
+          Review application details
+        </p>
+      </div>
+      <div>
+        {% if admin_request.status.value == 'pending' %}
+        <span
+          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+        >
+          Pending
+        </span>
+        {% elif admin_request.status.value == 'approved' %}
+        <span
+          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+        >
+          Approved
+        </span>
+        {% elif admin_request.status.value == 'rejected' %}
+        <span
+          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+        >
+          Rejected
+        </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="border-t border-gray-200">
+      <dl>
+        <div
+          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+        >
+          <dt class="text-sm font-medium text-gray-500">Full Name</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ admin_request.full_name }}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Email</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ admin_request.email }}
+          </dd>
+        </div>
+        <div
+          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+        >
+          <dt class="text-sm font-medium text-gray-500">Contact Number</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ admin_request.contact_number }}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Department</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ admin_request.department }}
+          </dd>
+        </div>
+        <div
+          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+        >
+          <dt class="text-sm font-medium text-gray-500">Qualifications</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ admin_request.qualification }}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Experience</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ admin_request.experience }}
+          </dd>
+        </div>
+        <div
+          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+        >
+          <dt class="text-sm font-medium text-gray-500">Reason for Request</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ admin_request.reason }}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Submitted On</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ admin_request.created_at.strftime('%B %d, %Y at %I:%M %p') if
+            admin_request.created_at else 'Unknown' }}
+          </dd>
+        </div>
+        <div
+          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+        >
+          <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ admin_request.updated_at.strftime('%B %d, %Y at %I:%M %p') if
+            admin_request.updated_at else 'Not updated' }}
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Actions Section -->
+    <div class="px-4 py-5 sm:px-6 border-t border-gray-200">
+      <div class="flex justify-between items-center">
+        <a
+          href="{{ url_for('hospital_admin.list_admin_requests') }}"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+        >
+          Back to List
+        </a>
+
+        {% if admin_request.status.value == 'pending' %}
+        <div class="flex space-x-4">
+          <form
+            method="POST"
+            action="{{ url_for('hospital_admin.update_admin_request_status', request_id=admin_request.id) }}"
+            class="inline"
+          >
+            <input type="hidden" name="status" value="rejected" />
+            <button
+              type="submit"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              Reject Application
+            </button>
+          </form>
+
+          <form
+            method="POST"
+            action="{{ url_for('hospital_admin.update_admin_request_status', request_id=admin_request.id) }}"
+            class="inline"
+          >
+            <input type="hidden" name="status" value="approved" />
+            <button
+              type="submit"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+              Approve Application
+            </button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

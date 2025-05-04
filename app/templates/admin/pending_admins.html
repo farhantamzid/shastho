@@ -1,0 +1,158 @@
+{% extends "admin/layout.html" %} {% block title %}Pending Hospital Admin
+Approvals - Shastho{% endblock %} {% block page_title %}Pending Hospital Admin
+Approvals{% endblock %} {% block admin_content %}
+<div class="mt-4">
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %}
+  <div
+    class="mb-4 rounded-md p-4 {% if category == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}"
+  >
+    {{ message }}
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-md">
+    {% if admin_details %}
+    <ul class="divide-y divide-gray-200">
+      {% for detail in admin_details %}
+      <li>
+        <div class="px-4 py-4 sm:px-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div
+                  class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold"
+                >
+                  {{ detail.admin.full_name[:1] }}
+                </div>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-indigo-600">
+                  {{ detail.admin.full_name }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ detail.user.username }}
+                </div>
+              </div>
+            </div>
+            <div class="ml-2 flex-shrink-0 flex">
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+              >
+                Pending Approval
+              </span>
+            </div>
+          </div>
+          <div class="mt-2 sm:flex sm:justify-between">
+            <div class="sm:flex">
+              <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                <svg
+                  class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm3 1h6v4H7V5zm8 8v2h1v1H4v-1h1v-2a1 1 0 011-1h8a1 1 0 011 1zM9 7h2v2H9V7z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Hospital: {{ detail.hospital_name }}
+              </div>
+              <div
+                class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6"
+              >
+                <svg
+                  class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Registered: {{ detail.admin.created_at.strftime('%Y-%m-%d') if
+                detail.admin.created_at else 'Unknown' }}
+              </div>
+              <div
+                class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6"
+              >
+                <svg
+                  class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"
+                  />
+                </svg>
+                {{ detail.admin.contact_number }}
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between sm:mt-0">
+              <div class="flex space-x-2">
+                <form
+                  method="POST"
+                  action="{{ url_for('admin.approve_admin', user_id=detail.user.id) }}"
+                >
+                  <button
+                    type="submit"
+                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  >
+                    Approve
+                  </button>
+                </form>
+                <form
+                  method="POST"
+                  action="{{ url_for('admin.reject_admin', user_id=detail.user.id) }}"
+                >
+                  <button
+                    type="submit"
+                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  >
+                    Reject
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="mt-2 text-sm text-gray-700">
+            <p>Address: {{ detail.admin.address }}</p>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="p-6 text-center">
+      <svg
+        class="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">
+        No pending approvals
+      </h3>
+      <p class="mt-1 text-sm text-gray-500">
+        There are no pending Hospital Admin applications to review at this time.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

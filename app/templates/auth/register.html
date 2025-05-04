@@ -329,6 +329,180 @@ block content %}
         </div>
       </div>
 
+      <!-- Doctor-specific fields - only shown when role is doctor -->
+      <div id="doctor-fields" class="hidden space-y-6">
+        <div>
+          <label
+            for="specialization"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Specialization</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="stethoscope" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            {{ form.specialization(id="specialization", class="appearance-none
+            block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg
+            shadow-sm placeholder-gray-400 focus:outline-none
+            focus:ring-cyan-500 focus:border-cyan-500", placeholder="Enter your
+            specialization") }}
+          </div>
+          {% if form.specialization.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.specialization.errors %} {{ error }} {% endfor
+            %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="credentials"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Credentials/Qualifications</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="award" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            {{ form.credentials(id="credentials", class="appearance-none block
+            w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+            placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+            focus:border-cyan-500", placeholder="Enter your credentials and
+            qualifications", rows=3) }}
+          </div>
+          {% if form.credentials.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.credentials.errors %} {{ error }} {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="hospital_id_doctor"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Hospital</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="building" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            {{ form.hospital_id(id="hospital_id_doctor", class="appearance-none
+            block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg
+            shadow-sm placeholder-gray-400 focus:outline-none
+            focus:ring-cyan-500 focus:border-cyan-500") }}
+          </div>
+          {% if form.hospital_id.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.hospital_id.errors %} {{ error }} {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="department_id"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Department</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="activity" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            {{ form.department_id(id="department_id", class="appearance-none
+            block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg
+            shadow-sm placeholder-gray-400 focus:outline-none
+            focus:ring-cyan-500 focus:border-cyan-500") }}
+          </div>
+          {% if form.department_id.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.department_id.errors %} {{ error }} {% endfor
+            %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="contact_number_doctor"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Contact Number</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="phone" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            {{ form.contact_number(id="contact_number_doctor",
+            class="appearance-none block w-full pl-10 pr-3 py-2.5 border
+            border-gray-300 rounded-lg shadow-sm placeholder-gray-400
+            focus:outline-none focus:ring-cyan-500 focus:border-cyan-500",
+            placeholder="Enter your contact number") }}
+          </div>
+          {% if form.contact_number.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.contact_number.errors %} {{ error }} {% endfor
+            %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Hospital Admin-specific fields - only shown when role is hospital_admin -->
+      <div id="hospital-admin-fields" class="hidden space-y-6">
+        <div class="form-group">
+          <label for="hospital_id">Hospital</label>
+          {{ form.hospital_id(class="form-control") }} {% if
+          form.hospital_id.errors %}
+          <div class="invalid-feedback">
+            {% for error in form.hospital_id.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="contact_number">Contact Number</label>
+          {{ form.contact_number(class="form-control", placeholder="Enter your
+          contact number") }} {% if form.contact_number.errors %}
+          <div class="invalid-feedback">
+            {% for error in form.contact_number.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="address">Address</label>
+          {{ form.address(class="form-control", placeholder="Enter your
+          address") }} {% if form.address.errors %}
+          <div class="invalid-feedback">
+            {% for error in form.address.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="alert alert-info">
+          <strong>Note:</strong> Hospital Administrator accounts require
+          approval by a System Administrator. Your account will be pending until
+          approved.
+        </div>
+      </div>
+
       <div class="mt-6">
         <button
           type="submit"
@@ -357,206 +531,111 @@ block content %}
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // Initialize Lucide icons
-    lucide.createIcons();
+    // Variables to hold elements
+    const roleSelect = document.getElementById("role");
+    const patientFields = document.getElementById("patient-fields");
+    const doctorFields = document.getElementById("doctor-fields");
+    const hospitalAdminFields = document.getElementById(
+      "hospital-admin-fields"
+    );
 
-    // Password toggle functionality
-    const toggleButtons = document.querySelectorAll(".password-toggle");
-    toggleButtons.forEach((button) => {
-      button.addEventListener("click", function () {
-        const passwordInput = this.closest("div").querySelector("input");
+    // Hospital select elements
+    const hospitalSelectDoctor = document.getElementById("hospital_id_doctor");
+    const departmentSelect = document.getElementById("department_id");
+
+    // Toggle role-specific fields
+    function toggleRoleFields() {
+      if (roleSelect.value === "patient") {
+        patientFields.classList.remove("hidden");
+        doctorFields.classList.add("hidden");
+        hospitalAdminFields.classList.add("hidden");
+      } else if (roleSelect.value === "doctor") {
+        patientFields.classList.add("hidden");
+        doctorFields.classList.remove("hidden");
+        hospitalAdminFields.classList.add("hidden");
+      } else if (roleSelect.value === "hospital_admin") {
+        patientFields.classList.add("hidden");
+        doctorFields.classList.add("hidden");
+        hospitalAdminFields.classList.remove("hidden");
+      } else {
+        patientFields.classList.add("hidden");
+        doctorFields.classList.add("hidden");
+        hospitalAdminFields.classList.add("hidden");
+      }
+    }
+
+    // Load departments for doctor registration based on selected hospital
+    function loadDepartments(hospitalId) {
+      // Clear current options except the first one
+      departmentSelect.innerHTML =
+        '<option value="">Loading departments...</option>';
+
+      // Make AJAX request to get departments
+      fetch(`/auth/register?hospital_id=${hospitalId}`, {
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then((response) => response.json())
+        .then((departments) => {
+          // Reset departments dropdown
+          departmentSelect.innerHTML =
+            '<option value="">Select Department</option>';
+
+          // Add departments to dropdown
+          departments.forEach((dept) => {
+            const option = document.createElement("option");
+            option.value = dept.id;
+            option.textContent = dept.name;
+            departmentSelect.appendChild(option);
+          });
+        })
+        .catch((error) => {
+          console.error("Error loading departments:", error);
+          departmentSelect.innerHTML =
+            '<option value="">Error loading departments</option>';
+        });
+    }
+
+    // Initialize fields based on current selection
+    toggleRoleFields();
+
+    // Add event listeners
+    roleSelect.addEventListener("change", toggleRoleFields);
+
+    // Hospital selection for doctor registration
+    if (hospitalSelectDoctor) {
+      hospitalSelectDoctor.addEventListener("change", function () {
+        if (this.value) {
+          loadDepartments(this.value);
+        } else {
+          departmentSelect.innerHTML =
+            '<option value="">Select Hospital First</option>';
+        }
+      });
+    }
+
+    // Show/hide password toggle
+    const passwordToggles = document.querySelectorAll(".password-toggle");
+    passwordToggles.forEach(function (toggle) {
+      toggle.addEventListener("click", function () {
+        const passwordField = this.closest(".relative").querySelector("input");
         const icon = this.querySelector("i");
 
-        if (passwordInput.type === "password") {
-          passwordInput.type = "text";
+        if (passwordField.type === "password") {
+          passwordField.type = "text";
           icon.setAttribute("data-lucide", "eye-off");
         } else {
-          passwordInput.type = "password";
+          passwordField.type = "password";
           icon.setAttribute("data-lucide", "eye");
         }
 
-        lucide.createIcons();
+        // Reinitialize Lucide icons
+        if (typeof lucide !== "undefined") {
+          lucide.createIcons();
+        }
       });
     });
-
-    // Show patient fields when role is 'patient'
-    const roleSelect = document.getElementById("role");
-    const patientFields = document.getElementById("patient-fields");
-
-    // Initial check on page load
-    if (roleSelect.value === "patient") {
-      patientFields.classList.remove("hidden");
-    }
-
-    // Check when role changes
-    roleSelect.addEventListener("change", function () {
-      if (this.value === "patient") {
-        patientFields.classList.remove("hidden");
-        // When patient role is selected, add required attribute to fields
-        document.getElementById("date_of_birth").setAttribute("required", "");
-        document.getElementById("gender").setAttribute("required", "");
-        document.getElementById("contact_number").setAttribute("required", "");
-        document.getElementById("address").setAttribute("required", "");
-        document
-          .getElementById("emergency_contact_name")
-          .setAttribute("required", "");
-        document
-          .getElementById("emergency_contact_number")
-          .setAttribute("required", "");
-      } else {
-        patientFields.classList.add("hidden");
-        // When patient role is not selected, remove required attribute
-        document.getElementById("date_of_birth").removeAttribute("required");
-        document.getElementById("gender").removeAttribute("required");
-        document.getElementById("contact_number").removeAttribute("required");
-        document.getElementById("address").removeAttribute("required");
-        document
-          .getElementById("emergency_contact_name")
-          .removeAttribute("required");
-        document
-          .getElementById("emergency_contact_number")
-          .removeAttribute("required");
-      }
-    });
-
-    // Client-side validation
-    const form = document.querySelector("form");
-
-    form.addEventListener("submit", function (event) {
-      let isValid = true;
-
-      // Basic email validation
-      const emailInput = document.getElementById("email");
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(emailInput.value)) {
-        showError(emailInput, "Please enter a valid email address");
-        isValid = false;
-      } else {
-        clearError(emailInput);
-      }
-
-      // Password validation
-      const passwordInput = document.getElementById("password");
-      if (passwordInput.value.length < 8) {
-        showError(passwordInput, "Password must be at least 8 characters");
-        isValid = false;
-      } else {
-        clearError(passwordInput);
-      }
-
-      // Password confirmation validation
-      const confirmPasswordInput = document.getElementById("confirm_password");
-      if (confirmPasswordInput.value !== passwordInput.value) {
-        showError(confirmPasswordInput, "Passwords do not match");
-        isValid = false;
-      } else {
-        clearError(confirmPasswordInput);
-      }
-
-      // If patient is selected, validate patient fields
-      if (roleSelect.value === "patient") {
-        // Date of birth validation
-        const dobInput = document.getElementById("date_of_birth");
-        if (!dobInput.value) {
-          showError(dobInput, "Please enter your date of birth");
-          isValid = false;
-        } else {
-          // Check if the date is in the past
-          const dob = new Date(dobInput.value);
-          const today = new Date();
-          if (dob > today) {
-            showError(dobInput, "Date of birth cannot be in the future");
-            isValid = false;
-          } else {
-            clearError(dobInput);
-          }
-        }
-
-        // Gender validation
-        const genderInput = document.getElementById("gender");
-        if (!genderInput.value) {
-          showError(genderInput, "Please select your gender");
-          isValid = false;
-        } else {
-          clearError(genderInput);
-        }
-
-        // Contact number validation
-        const contactInput = document.getElementById("contact_number");
-        const phonePattern = /^[\d\+\-\(\) ]{10,15}$/;
-        if (!phonePattern.test(contactInput.value)) {
-          showError(
-            contactInput,
-            "Please enter a valid phone number (10-15 digits)"
-          );
-          isValid = false;
-        } else {
-          clearError(contactInput);
-        }
-
-        // Address validation
-        const addressInput = document.getElementById("address");
-        if (!addressInput.value || addressInput.value.length < 5) {
-          showError(addressInput, "Please enter a valid address");
-          isValid = false;
-        } else {
-          clearError(addressInput);
-        }
-
-        // Emergency contact name validation
-        const ecNameInput = document.getElementById("emergency_contact_name");
-        if (!ecNameInput.value || ecNameInput.value.length < 2) {
-          showError(ecNameInput, "Please enter a valid emergency contact name");
-          isValid = false;
-        } else {
-          clearError(ecNameInput);
-        }
-
-        // Emergency contact number validation
-        const ecNumberInput = document.getElementById(
-          "emergency_contact_number"
-        );
-        if (!phonePattern.test(ecNumberInput.value)) {
-          showError(
-            ecNumberInput,
-            "Please enter a valid emergency contact number (10-15 digits)"
-          );
-          isValid = false;
-        } else {
-          clearError(ecNumberInput);
-        }
-      }
-
-      if (!isValid) {
-        event.preventDefault();
-      }
-    });
-
-    // Helper functions for validation
-    function showError(input, message) {
-      const parentDiv = input.closest("div.relative").parentElement;
-      let errorDiv = parentDiv.querySelector(".text-red-500");
-
-      if (!errorDiv) {
-        errorDiv = document.createElement("div");
-        errorDiv.className = "text-red-500 text-sm mt-1";
-        parentDiv.appendChild(errorDiv);
-      }
-
-      errorDiv.textContent = message;
-      input.classList.add("border-red-500");
-    }
-
-    function clearError(input) {
-      const parentDiv = input.closest("div.relative").parentElement;
-      const errorDiv = parentDiv.querySelector(".text-red-500");
-
-      if (errorDiv) {
-        errorDiv.textContent = "";
-      }
-
-      input.classList.remove("border-red-500");
-    }
   });
 </script>
 {% endblock %}

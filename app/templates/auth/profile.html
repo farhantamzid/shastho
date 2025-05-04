@@ -1,9 +1,9 @@
-{% extends "base.html" %} {% block title %}Profile - HealthBD{% endblock %} {%
-block content %}
+{% extends "base.html" %} {% block title %}Account Settings - shastho{% endblock
+%} {% block content %}
 <div
   class="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8"
 >
-  <div class="max-w-3xl mx-auto">
+  <div class="max-w-5xl mx-auto">
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
       <!-- Header with user info -->
       <div class="bg-cyan-600 p-6 text-white">
@@ -12,7 +12,7 @@ block content %}
             <i data-lucide="user" class="h-10 w-10 text-cyan-600"></i>
           </div>
           <div>
-            <h1 class="text-2xl font-bold">Welcome, {{ user.username }}</h1>
+            <h1 class="text-2xl font-bold">Account Settings</h1>
             <p class="text-cyan-100">
               <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800 capitalize"
@@ -21,6 +21,40 @@ block content %}
               </span>
             </p>
           </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="border-b border-gray-200">
+        <div class="flex">
+          <button
+            id="profile-tab"
+            class="tab-button active py-4 px-6 font-medium focus:outline-none"
+          >
+            <i data-lucide="user" class="h-4 w-4 inline mr-2"></i>
+            Profile
+          </button>
+          <button
+            id="security-tab"
+            class="tab-button py-4 px-6 font-medium focus:outline-none"
+          >
+            <i data-lucide="shield" class="h-4 w-4 inline mr-2"></i>
+            Security
+          </button>
+          <button
+            id="preferences-tab"
+            class="tab-button py-4 px-6 font-medium focus:outline-none"
+          >
+            <i data-lucide="settings" class="h-4 w-4 inline mr-2"></i>
+            Preferences
+          </button>
+          <button
+            id="sessions-tab"
+            class="tab-button py-4 px-6 font-medium focus:outline-none"
+          >
+            <i data-lucide="log-in" class="h-4 w-4 inline mr-2"></i>
+            Sessions
+          </button>
         </div>
       </div>
 
@@ -35,39 +69,404 @@ block content %}
         </div>
         {% endfor %} {% endif %} {% endwith %}
 
-        <div class="bg-gray-50 rounded-lg p-6 mb-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">
-            Account Information
-          </h2>
-          <div class="space-y-3">
-            <div>
-              <h3 class="text-sm font-medium text-gray-500">Email</h3>
-              <p class="mt-1 text-gray-900">{{ user.username }}</p>
+        <!-- Profile Tab Content -->
+        <div id="profile-content" class="tab-content">
+          <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">
+              Account Information
+            </h2>
+            <div class="space-y-3">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Email</h3>
+                <p class="mt-1 text-gray-900">{{ user.username }}</p>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Role</h3>
+                <p class="mt-1 text-gray-900 capitalize">
+                  {{ user.role.value if user.role else 'User' }}
+                </p>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Status</h3>
+                <p class="mt-1 text-gray-900 capitalize">
+                  {{ user.status.value if user.status else 'Unknown' }}
+                </p>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">
+                  Account Created
+                </h3>
+                <p class="mt-1 text-gray-900">
+                  {% if user.created_at %} {% if user.created_at is string %} {{
+                  user.created_at }} {% else %} {{ user.created_at.strftime('%B
+                  %d, %Y') }} {% endif %} {% else %} Unknown {% endif %}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 class="text-sm font-medium text-gray-500">Role</h3>
-              <p class="mt-1 text-gray-900 capitalize">
-                {{ user.role.value if user.role else 'User' }}
-              </p>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">
+              Profile Picture
+            </h2>
+            <div class="flex items-center space-x-4">
+              <div
+                class="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
+              >
+                {% if user.profile_picture_url %}
+                <img
+                  src="{{ user.profile_picture_url }}"
+                  alt="Profile Picture"
+                  class="h-full w-full object-cover"
+                />
+                {% else %}
+                <i data-lucide="user" class="h-12 w-12 text-gray-500"></i>
+                {% endif %}
+              </div>
+              <div>
+                <p class="text-sm text-gray-500 mb-2">
+                  Upload a new profile picture
+                </p>
+                <form
+                  method="POST"
+                  action="{{ url_for('auth.upload_profile_picture') }}"
+                  enctype="multipart/form-data"
+                  class="flex flex-col sm:flex-row gap-2"
+                >
+                  {{ profile_picture_form.csrf_token }}
+                  <div class="flex items-center">
+                    <label
+                      for="profile_picture"
+                      class="cursor-pointer px-3 py-1.5 bg-cyan-600 text-white rounded-md text-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                    >
+                      Choose File
+                    </label>
+                    <input
+                      id="profile_picture"
+                      name="picture"
+                      type="file"
+                      class="hidden"
+                      accept="image/jpeg,image/png"
+                      onchange="document.getElementById('file-name').textContent = this.files[0].name"
+                    />
+                    <span
+                      id="file-name"
+                      class="ml-2 text-sm text-gray-600"
+                    ></span>
+                  </div>
+                  <button
+                    type="submit"
+                    class="px-3 py-1.5 bg-cyan-600 text-white rounded-md text-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  >
+                    Upload
+                  </button>
+                </form>
+              </div>
             </div>
-            <div>
-              <h3 class="text-sm font-medium text-gray-500">Status</h3>
-              <p class="mt-1 text-gray-900 capitalize">
-                {{ user.status.value if user.status else 'Unknown' }}
-              </p>
+          </div>
+        </div>
+
+        <!-- Security Tab Content -->
+        <div id="security-content" class="tab-content hidden">
+          <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">
+              Change Password
+            </h2>
+            <form
+              method="POST"
+              action="{{ url_for('auth.change_password_route') }}"
+              class="space-y-4"
+            >
+              {{ password_form.csrf_token }}
+              <div>
+                <label
+                  for="current_password"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  Current Password
+                </label>
+                {{ password_form.current_password(id="current_password",
+                class="mt-1 block w-full px-3 py-2 border border-gray-300
+                rounded-md shadow-sm placeholder-gray-400 focus:outline-none
+                focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm") }} {% if
+                password_form.current_password.errors %}
+                <div class="text-red-500 text-sm mt-1">
+                  {% for error in password_form.current_password.errors %}{{
+                  error }}{% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <div>
+                <label
+                  for="new_password"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  New Password
+                </label>
+                {{ password_form.new_password(id="new_password", class="mt-1
+                block w-full px-3 py-2 border border-gray-300 rounded-md
+                shadow-sm placeholder-gray-400 focus:outline-none
+                focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm") }} {% if
+                password_form.new_password.errors %}
+                <div class="text-red-500 text-sm mt-1">
+                  {% for error in password_form.new_password.errors %}{{ error
+                  }}{% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <div>
+                <label
+                  for="confirm_password"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  Confirm New Password
+                </label>
+                {{ password_form.confirm_password(id="confirm_password",
+                class="mt-1 block w-full px-3 py-2 border border-gray-300
+                rounded-md shadow-sm placeholder-gray-400 focus:outline-none
+                focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm") }} {% if
+                password_form.confirm_password.errors %}
+                <div class="text-red-500 text-sm mt-1">
+                  {% for error in password_form.confirm_password.errors %}{{
+                  error }}{% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <div>
+                <button
+                  type="submit"
+                  class="px-4 py-2 bg-cyan-600 text-white rounded-md text-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                >
+                  Update Password
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2
+              class="text-lg font-medium text-gray-900 mb-4 flex items-center justify-between"
+            >
+              <span>Two-Factor Authentication</span>
+              <span
+                class="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-600"
+                >Coming Soon</span
+              >
+            </h2>
+            <p class="text-sm text-gray-500 mb-4">
+              Add an extra layer of security to your account by enabling
+              two-factor authentication.
+            </p>
+            <button
+              disabled
+              class="px-4 py-2 bg-gray-300 text-gray-600 rounded-md text-sm focus:outline-none cursor-not-allowed"
+            >
+              Enable 2FA
+            </button>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6">
+            <h2 class="text-lg font-medium text-red-600 mb-4">
+              Deactivate Account
+            </h2>
+            <p class="text-sm text-gray-500 mb-4">
+              Deactivating your account will temporarily disable your access to
+              shastho. You can reactivate at any time by contacting support.
+            </p>
+            <form
+              method="POST"
+              action="{{ url_for('auth.deactivate_account') }}"
+              class="space-y-4"
+            >
+              {{ deactivate_form.csrf_token }}
+              <div>
+                <label
+                  for="password"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  Password
+                </label>
+                {{ deactivate_form.password(id="password", class="mt-1 block
+                w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                placeholder-gray-400 focus:outline-none focus:ring-red-500
+                focus:border-red-500 sm:text-sm") }} {% if
+                deactivate_form.password.errors %}
+                <div class="text-red-500 text-sm mt-1">
+                  {% for error in deactivate_form.password.errors %}{{ error
+                  }}{% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <div class="flex items-start mt-2">
+                {{ deactivate_form.confirm(id="confirm-deactivate", class="h-4
+                w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded
+                mt-1") }}
+                <label
+                  for="confirm-deactivate"
+                  class="ml-2 block text-sm text-gray-700"
+                >
+                  I understand that this will deactivate my account and I will
+                  need to contact support to reactivate it.
+                </label>
+                {% if deactivate_form.confirm.errors %}
+                <div class="text-red-500 text-sm mt-1">
+                  {% for error in deactivate_form.confirm.errors %}{{ error }}{%
+                  endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <div>
+                <button
+                  type="submit"
+                  class="px-4 py-2 bg-red-100 text-red-600 border border-red-200 rounded-md text-sm hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  onclick="return confirm('Are you sure you want to deactivate your account? This action cannot be undone.')"
+                >
+                  Deactivate Account
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Preferences Tab Content -->
+        <div id="preferences-content" class="tab-content hidden">
+          <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">
+              Language Preferences
+            </h2>
+            <form
+              method="POST"
+              action="{{ url_for('auth.change_language') }}"
+              class="space-y-4"
+            >
+              {{ language_form.csrf_token }}
+              <div>
+                <label
+                  for="language"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  Display Language
+                </label>
+                {{ language_form.language(id="language", class="mt-1 block
+                w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+                focus:border-cyan-500 sm:text-sm") }} {% if
+                language_form.language.errors %}
+                <div class="text-red-500 text-sm mt-1">
+                  {% for error in language_form.language.errors %}{{ error }}{%
+                  endfor %}
+                </div>
+                {% endif %}
+                <p class="text-sm text-gray-500 mt-1">
+                  Choose your preferred language for the shastho interface.
+                </p>
+              </div>
+              <div>
+                <button
+                  type="submit"
+                  class="px-4 py-2 bg-cyan-600 text-white rounded-md text-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                >
+                  Save Language Preference
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Sessions Tab Content -->
+        <div id="sessions-content" class="tab-content hidden">
+          <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2
+              class="text-lg font-medium text-gray-900 mb-4 flex items-center justify-between"
+            >
+              <span>Active Sessions</span>
+              <a
+                href="{{ url_for('auth.terminate_all_user_sessions') }}"
+                class="text-xs font-medium bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-full hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                onclick="return confirm('Are you sure you want to terminate all other sessions?')"
+              >
+                <i data-lucide="log-out" class="h-3 w-3 inline mr-1"></i>
+                Logout All Other Devices
+              </a>
+            </h2>
+
+            {% if active_sessions|length > 0 %}
+            <div
+              class="border border-gray-200 rounded-md divide-y divide-gray-200"
+            >
+              {% for session in active_sessions %}
+              <div
+                class="flex items-center justify-between p-4 {% if session.session_id == current_session_id %}bg-cyan-50{% endif %}"
+              >
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <i data-lucide="monitor" class="h-4 w-4 text-gray-500"></i>
+                    <div class="font-medium text-gray-700">
+                      {% if session.session_id == current_session_id %}
+                      <span class="text-cyan-700">Current Device</span>
+                      {% else %}
+                      <span>Other Device</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="text-xs text-gray-500 mt-1">
+                    <div>
+                      {{ session.user_agent[:50] + '...' if session.user_agent
+                      and session.user_agent|length > 50 else session.user_agent
+                      or 'Unknown device' }}
+                    </div>
+                    <div class="mt-0.5">
+                      <span>IP: {{ session.ip_address or 'Unknown' }}</span> ·
+                      <span
+                        >First login: {% if session.created_at %}{{
+                        session.created_at.strftime('%b %d, %Y %H:%M') }}{% else
+                        %}Unknown{% endif %}</span
+                      >
+                      ·
+                      <span
+                        >Last activity: {% if session.last_activity %}{{
+                        session.last_activity.strftime('%b %d, %Y %H:%M') }}{%
+                        else %}Unknown{% endif %}</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  {% if session.session_id == current_session_id %}
+                  <a
+                    href="{{ url_for('auth.logout') }}"
+                    class="text-cyan-600 hover:text-cyan-800 text-sm font-medium"
+                  >
+                    Sign Out
+                  </a>
+                  {% else %}
+                  <a
+                    href="{{ url_for('auth.terminate_user_session', session_id=session.session_id) }}"
+                    class="text-red-600 hover:text-red-800 text-sm font-medium"
+                    onclick="return confirm('Are you sure you want to terminate this session?')"
+                  >
+                    Terminate
+                  </a>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
             </div>
-            <div>
-              <h3 class="text-sm font-medium text-gray-500">Account Created</h3>
-              <p class="mt-1 text-gray-900">
-                {% if user.created_at %} {% if user.created_at is string %} {{
-                user.created_at }} {% else %} {{ user.created_at.strftime('%B
-                %d, %Y') }} {% endif %} {% else %} Unknown {% endif %}
+            {% else %}
+            <p class="text-gray-500 text-sm">No active sessions found.</p>
+            {% endif %}
+
+            <div class="mt-4 text-sm text-gray-500">
+              <p>
+                <i data-lucide="info" class="h-4 w-4 inline text-cyan-600"></i>
+                Sessions are automatically created when you log in. You can
+                terminate any session except the current one.
               </p>
             </div>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col sm:flex-row gap-4 mt-6">
           <a
             href="{{ url_for('main.index') }}"
             class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
@@ -93,6 +492,45 @@ block content %}
   document.addEventListener("DOMContentLoaded", function () {
     // Initialize Lucide icons
     lucide.createIcons();
+
+    // Tab functionality
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        // Remove active class from all tabs
+        tabButtons.forEach((btn) => btn.classList.remove("active"));
+        tabContents.forEach((content) => content.classList.add("hidden"));
+
+        // Add active class to clicked tab
+        button.classList.add("active");
+
+        // Show corresponding content
+        const contentId = button.id.replace("-tab", "-content");
+        document.getElementById(contentId).classList.remove("hidden");
+      });
+    });
   });
 </script>
+<style>
+  .tab-button {
+    color: #6b7280;
+    position: relative;
+  }
+
+  .tab-button.active {
+    color: #0891b2;
+  }
+
+  .tab-button.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #0891b2;
+  }
+</style>
 {% endblock %}

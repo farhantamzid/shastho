@@ -1,0 +1,324 @@
+{% extends "hospital_admin/layout.html" %} {% block title %}Test/Imaging Admin
+Requests - Shastho{% endblock %} {% block page_title %}Test/Imaging Admin
+Requests{% endblock %} {% block hospital_admin_content %}
+<div class="mt-4">
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %}
+  <div
+    class="mb-4 rounded-md p-4 {% if category == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}"
+  >
+    {{ message }}
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
+
+  <!-- Status Statistics -->
+  <div class="mb-6 bg-white rounded-lg shadow p-4">
+    <h3 class="text-lg font-medium text-gray-900 mb-2">Request Statistics</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="p-3 bg-purple-50 rounded-lg">
+        <p class="text-sm text-purple-500 font-medium">Total Requests</p>
+        <p class="text-2xl font-bold text-purple-700">{{ status_counts.total }}</p>
+      </div>
+      <div class="p-3 bg-yellow-50 rounded-lg">
+        <p class="text-sm text-yellow-500 font-medium">Pending</p>
+        <p class="text-2xl font-bold text-yellow-700">{{ status_counts.pending }}</p>
+      </div>
+      <div class="p-3 bg-green-50 rounded-lg">
+        <p class="text-sm text-green-500 font-medium">Approved</p>
+        <p class="text-2xl font-bold text-green-700">{{ status_counts.approved }}</p>
+      </div>
+      <div class="p-3 bg-red-50 rounded-lg">
+        <p class="text-sm text-red-500 font-medium">Rejected</p>
+        <p class="text-2xl font-bold text-red-700">{{ status_counts.rejected }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filter Bar -->
+  <div class="mb-6 bg-white rounded-lg shadow p-4">
+    <form method="GET" action="{{ url_for('hospital_admin.list_admin_requests') }}" class="space-y-3">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Search Box -->
+        <div>
+          <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <input
+              type="text"
+              name="search"
+              id="search"
+              value="{{ current_filters.search }}"
+              placeholder="Name, email, department..."
+              class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-10 sm:text-sm border-gray-300 rounded-md"
+            />
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div>
+          <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+          <select
+            id="status"
+            name="status"
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          >
+            <option value="">All Statuses</option>
+            <option value="pending" {% if current_filters.status == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="approved" {% if current_filters.status == 'approved' %}selected{% endif %}>Approved</option>
+            <option value="rejected" {% if current_filters.status == 'rejected' %}selected{% endif %}>Rejected</option>
+          </select>
+        </div>
+
+        <!-- Department Filter -->
+        <div>
+          <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
+          <select
+            id="department"
+            name="department"
+            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          >
+            <option value="">All Departments</option>
+            {% for dept in departments %}
+            <option value="{{ dept }}" {% if current_filters.department == dept %}selected{% endif %}>{{ dept }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Sort Options -->
+        <div>
+          <label for="sort" class="block text-sm font-medium text-gray-700">Sort By</label>
+          <div class="mt-1 flex rounded-md shadow-sm">
+            <select
+              id="sort"
+              name="sort"
+              class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
+            >
+              <option value="created_at" {% if current_filters.sort == 'created_at' %}selected{% endif %}>Date</option>
+              <option value="name" {% if current_filters.sort == 'name' %}selected{% endif %}>Name</option>
+              <option value="department" {% if current_filters.sort == 'department' %}selected{% endif %}>Department</option>
+              <option value="status" {% if current_filters.sort == 'status' %}selected{% endif %}>Status</option>
+            </select>
+            <select
+              id="dir"
+              name="dir"
+              class="focus:ring-indigo-500 focus:border-indigo-500 inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm"
+            >
+              <option value="desc" {% if current_filters.dir == 'desc' %}selected{% endif %}>↓ Desc</option>
+              <option value="asc" {% if current_filters.dir == 'asc' %}selected{% endif %}>↑ Asc</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between">
+        <button
+          type="submit"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Apply Filters
+        </button>
+        <a
+          href="{{ url_for('hospital_admin.list_admin_requests') }}"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Clear Filters
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="mb-6 flex justify-end">
+    <a
+      href="{{ url_for('hospital_admin.new_admin_request') }}"
+      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    >
+      <svg
+        class="-ml-1 mr-2 h-5 w-5"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      New Admin Request
+    </a>
+  </div>
+
+  <!-- Requests Table -->
+  <div class="bg-white shadow overflow-hidden sm:rounded-md">
+    {% if admin_requests %}
+    <ul class="divide-y divide-gray-200">
+      {% for request in admin_requests %}
+      <li>
+        <div class="px-4 py-4 sm:px-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-10 w-10 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-indigo-600">
+                  {{ request.full_name }}
+                </div>
+                <div class="text-sm text-gray-500">{{ request.email }}</div>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                {% if request.status.value == 'pending' %}
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                >
+                  Pending
+                </span>
+                {% elif request.status.value == 'approved' %}
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                >
+                  Approved
+                </span>
+                {% elif request.status.value == 'rejected' %}
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                >
+                  Rejected
+                </span>
+                {% endif %}
+              </div>
+              <div class="ml-2 flex-shrink-0 flex">
+                <a
+                  href="{{ url_for('hospital_admin.view_admin_request', request_id=request.id) }}"
+                  class="ml-4 font-medium text-indigo-600 hover:text-indigo-500"
+                >
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="mt-2 sm:flex sm:justify-between">
+            <div class="sm:flex">
+              <div class="flex items-center text-sm text-gray-500">
+                <svg
+                  class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 01-1 1h-1.5v1a1.5 1.5 0 01-3 0v-1H7.5v1a1.5 1.5 0 01-3 0v-1H3a1 1 0 01-1-1V4zm3 0v2h10V4H7z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                Department: {{ request.department }}
+              </div>
+              <div
+                class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6"
+              >
+                <svg
+                  class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"
+                  />
+                </svg>
+                {{ request.contact_number }}
+              </div>
+            </div>
+            <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+              <svg
+                class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <span>
+                Applied {{ request.created_at.strftime('%b %d, %Y') if
+                request.created_at else 'Unknown date' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Quick Actions for Pending Requests -->
+          {% if request.status.value == 'pending' %}
+          <div class="mt-4 flex justify-end space-x-3">
+            <form
+              method="POST"
+              action="{{ url_for('hospital_admin.update_admin_request_status', request_id=request.id) }}"
+              class="inline"
+            >
+              <input type="hidden" name="status" value="rejected" />
+              <button
+                type="submit"
+                class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-red-500"
+              >
+                Reject
+              </button>
+            </form>
+            <form
+              method="POST"
+              action="{{ url_for('hospital_admin.update_admin_request_status', request_id=request.id) }}"
+              class="inline"
+            >
+              <input type="hidden" name="status" value="approved" />
+              <button
+                type="submit"
+                class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-green-500"
+              >
+                Approve
+              </button>
+            </form>
+          </div>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="px-4 py-10 sm:px-6 text-center">
+      <p class="text-gray-500">No Test/Imaging Admin requests found.</p>
+      <div class="mt-4">
+        <a
+          href="{{ url_for('hospital_admin.new_admin_request') }}"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Create New Request
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -2,6 +2,7 @@ from datetime import datetime, date, time
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union
 from uuid import UUID, uuid4
+from sqlalchemy import Column, String, Text, ForeignKey, Boolean
 
 
 class UserRole(str, Enum):
@@ -9,6 +10,8 @@ class UserRole(str, Enum):
     PATIENT = 'patient'
     DOCTOR = 'doctor'
     STAFF = 'staff'
+    HOSPITAL_ADMIN = 'hospital_admin'
+    TEST_ADMIN = 'test_admin'
 
 
 class UserStatus(str, Enum):
@@ -21,6 +24,11 @@ class Gender(str, Enum):
     MALE = 'male'
     FEMALE = 'female'
     OTHER = 'other'
+
+
+class Language(str, Enum):
+    ENGLISH = 'english'
+    BANGLA = 'bangla'
 
 
 class AppointmentStatus(str, Enum):
@@ -41,7 +49,9 @@ class User:
         role: UserRole = None,
         status: UserStatus = UserStatus.ACTIVE,
         created_at: datetime = None,
-        updated_at: datetime = None
+        updated_at: datetime = None,
+        profile_picture_url: str = None,
+        language_preference: Language = Language.ENGLISH
     ):
         self.id = id or uuid4()
         self.username = username
@@ -50,6 +60,8 @@ class User:
         self.status = status
         self.created_at = created_at or datetime.now()
         self.updated_at = updated_at or datetime.now()
+        self.profile_picture_url = profile_picture_url
+        self.language_preference = language_preference
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'User':
@@ -61,7 +73,9 @@ class User:
             role=UserRole(data.get('role')) if data.get('role') else None,
             status=UserStatus(data.get('status')) if data.get('status') else UserStatus.ACTIVE,
             created_at=data.get('created_at'),
-            updated_at=data.get('updated_at')
+            updated_at=data.get('updated_at'),
+            profile_picture_url=data.get('profile_picture_url'),
+            language_preference=Language(data.get('language_preference')) if data.get('language_preference') else Language.ENGLISH
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -73,7 +87,9 @@ class User:
             'role': self.role.value if self.role else None,
             'status': self.status.value if self.status else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'profile_picture_url': self.profile_picture_url,
+            'language_preference': self.language_preference.value if self.language_preference else None
         }
 
 
@@ -124,47 +140,31 @@ class Hospital:
         }
 
 
-class Department:
-    """Model representing a department in a hospital."""
+class Department(SQLiteEntity):
+    """Department model."""
 
-    def __init__(
-        self,
-        id: Optional[UUID] = None,
-        name: str = None,
-        hospital_id: UUID = None,
-        created_at: datetime = None,
-        updated_at: datetime = None
-    ):
-        self.id = id or uuid4()
-        self.name = name
-        self.hospital_id = hospital_id
-        self.created_at = created_at or datetime.now()
-        self.updated_at = updated_at or datetime.now()
+    __tablename__ = 'department'
 
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'Department':
-        """Create a Department instance from a dictionary."""
-        return cls(
-            id=data.get('id'),
-            name=data.get('name'),
-            hospital_id=data.get('hospital_id'),
-            created_at=data.get('created_at'),
-            updated_at=data.get('updated_at')
-        )
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert instance to a dictionary."""
-        return {
-            'id': str(self.id),
-            'name': self.name,
-            'hospital_id': str(self.hospital_id) if self.hospital_id else None,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
-        }
+    name = Column(String(100), nullable=False)
+    description = Column(Text)
+    hospital_id = Column(ForeignKey("hospital.id"), nullable=False)
 
 
-class Patient:
+class Patient(SQLiteEntity):
     """Model representing a patient in the system."""
+
+    __tablename__ = 'patient'
+
+    user_id = Column(ForeignKey("user.id"), nullable=False)
+    full_name = Column(String(100), nullable=False)
+    date_of_birth = Column(Date)
+    gender = Column(String(10))
+    contact_number = Column(String(20))
+    address = Column(Text)
+    emergency_contact_name = Column(String(100))
+    emergency_contact_number = Column(String(20))
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
 
     def __init__(
         self,
@@ -226,63 +226,20 @@ class Patient:
         }
 
 
-class Doctor:
-    """Model representing a doctor in the system."""
+class Doctor(SQLiteEntity):
+    """Doctor model."""
 
-    def __init__(
-        self,
-        id: Optional[UUID] = None,
-        user_id: UUID = None,
-        full_name: str = None,
-        specialization: str = None,
-        credentials: str = None,
-        hospital_id: UUID = None,
-        department_id: UUID = None,
-        contact_number: str = None,
-        created_at: datetime = None,
-        updated_at: datetime = None
-    ):
-        self.id = id or uuid4()
-        self.user_id = user_id
-        self.full_name = full_name
-        self.specialization = specialization
-        self.credentials = credentials
-        self.hospital_id = hospital_id
-        self.department_id = department_id
-        self.contact_number = contact_number
-        self.created_at = created_at or datetime.now()
-        self.updated_at = updated_at or datetime.now()
+    __tablename__ = 'doctor'
 
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'Doctor':
-        """Create a Doctor instance from a dictionary."""
-        return cls(
-            id=data.get('id'),
-            user_id=data.get('user_id'),
-            full_name=data.get('full_name'),
-            specialization=data.get('specialization'),
-            credentials=data.get('credentials'),
-            hospital_id=data.get('hospital_id'),
-            department_id=data.get('department_id'),
-            contact_number=data.get('contact_number'),
-            created_at=data.get('created_at'),
-            updated_at=data.get('updated_at')
-        )
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert instance to a dictionary."""
-        return {
-            'id': str(self.id),
-            'user_id': str(self.user_id) if self.user_id else None,
-            'full_name': self.full_name,
-            'specialization': self.specialization,
-            'credentials': self.credentials,
-            'hospital_id': str(self.hospital_id) if self.hospital_id else None,
-            'department_id': str(self.department_id) if self.department_id else None,
-            'contact_number': self.contact_number,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
-        }
+    user_id = Column(ForeignKey("user.id"), nullable=False, unique=True)
+    full_name = Column(String(100), nullable=False)
+    specialization = Column(String(100), nullable=False)
+    credentials = Column(Text)
+    contact_number = Column(String(20))
+    hospital_id = Column(ForeignKey("hospital.id"), nullable=True)
+    department_id = Column(ForeignKey("department.id"), nullable=True)
+    first_login_complete = Column(Boolean, default=False)
+    # Other doctor info can be added here
 
 
 class DoctorAvailabilitySlot:
@@ -415,4 +372,279 @@ class Appointment:
             'status': self.status.value if self.status else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+class HospitalAdmin:
+    """Model representing a hospital administrator in the system."""
+
+    def __init__(
+        self,
+        id: Optional[UUID] = None,
+        user_id: UUID = None,
+        full_name: str = None,
+        hospital_id: UUID = None,
+        contact_number: str = None,
+        address: str = None,
+        created_at: datetime = None,
+        updated_at: datetime = None
+    ):
+        self.id = id or uuid4()
+        self.user_id = user_id
+        self.full_name = full_name
+        self.hospital_id = hospital_id
+        self.contact_number = contact_number
+        self.address = address
+        self.created_at = created_at or datetime.now()
+        self.updated_at = updated_at or datetime.now()
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'HospitalAdmin':
+        """Create a HospitalAdmin instance from a dictionary."""
+        return cls(
+            id=data.get('id'),
+            user_id=data.get('user_id'),
+            full_name=data.get('full_name'),
+            hospital_id=data.get('hospital_id'),
+            contact_number=data.get('contact_number'),
+            address=data.get('address'),
+            created_at=data.get('created_at'),
+            updated_at=data.get('updated_at')
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instance to a dictionary."""
+        return {
+            'id': str(self.id),
+            'user_id': str(self.user_id) if self.user_id else None,
+            'full_name': self.full_name,
+            'hospital_id': str(self.hospital_id) if self.hospital_id else None,
+            'contact_number': self.contact_number,
+            'address': self.address,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+class AdminRequestStatus(str, Enum):
+    PENDING = 'pending'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
+
+
+class TestImageAdminRequest:
+    """Model representing a request for a Test/Imaging Admin role."""
+
+    def __init__(
+        self,
+        id: Optional[UUID] = None,
+        hospital_id: UUID = None,
+        full_name: str = None,
+        email: str = None,
+        contact_number: str = None,
+        department: str = None,
+        qualification: str = None,
+        experience: str = None,
+        reason: str = None,
+        submitted_by: UUID = None,  # HospitalAdmin user_id who submitted the request
+        status: AdminRequestStatus = AdminRequestStatus.PENDING,
+        created_at: datetime = None,
+        updated_at: datetime = None
+    ):
+        self.id = id or uuid4()
+        self.hospital_id = hospital_id
+        self.full_name = full_name
+        self.email = email
+        self.contact_number = contact_number
+        self.department = department
+        self.qualification = qualification
+        self.experience = experience
+        self.reason = reason
+        self.submitted_by = submitted_by
+        self.status = status
+        self.created_at = created_at or datetime.now()
+        self.updated_at = updated_at or datetime.now()
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'TestImageAdminRequest':
+        """Create a TestImageAdminRequest instance from a dictionary."""
+        return cls(
+            id=data.get('id'),
+            hospital_id=data.get('hospital_id'),
+            full_name=data.get('full_name'),
+            email=data.get('email'),
+            contact_number=data.get('contact_number'),
+            department=data.get('department'),
+            qualification=data.get('qualification'),
+            experience=data.get('experience'),
+            reason=data.get('reason'),
+            submitted_by=data.get('submitted_by'),
+            status=AdminRequestStatus(data.get('status')) if data.get('status') else AdminRequestStatus.PENDING,
+            created_at=data.get('created_at'),
+            updated_at=data.get('updated_at')
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instance to a dictionary."""
+        return {
+            'id': str(self.id),
+            'hospital_id': str(self.hospital_id) if self.hospital_id else None,
+            'full_name': self.full_name,
+            'email': self.email,
+            'contact_number': self.contact_number,
+            'department': self.department,
+            'qualification': self.qualification,
+            'experience': self.experience,
+            'reason': self.reason,
+            'submitted_by': str(self.submitted_by) if self.submitted_by else None,
+            'status': self.status.value if self.status else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+class PasswordResetToken:
+    """Model representing a password reset token."""
+
+    def __init__(
+        self,
+        id: Optional[UUID] = None,
+        user_id: UUID = None,
+        token: str = None,
+        expires_at: datetime = None,
+        created_at: datetime = None,
+        used: bool = False
+    ):
+        self.id = id or uuid4()
+        self.user_id = user_id
+        self.token = token
+        self.expires_at = expires_at
+        self.created_at = created_at or datetime.now()
+        self.used = used
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'PasswordResetToken':
+        """Create a PasswordResetToken instance from a dictionary."""
+        return cls(
+            id=UUID(data.get('id')) if data.get('id') else None,
+            user_id=UUID(data.get('user_id')) if data.get('user_id') else None,
+            token=data.get('token'),
+            expires_at=data.get('expires_at'),
+            created_at=data.get('created_at'),
+            used=data.get('used', False)
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instance to a dictionary."""
+        return {
+            'id': str(self.id),
+            'user_id': str(self.user_id) if self.user_id else None,
+            'token': self.token,
+            'expires_at': self.expires_at.isoformat() if self.expires_at else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'used': self.used
+        }
+
+    def is_valid(self) -> bool:
+        """Check if the token is valid (not used and not expired)."""
+        if self.used:
+            return False
+
+        if self.expires_at and datetime.now() > self.expires_at:
+            return False
+
+        return True
+
+
+class UserSession:
+    """Model for user sessions."""
+
+    def __init__(
+        self,
+        id: Optional[UUID] = None,
+        user_id: UUID = None,
+        session_id: str = None,
+        user_agent: str = None,
+        ip_address: str = None,
+        last_activity: datetime = None,
+        created_at: datetime = None,
+        is_active: bool = True
+    ):
+        self.id = id or uuid4()
+        self.user_id = user_id
+        self.session_id = session_id
+        self.user_agent = user_agent
+        self.ip_address = ip_address
+        self.last_activity = last_activity or datetime.now()
+        self.created_at = created_at or datetime.now()
+        self.is_active = is_active
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'UserSession':
+        """Create a UserSession instance from a dictionary."""
+        return cls(
+            id=data.get('id'),
+            user_id=data.get('user_id'),
+            session_id=data.get('session_id'),
+            user_agent=data.get('user_agent'),
+            ip_address=data.get('ip_address'),
+            last_activity=data.get('last_activity'),
+            created_at=data.get('created_at'),
+            is_active=data.get('is_active', True)
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instance to a dictionary."""
+        return {
+            'id': str(self.id),
+            'user_id': str(self.user_id) if self.user_id else None,
+            'session_id': self.session_id,
+            'user_agent': self.user_agent,
+            'ip_address': self.ip_address,
+            'last_activity': self.last_activity.isoformat() if self.last_activity else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'is_active': self.is_active
+        }
+
+
+class DoctorNote:
+    """Model for storing notes about doctor approval/rejection."""
+
+    def __init__(
+        self,
+        id: Optional[UUID] = None,
+        doctor_id: UUID = None,
+        note_type: str = None,  # 'approval', 'rejection'
+        content: str = None,
+        created_by: UUID = None,
+        created_at: datetime = None
+    ):
+        self.id = id or uuid4()
+        self.doctor_id = doctor_id
+        self.note_type = note_type
+        self.content = content
+        self.created_by = created_by
+        self.created_at = created_at or datetime.now()
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'DoctorNote':
+        """Create a DoctorNote instance from a dictionary."""
+        return cls(
+            id=data.get('id'),
+            doctor_id=data.get('doctor_id'),
+            note_type=data.get('note_type'),
+            content=data.get('content'),
+            created_by=data.get('created_by'),
+            created_at=data.get('created_at')
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instance to a dictionary."""
+        return {
+            'id': str(self.id),
+            'doctor_id': str(self.doctor_id) if self.doctor_id else None,
+            'note_type': self.note_type,
+            'content': self.content,
+            'created_by': str(self.created_by) if self.created_by else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }

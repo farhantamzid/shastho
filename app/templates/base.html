@@ -53,26 +53,26 @@
           <a
             href="{{ url_for('main.index') }}"
             class="font-medium text-gray-700 hover:text-cyan-600"
-            >Home</a
+            >{{ 'Home'|t }}</a
           >
           {% if session.get('user_id') %}
           <a
             href="{{ url_for('main.dashboard') }}"
             class="font-medium text-gray-700 hover:text-cyan-600"
-            >Dashboard</a
+            >{{ 'Dashboard'|t }}</a
           >
           {% endif %}
           <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
-            >Services</a
+            >{{ 'Services'|t }}</a
           >
           <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
-            >Doctors</a
+            >{{ 'Doctors'|t }}</a
           >
           <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
-            >About</a
+            >{{ 'About'|t }}</a
           >
           <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
-            >Contact</a
+            >{{ 'Contact'|t }}</a
           >
         </div>
 
@@ -88,14 +88,23 @@
           {% if session.get('user_id') %}
           <div class="flex items-center space-x-4">
             <span class="text-gray-700">
-              Welcome, {{ session.get('user_name', session.get('user_email')) }}
+              {{ 'Welcome'|t }}, {{ session.get('user_name',
+              session.get('user_email')) }}
             </span>
             <div class="relative" id="userMenuDropdown">
               <button
                 class="flex items-center text-gray-700 focus:outline-none"
                 id="userMenuButton"
               >
+                {% if session.get('profile_picture_url') %}
+                <img
+                  src="{{ session.get('profile_picture_url') }}"
+                  alt="Profile"
+                  class="h-8 w-8 rounded-full object-cover"
+                />
+                {% else %}
                 <i data-lucide="user-circle" class="h-8 w-8 text-cyan-600"></i>
+                {% endif %}
                 <i data-lucide="chevron-down" class="h-4 w-4 ml-1"></i>
               </button>
               <div
@@ -132,12 +141,12 @@
           <a
             href="{{ url_for('auth.login') }}"
             class="border border-cyan-600 text-cyan-600 hover:bg-cyan-50 px-4 py-2 rounded-lg font-medium transition duration-150"
-            >Login</a
+            >{{ 'Login'|t }}</a
           >
           <a
             href="{{ url_for('auth.register') }}"
             class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium transition duration-150"
-            >Register</a
+            >{{ 'Register'|t }}</a
           >
           {% endif %}
         </div>
@@ -149,31 +158,39 @@
           <a
             href="{{ url_for('main.index') }}"
             class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >Home</a
+            >{{ 'Home'|t }}</a
           >
           {% if session.get('user_id') %}
           <a
             href="{{ url_for('main.dashboard') }}"
             class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >Dashboard</a
+            >{{ 'Dashboard'|t }}</a
           >
           {% endif %}
           <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >Services</a
+            >{{ 'Services'|t }}</a
           >
           <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >Doctors</a
+            >{{ 'Doctors'|t }}</a
           >
           <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >About</a
+            >{{ 'About'|t }}</a
           >
           <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >Contact</a
+            >{{ 'Contact'|t }}</a
           >
 
           {% if session.get('user_id') %}
           <div class="flex items-center pt-2">
+            {% if session.get('profile_picture_url') %}
+            <img
+              src="{{ session.get('profile_picture_url') }}"
+              alt="Profile"
+              class="h-8 w-8 rounded-full object-cover mr-2"
+            />
+            {% else %}
             <i data-lucide="user-circle" class="h-8 w-8 text-cyan-600 mr-2"></i>
+            {% endif %}
             <span
               >{{ session.get('user_name', session.get('user_email')) }}</span
             >
@@ -204,12 +221,12 @@
             <a
               href="{{ url_for('auth.login') }}"
               class="border border-cyan-600 text-cyan-600 hover:bg-cyan-50 px-4 py-2 rounded-lg font-medium transition duration-150 flex-1 text-center"
-              >Login</a
+              >{{ 'Login'|t }}</a
             >
             <a
               href="{{ url_for('auth.register') }}"
               class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium transition duration-150 flex-1 text-center"
-              >Register</a
+              >{{ 'Register'|t }}</a
             >
           </div>
           {% endif %}

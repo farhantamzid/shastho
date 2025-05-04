@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
 from app.routes.auth import role_required, login_required
 from app.utils.db import Database
-from app.models.database import Hospital, Department
+from app.models.database import Hospital, Department, HospitalAdmin, User, UserStatus, Doctor, DoctorNote
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, Optional
@@ -35,9 +35,15 @@ def dashboard():
     hospital_count = len(hospitals)
     department_count = len(departments)
 
+    # Get count of pending hospital admin applications
+    from app.models.auth import find_users_by_role_and_status
+    pending_admins = find_users_by_role_and_status('hospital_admin', UserStatus.INACTIVE)
+    pending_admin_count = len(pending_admins)
+
     stats = {
         'hospital_count': hospital_count,
         'department_count': department_count,
+        'pending_admin_count': pending_admin_count,
     }
 
     return render_template('admin/dashboard.html', stats=stats)
@@ -288,3 +294,237 @@ def delete_department(department_id):
         flash('Failed to delete department.', 'error')
 
     return redirect(url_for('admin.departments'))
+
+@admin_bp.route('/pending-admins')
+@role_required(['admin'])
+def pending_admins():
+    """View pending Hospital Admin applications."""
+    # Get all users with Hospital Admin role and pending status
+    from app.models.auth import find_users_by_role_and_status
+    pending_admins = find_users_by_role_and_status('hospital_admin', UserStatus.INACTIVE)
+
+    # Get additional hospital admin info for each user
+    admin_details = []
+    for user in pending_admins:
+        # Find the HospitalAdmin record for this user
+        hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', user.id)
+        if hospital_admin:
+            # Get the hospital name
+            hospital = db.get_by_id(Hospital, hospital_admin.hospital_id) if hospital_admin.hospital_id else None
+            hospital_name = hospital.name if hospital else "Unknown Hospital"
+
+            admin_details.append({
+                'user': user,
+                'admin': hospital_admin,
+                'hospital_name': hospital_name
+            })
+
+    return render_template('admin/pending_admins.html', admin_details=admin_details)
+
+@admin_bp.route('/pending-admins/<user_id>/approve', methods=['POST'])
+@role_required(['admin'])
+def approve_admin(user_id):
+    """Approve a Hospital Admin application."""
+    # Find the user
+    from app.models.auth import find_user_by_id, update_user_status
+    user = find_user_by_id(user_id)
+
+    if not user:
+        flash('User not found.', 'error')
+        return redirect(url_for('admin.pending_admins'))
+
+    # Update user status to ACTIVE
+    success = update_user_status(user_id, UserStatus.ACTIVE)
+
+    if success:
+        # TODO: In a real application, send an email notification to the user
+        flash('Hospital Admin approved successfully. They can now log in.', 'success')
+    else:
+        flash('Failed to approve Hospital Admin.', 'error')
+
+    return redirect(url_for('admin.pending_admins'))
+
+@admin_bp.route('/pending-admins/<user_id>/reject', methods=['POST'])
+@role_required(['admin'])
+def reject_admin(user_id):
+    """Reject a Hospital Admin application."""
+    # Find the user
+    from app.models.auth import find_user_by_id, update_user_status
+    user = find_user_by_id(user_id)
+
+    if not user:
+        flash('User not found.', 'error')
+        return redirect(url_for('admin.pending_admins'))
+
+    # Update user status to SUSPENDED (rejected)
+    success = update_user_status(user_id, UserStatus.SUSPENDED)
+
+    if success:
+        # TODO: In a real application, send an email notification to the user
+        flash('Hospital Admin application rejected.', 'success')
+    else:
+        flash('Failed to reject Hospital Admin application.', 'error')
+
+    return redirect(url_for('admin.pending_admins'))
+
+# Doctor application management routes
+@admin_bp.route('/pending-doctors')
+@role_required(['admin'])
+def pending_doctors():
+    """List of pending doctor applications."""
+    # Get query parameters for searching and filtering
+    search_query = request.args.get('search', '')
+
+    # Find users with doctor role and inactive status
+    from app.models.auth import find_users_by_role_and_status
+    from app.models.database import UserStatus
+
+    pending_doctor_users = find_users_by_role_and_status('doctor', UserStatus.INACTIVE)
+
+    # Get the complete doctor info for each user
+    from app.models.database import Doctor
+    from app.utils.db import db
+
+    pending_doctors = []
+    for user in pending_doctor_users:
+        # Query the doctor record using the user_id
+        doctor_records = db.query(Doctor, user_id=user.id)
+        if doctor_records:
+            doctor = doctor_records[0]
+
+            # Get hospital and department info
+            hospital = db.get_by_id(Hospital, doctor.hospital_id) if doctor.hospital_id else None
+            department = db.get_by_id(Department, doctor.department_id) if doctor.department_id else None
+
+            # Create a combined record
+            doctor_info = {
+                'user_id': str(user.id),
+                'username': user.username,
+                'full_name': doctor.full_name,
+                'specialization': doctor.specialization,
+                'credentials': doctor.credentials,
+                'contact_number': doctor.contact_number,
+                'hospital_id': str(doctor.hospital_id) if doctor.hospital_id else None,
+                'hospital_name': hospital.name if hospital else "Unknown Hospital",
+                'department_id': str(doctor.department_id) if doctor.department_id else None,
+                'department_name': department.name if department else "Unknown Department",
+                'created_at': user.created_at.strftime('%Y-%m-%d %H:%M:%S') if user.created_at else "Unknown"
+            }
+
+            # Filter by search query if provided
+            if search_query:
+                if (search_query.lower() in doctor_info['full_name'].lower() or
+                    search_query.lower() in doctor_info['specialization'].lower() or
+                    search_query.lower() in doctor_info['username'].lower() or
+                    search_query.lower() in doctor_info['hospital_name'].lower() or
+                    search_query.lower() in doctor_info['department_name'].lower()):
+                    pending_doctors.append(doctor_info)
+            else:
+                pending_doctors.append(doctor_info)
+
+    return render_template('admin/pending_doctors.html',
+                           pending_doctors=pending_doctors,
+                           search_query=search_query,
+                           count=len(pending_doctors))
+
+@admin_bp.route('/pending-doctors/<user_id>/approve', methods=['POST'])
+@role_required(['admin'])
+def approve_doctor(user_id):
+    """Approve a doctor application."""
+    # Get the user
+    from app.models.auth import find_user_by_id, update_user_status
+    from app.models.database import UserStatus, Doctor, DoctorNote
+    from app.utils.db import db
+    from flask import session as flask_session
+
+    user = find_user_by_id(user_id)
+
+    if not user:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': 'User not found.'}), 404
+
+        flash('User not found.', 'error')
+        return redirect(url_for('admin.pending_doctors'))
+
+    # Update the user status to active
+    updated = update_user_status(user.id, UserStatus.ACTIVE)
+
+    if updated:
+        # Get notes if provided
+        notes = request.form.get('notes', '')
+        if notes:
+            # Get doctor record
+            doctor_records = db.query(Doctor, user_id=user.id)
+            if doctor_records:
+                doctor = doctor_records[0]
+                # Create note record
+                doctor_note = DoctorNote(
+                    doctor_id=doctor.id,
+                    note_type='approval',
+                    content=notes,
+                    created_by=flask_session.get('user_id')
+                )
+                db.create(doctor_note)
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': 'Doctor application approved.'})
+
+        flash('Doctor application approved.', 'success')
+    else:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': 'Failed to approve doctor application.'}), 500
+
+        flash('Failed to approve doctor application.', 'error')
+
+    return redirect(url_for('admin.pending_doctors'))
+
+@admin_bp.route('/pending-doctors/<user_id>/reject', methods=['POST'])
+@role_required(['admin'])
+def reject_doctor(user_id):
+    """Reject a doctor application."""
+    # Get the user
+    from app.models.auth import find_user_by_id, update_user_status
+    from app.models.database import UserStatus, Doctor, DoctorNote
+    from app.utils.db import db
+    from flask import session as flask_session
+
+    user = find_user_by_id(user_id)
+
+    if not user:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': 'User not found.'}), 404
+
+        flash('User not found.', 'error')
+        return redirect(url_for('admin.pending_doctors'))
+
+    # Update the user status to suspended (rejected)
+    updated = update_user_status(user.id, UserStatus.SUSPENDED)
+
+    if updated:
+        # Get rejection reason if provided
+        reason = request.form.get('reason', '')
+        if reason:
+            # Get doctor record
+            doctor_records = db.query(Doctor, user_id=user.id)
+            if doctor_records:
+                doctor = doctor_records[0]
+                # Create note record
+                doctor_note = DoctorNote(
+                    doctor_id=doctor.id,
+                    note_type='rejection',
+                    content=reason,
+                    created_by=flask_session.get('user_id')
+                )
+                db.create(doctor_note)
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': 'Doctor application rejected.'})
+
+        flash('Doctor application rejected.', 'success')
+    else:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': 'Failed to reject doctor application.'}), 500
+
+        flash('Failed to reject doctor application.', 'error')
+
+    return redirect(url_for('admin.pending_doctors'))

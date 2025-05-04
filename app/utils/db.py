@@ -1,13 +1,15 @@
 import os
 from typing import List, Dict, Any, Optional, Union, Type, TypeVar
 from uuid import UUID
+from datetime import datetime
 
 from supabase import create_client, Client
 from dotenv import load_dotenv
 
 from app.models.database import (
     User, Hospital, Department, Patient, Doctor,
-    DoctorAvailabilitySlot, Appointment
+    DoctorAvailabilitySlot, Appointment, PasswordResetToken,
+    DoctorNote
 )
 from app.models.ehr import (
     EHR, EHR_Visit, EHR_Diagnosis, EHR_Medication,
@@ -22,7 +24,7 @@ T = TypeVar('T', User, Hospital, Department, Patient, Doctor,
             DoctorAvailabilitySlot, Appointment, EHR, EHR_Visit,
             EHR_Diagnosis, EHR_Medication, EHR_Allergy, EHR_Procedure,
             EHR_Vital, EHR_Immunization, EHR_TestResult, EHR_ProviderNote,
-            Prescription)
+            Prescription, PasswordResetToken, DoctorNote)
 
 class Database:
     """Database utility for Supabase interactions."""
@@ -68,7 +70,11 @@ class Database:
             EHR_Immunization: "EHR_Immunizations",
             EHR_TestResult: "EHR_TestResults",
             EHR_ProviderNote: "EHR_ProviderNotes",
-            Prescription: "Prescriptions"
+            Prescription: "Prescriptions",
+            # Password reset token
+            PasswordResetToken: "password_reset_tokens",
+            # Doctor notes
+            DoctorNote: "doctor_notes"
         }
 
         if model_class not in table_map:
@@ -335,6 +341,43 @@ class Database:
             "test_results": [result.to_dict() for result in test_results]
         }
 
+    def get_reset_token_by_token(self, token: str) -> Optional[PasswordResetToken]:
+        """Get a password reset token by its token value."""
+        response = self.client.table("password_reset_tokens").select("*").eq("token", token).execute()
+
+        if response.data and len(response.data) > 0:
+            return PasswordResetToken.from_dict(response.data[0])
+
+        return None
+
+    def get_valid_reset_token_by_user_id(self, user_id: Union[str, UUID]) -> Optional[PasswordResetToken]:
+        """Get the most recent valid (not used, not expired) reset token for a user."""
+        response = self.client.table("password_reset_tokens") \
+            .select("*") \
+            .eq("user_id", str(user_id)) \
+            .eq("used", False) \
+            .gt("expires_at", datetime.now().isoformat()) \
+            .order("created_at", desc=True) \
+            .limit(1) \
+            .execute()
+
+        if response.data and len(response.data) > 0:
+            return PasswordResetToken.from_dict(response.data[0])
+
+        return None
+
+    def mark_token_as_used(self, token_id: Union[str, UUID]) -> bool:
+        """Mark a password reset token as used."""
+        response = self.client.table("password_reset_tokens") \
+            .update({"used": True}) \
+            .eq("id", str(token_id)) \
+            .execute()
+
+        return response.data is not None and len(response.data) > 0
+
+    def get_doctor_notes(self, doctor_id: Union[str, UUID]) -> List[DoctorNote]:
+        """Get all notes for a doctor."""
+        return self.query(DoctorNote, doctor_id=str(doctor_id))
 
 # Singleton instance for easy access
 db = Database()

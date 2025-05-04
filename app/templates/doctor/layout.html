@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Doctor Portal - Shastho{% endblock %}</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+      defer
+    ></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav class="bg-cyan-600 text-white shadow-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <a
+              href="{{ url_for('doctor.dashboard') }}"
+              class="flex-shrink-0 flex items-center"
+            >
+              <img
+                class="h-10 w-auto"
+                src="{{ url_for('static', filename='images/logo.png') }}"
+                alt="Shastho"
+              />
+              <span class="ml-2 text-xl font-bold">Shastho</span>
+            </a>
+          </div>
+          <div class="flex items-center">
+            <div class="ml-4 flex items-center md:ml-6">
+              <!-- Profile dropdown -->
+              <div class="ml-3 relative" x-data="{ open: false }">
+                <div>
+                  <button
+                    @click="open = !open"
+                    class="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:shadow-solid"
+                    id="user-menu"
+                    aria-haspopup="true"
+                  >
+                    {% if session.get('profile_picture_url') %}
+                    <img
+                      class="h-8 w-8 rounded-full"
+                      src="{{ session.get('profile_picture_url') }}"
+                      alt=""
+                    />
+                    {% else %}
+                    <div
+                      class="h-8 w-8 rounded-full bg-cyan-300 flex items-center justify-center"
+                    >
+                      <span class="text-cyan-800 font-semibold"
+                        >{{ session.get('user_name', 'U')[0] }}</span
+                      >
+                    </div>
+                    {% endif %}
+                    <span class="ml-2 text-white"
+                      >{{ session.get('user_name', 'User') }}</span
+                    >
+                    <i data-lucide="chevron-down" class="ml-1 h-4 w-4"></i>
+                  </button>
+                </div>
+                <div
+                  x-show="open"
+                  @click.away="open = false"
+                  class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg"
+                >
+                  <div class="py-1 rounded-md bg-white shadow-xs">
+                    <a
+                      href="{{ url_for('auth.profile') }}"
+                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >Your Profile</a
+                    >
+                    <a
+                      href="{{ url_for('auth.logout') }}"
+                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >Sign out</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="flex-1 flex overflow-hidden">
+      <div class="md:flex md:flex-shrink-0">
+        <div class="flex flex-col w-64 border-r border-gray-200 bg-white">
+          <div class="h-0 flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+            <nav class="mt-5 flex-1 px-2 bg-white">
+              <a
+                href="{{ url_for('doctor.dashboard') }}"
+                class="group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-900 bg-gray-100 focus:outline-none focus:bg-gray-200 transition ease-in-out duration-150"
+              >
+                <i
+                  data-lucide="layout-dashboard"
+                  class="mr-3 h-6 w-6 text-gray-500 group-hover:text-gray-600 transition ease-in-out duration-150"
+                ></i>
+                Dashboard
+              </a>
+              <a
+                href="#"
+                class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:text-gray-900 focus:bg-gray-100 transition ease-in-out duration-150"
+              >
+                <i
+                  data-lucide="calendar"
+                  class="mr-3 h-6 w-6 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
+                ></i>
+                Appointments
+              </a>
+              <a
+                href="#"
+                class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:text-gray-900 focus:bg-gray-100 transition ease-in-out duration-150"
+              >
+                <i
+                  data-lucide="users"
+                  class="mr-3 h-6 w-6 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
+                ></i>
+                Patients
+              </a>
+              <a
+                href="#"
+                class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:text-gray-900 focus:bg-gray-100 transition ease-in-out duration-150"
+              >
+                <i
+                  data-lucide="file-text"
+                  class="mr-3 h-6 w-6 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
+                ></i>
+                Medical Records
+              </a>
+              <a
+                href="#"
+                class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:text-gray-900 focus:bg-gray-100 transition ease-in-out duration-150"
+              >
+                <i
+                  data-lucide="settings"
+                  class="mr-3 h-6 w-6 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
+                ></i>
+                Settings
+              </a>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <main class="flex-1 overflow-y-auto focus:outline-none">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize Lucide icons
+        lucide.createIcons();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,231 @@
+{% extends "doctor/layout.html" %} {% block title %}Doctor Dashboard - Shastho{%
+endblock %} {% block content %}
+<div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
+  <!-- Welcome Banner -->
+  <div class="relative bg-cyan-200 p-4 sm:p-6 rounded-sm overflow-hidden mb-8">
+    <!-- Background illustration -->
+    <div
+      class="absolute right-0 top-0 -mt-4 mr-16 pointer-events-none hidden xl:block"
+      aria-hidden="true"
+    >
+      <svg width="319" height="198" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs>
+          <path id="welcome-a" d="M64 0l64 128-64-20-64 20z"></path>
+          <path id="welcome-e" d="M40 0l40 80-40-12.5L0 80z"></path>
+          <path id="welcome-g" d="M40 0l40 80-40-12.5L0 80z"></path>
+          <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="welcome-b">
+            <stop stop-color="#A5B4FC" offset="0%"></stop>
+            <stop stop-color="#818CF8" offset="100%"></stop>
+          </linearGradient>
+          <linearGradient
+            x1="50%"
+            y1="24.537%"
+            x2="50%"
+            y2="100%"
+            id="welcome-c"
+          >
+            <stop stop-color="#4338CA" offset="0%"></stop>
+            <stop stop-color="#6366F1" stop-opacity="0" offset="100%"></stop>
+          </linearGradient>
+        </defs>
+        <g fill="none" fill-rule="evenodd">
+          <g transform="rotate(64 93.512 126.234)">
+            <use fill="url(#welcome-b)" xlink:href="#welcome-a"></use>
+            <use fill="url(#welcome-c)" xlink:href="#welcome-a"></use>
+          </g>
+          <g transform="rotate(-51 218.874 103.546)">
+            <use fill="url(#welcome-b)" xlink:href="#welcome-e"></use>
+            <use fill="url(#welcome-c)" xlink:href="#welcome-e"></use>
+          </g>
+          <g transform="rotate(44 94.374 215.046)">
+            <use fill="url(#welcome-b)" xlink:href="#welcome-g"></use>
+            <use fill="url(#welcome-c)" xlink:href="#welcome-g"></use>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Content -->
+    <div class="relative">
+      <h1 class="text-2xl md:text-3xl text-slate-800 font-bold mb-1">
+        Welcome, {{ doctor.full_name }} 👋
+      </h1>
+      <p class="text-slate-600">
+        Here's what's happening with your doctor account today:
+      </p>
+    </div>
+  </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %}
+  <div class="mb-8">
+    {% for category, message in messages %}
+    <div
+      class="rounded-md p-4 {% if category == 'error' %}bg-red-50 border border-red-200 text-red-700{% else %}bg-green-50 border border-green-200 text-green-700{% endif %}"
+    >
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %} {% endwith %}
+
+  <!-- Doctor Profile Card -->
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+    <div class="px-4 py-5 sm:px-6 flex justify-between">
+      <div>
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          Doctor Profile
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+          Your personal and professional details.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+      >
+        <i data-lucide="edit" class="h-4 w-4 mr-1"></i>
+        Edit Profile
+      </button>
+    </div>
+    <div class="border-t border-gray-200">
+      <dl>
+        <div
+          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+        >
+          <dt class="text-sm font-medium text-gray-500">Full name</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ doctor.full_name }}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Specialization</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ doctor.specialization }}
+          </dd>
+        </div>
+        <div
+          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+        >
+          <dt class="text-sm font-medium text-gray-500">Hospital</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ doctor.hospital_name }}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Department</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ doctor.department_name }}
+          </dd>
+        </div>
+        <div
+          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+        >
+          <dt class="text-sm font-medium text-gray-500">Contact number</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            {{ doctor.contact_number }}
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">
+            Credentials/Qualifications
+          </dt>
+          <dd
+            class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-line"
+          >
+            {{ doctor.credentials }}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Dashboard Cards -->
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <!-- Upcoming Appointments Card -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-cyan-500 rounded-md p-3">
+            <i data-lucide="calendar" class="h-6 w-6 text-white"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                Upcoming Appointments
+              </dt>
+              <dd>
+                <div class="text-lg font-medium text-gray-900">0</div>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-5 py-3">
+        <div class="text-sm">
+          <a href="#" class="font-medium text-cyan-700 hover:text-cyan-900">
+            View all appointments &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patients Card -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+            <i data-lucide="users" class="h-6 w-6 text-white"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                Total Patients
+              </dt>
+              <dd>
+                <div class="text-lg font-medium text-gray-900">0</div>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-5 py-3">
+        <div class="text-sm">
+          <a href="#" class="font-medium text-cyan-700 hover:text-cyan-900">
+            View all patients &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medical Records Card -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+            <i data-lucide="file-text" class="h-6 w-6 text-white"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                Medical Records
+              </dt>
+              <dd>
+                <div class="text-lg font-medium text-gray-900">0</div>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-5 py-3">
+        <div class="text-sm">
+          <a href="#" class="font-medium text-cyan-700 hover:text-cyan-900">
+            View all records &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

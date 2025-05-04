@@ -1,0 +1,95 @@
+{% extends "hospital_admin/layout.html" %} {% block title %}Admin Approval
+Confirmation - Shastho{% endblock %} {% block page_title %}Admin Approval
+Confirmation{% endblock %} {% block hospital_admin_content %}
+<div class="mt-4">
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %}
+  <div
+    class="mb-4 rounded-md p-4 {% if category == 'error' %}bg-red-50 text-red-700{% elif category == 'warning' %}bg-yellow-50 text-yellow-700{% else %}bg-green-50 text-green-700{% endif %}"
+  >
+    {{ message }}
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6 bg-green-50">
+      <h3 class="text-lg leading-6 font-medium text-green-900">
+        <svg
+          class="inline-block h-6 w-6 mr-2"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        Admin Request Approved
+      </h3>
+      <p class="mt-1 max-w-2xl text-sm text-green-700">
+        The Test/Imaging Admin request has been approved
+      </p>
+    </div>
+
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <div class="text-center py-4">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">
+          {{ admin_request.full_name }}
+        </h3>
+        <p class="text-sm text-gray-500 mb-4">
+          has been approved as a Test/Imaging Administrator
+        </p>
+      </div>
+
+      <div class="bg-indigo-50 p-4 rounded-md mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-5 w-5 text-indigo-400"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-indigo-800">Next Steps</h3>
+            <div class="mt-2 text-sm text-indigo-700">
+              <p>
+                Inform the user that their request has been approved. They can
+                now register a new account using the approved email address ({{
+                admin_request.email }}).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-center space-x-3">
+        <a
+          href="{{ url_for('hospital_admin.list_admin_requests') }}"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50"
+        >
+          Return to Admin Requests
+        </a>
+        <a
+          href="{{ url_for('hospital_admin.dashboard') }}"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+        >
+          Go to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
