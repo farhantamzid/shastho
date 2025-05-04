@@ -4,8 +4,8 @@
 
 | Phase                                      | Status      | Progress |
 | ------------------------------------------ | ----------- | -------- |
-| **0: Project Setup**                       | In Progress | 50%      |
-| **1: Foundation & Core MVP**               | Not Started | 0%       |
+| **0: Project Setup**                       | In Progress | 75%      |
+| **1: Foundation & Core MVP**               | In Progress | 15%      |
 | **2: EHR Core & Basic Interactions**       | Not Started | 0%       |
 | **3: Enhanced Features & Feedback**        | Not Started | 0%       |
 | **4: Analytics & Advanced Administration** | Not Started | 0%       |
@@ -45,6 +45,21 @@
 - ✅ Developed reusable UI component modules (button.py, card.py, input.py)
 - ✅ Created README with setup instructions
 
+### User Authentication System (Task #3)
+
+- ✅ Created User model with role-based attributes
+- ✅ Implemented login form with email/password validation
+- ✅ Added registration form with proper validation
+- ✅ Implemented password hashing with bcrypt
+- ✅ Set up Flask session management for authentication state
+- ✅ Created login/logout functionality
+- ✅ Implemented role-based access control decorators
+- ✅ Added user profile page template
+- ✅ Created demo user accounts for testing (patient, doctor, admin, staff)
+- ✅ Designed clean, user-friendly authentication templates
+- ✅ Fixed UI issues in form spacing and placeholders
+- ✅ Improved responsive navigation bar with proper spacing
+
 ## In Progress Items
 
 ### Database Schema (Task #2)
@@ -57,7 +72,6 @@
 
 ### Phase 1: Foundation & Core MVP
 
-- ⏳ User Authentication System (Task #3)
 - ⏳ Patient Registration (Task #4)
 - ⏳ System Admin Portal - Hospital Management (Task #5)
 - ⏳ Doctor Application and Approval Workflow (Task #6)
@@ -66,9 +80,11 @@
 
 ## Issues & Resolutions
 
-| Issue                | Resolution | Status |
-| -------------------- | ---------- | ------ |
-| No issues logged yet | -          | -      |
+| Issue                                                           | Resolution                                                                                                         | Status   |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------- |
+| Spacing issues in form input fields, especially in placeholders | Redesigned form templates with cleaner structure and direct HTML input elements where WTForms had issues           | Resolved |
+| Navbar elements overlapping on narrower screens                 | Implemented improved responsive navbar with proper spacing and mobile menu                                         | Resolved |
+| User name not showing in navbar after login                     | Updated session management to store user's full name and modified navbar template to display name instead of email | Resolved |
 
 ## Next Milestones
 
@@ -82,7 +98,7 @@
 
 - **Target**: Working login/registration for all user types
 - **Dependencies**: Tasks #1, #2, #3
-- **Estimated Completion**: TBD
+- **Estimated Completion**: Completed
 
 ### Milestone 3: Appointment Booking MVP
 
@@ -92,18 +108,21 @@
 
 ## Recent Changes
 
-| Date    | Change                                                   |
-| ------- | -------------------------------------------------------- |
-| Current | Completed project structure setup (Task #1)              |
-| Current | Changed application name from "HealthBD" to "shastho"    |
-| Prior   | Completed design system implementation (Task #26)        |
-| Prior   | Memory Bank initialized                                  |
-| Prior   | Task #26 added for frontend design guidelines            |
-| Prior   | PRD analyzed and tasks expanded with complexity analysis |
+| Date     | Change                                                   |
+| -------- | -------------------------------------------------------- |
+| Current  | Completed user authentication implementation (Task #3)   |
+| Current  | Fixed UI issues in forms and navigation                  |
+| Previous | Completed project structure setup (Task #1)              |
+| Previous | Changed application name from "HealthBD" to "shastho"    |
+| Previous | Completed design system implementation (Task #26)        |
+| Previous | Memory Bank initialized                                  |
+| Previous | Task #26 added for frontend design guidelines            |
+| Previous | PRD analyzed and tasks expanded with complexity analysis |
 
 ## Areas Needing Attention
 
 - Database schema design and relationships
-- Role-based access control implementation strategy
-- User authentication flow and security considerations
+- Integration of authentication with a proper database (currently using a mock DB)
+- Patient registration workflow expansion
+- Hospital and doctor management interfaces
 - EHR data structure and privacy concerns

@@ -34,42 +34,176 @@
     <!-- Header / Navigation -->
     <header class="bg-white shadow-sm">
       <nav
-        class="container mx-auto px-4 py-4 flex justify-between items-center"
+        class="container mx-auto px-4 py-4 flex items-center justify-between"
       >
+        <!-- Logo section -->
         <div class="flex items-center">
-          <a href="/" class="font-bold text-2xl text-primary">shastho</a>
+          <a href="/" class="flex items-center">
+            <img
+              src="{{ url_for('static', filename='images/logo.svg') }}"
+              alt="shastho Logo"
+              class="h-8 w-8 mr-2"
+            />
+            <span class="font-bold text-2xl text-cyan-600">shastho</span>
+          </a>
         </div>
-        <div class="hidden md:flex space-x-6">
-          <a href="/" class="font-medium text-gray-700 hover:text-primary"
+
+        <!-- Main Nav Links - center -->
+        <div class="hidden md:flex items-center justify-center space-x-8">
+          <a
+            href="{{ url_for('main.index') }}"
+            class="font-medium text-gray-700 hover:text-cyan-600"
             >Home</a
           >
-          <a href="#" class="font-medium text-gray-700 hover:text-primary"
+          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
             >Services</a
           >
-          <a href="#" class="font-medium text-gray-700 hover:text-primary"
+          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
             >Doctors</a
           >
-          <a href="#" class="font-medium text-gray-700 hover:text-primary"
+          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
             >About</a
           >
-          <a href="#" class="font-medium text-gray-700 hover:text-primary"
+          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
             >Contact</a
           >
         </div>
-        <div>
+
+        <!-- Mobile menu button -->
+        <div class="md:hidden">
+          <button id="mobile-menu-toggle" class="focus:outline-none">
+            <i data-lucide="menu" class="h-6 w-6 text-gray-700"></i>
+          </button>
+        </div>
+
+        <!-- Auth buttons -->
+        <div class="hidden md:flex items-center space-x-4">
+          {% if session.get('user_id') %}
+          <div class="flex items-center space-x-4">
+            <span class="text-gray-700">
+              Welcome, {{ session.get('user_name', session.get('user_email')) }}
+            </span>
+            <div class="relative" id="userMenuDropdown">
+              <button
+                class="flex items-center text-gray-700 focus:outline-none"
+                id="userMenuButton"
+              >
+                <i data-lucide="user-circle" class="h-8 w-8 text-cyan-600"></i>
+                <i data-lucide="chevron-down" class="h-4 w-4 ml-1"></i>
+              </button>
+              <div
+                class="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-lg hidden z-50"
+                id="userMenu"
+              >
+                <a
+                  href="{{ url_for('auth.profile') }}"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <i data-lucide="user" class="h-4 w-4 inline mr-1"></i> Profile
+                </a>
+                {% if session.get('user_role') == 'admin' %}
+                <a
+                  href="{{ url_for('auth.admin') }}"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <i data-lucide="settings" class="h-4 w-4 inline mr-1"></i>
+                  Admin
+                </a>
+                {% endif %}
+                <div class="border-t border-gray-100"></div>
+                <a
+                  href="{{ url_for('auth.logout') }}"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <i data-lucide="log-out" class="h-4 w-4 inline mr-1"></i>
+                  Logout
+                </a>
+              </div>
+            </div>
+          </div>
+          {% else %}
           <a
-            href="#"
-            class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg font-medium"
+            href="{{ url_for('auth.login') }}"
+            class="border border-cyan-600 text-cyan-600 hover:bg-cyan-50 px-4 py-2 rounded-lg font-medium transition duration-150"
             >Login</a
           >
+          <a
+            href="{{ url_for('auth.register') }}"
+            class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium transition duration-150"
+            >Register</a
+          >
+          {% endif %}
         </div>
       </nav>
+
+      <!-- Mobile Menu (hidden by default) -->
+      <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
+        <div class="flex flex-col space-y-2">
+          <a
+            href="{{ url_for('main.index') }}"
+            class="font-medium text-gray-700 hover:text-cyan-600 py-2"
+            >Home</a
+          >
+          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
+            >Services</a
+          >
+          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
+            >Doctors</a
+          >
+          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
+            >About</a
+          >
+          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
+            >Contact</a
+          >
+
+          {% if session.get('user_id') %}
+          <div class="flex items-center pt-2">
+            <i data-lucide="user-circle" class="h-8 w-8 text-cyan-600 mr-2"></i>
+            <span
+              >{{ session.get('user_name', session.get('user_email')) }}</span
+            >
+          </div>
+          <a
+            href="{{ url_for('auth.profile') }}"
+            class="font-medium text-gray-700 hover:text-cyan-600 py-1 ml-6"
+          >
+            <i data-lucide="user" class="h-4 w-4 inline mr-1"></i> Profile
+          </a>
+          {% if session.get('user_role') == 'admin' %}
+          <a
+            href="{{ url_for('auth.admin') }}"
+            class="font-medium text-gray-700 hover:text-cyan-600 py-1 ml-6"
+          >
+            <i data-lucide="settings" class="h-4 w-4 inline mr-1"></i> Admin
+          </a>
+          {% endif %}
+          <a
+            href="{{ url_for('auth.logout') }}"
+            class="font-medium text-gray-700 hover:text-cyan-600 py-1 ml-6"
+          >
+            <i data-lucide="log-out" class="h-4 w-4 inline mr-1"></i> Logout
+          </a>
+          {% else %}
+          <div class="flex space-x-2 pt-2">
+            <a
+              href="{{ url_for('auth.login') }}"
+              class="border border-cyan-600 text-cyan-600 hover:bg-cyan-50 px-4 py-2 rounded-lg font-medium transition duration-150 flex-1 text-center"
+              >Login</a
+            >
+            <a
+              href="{{ url_for('auth.register') }}"
+              class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium transition duration-150 flex-1 text-center"
+              >Register</a
+            >
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-6 md:py-8">
-      {% block content %}{% endblock %}
-    </main>
+    <main class="flex-grow">{% block content %}{% endblock %}</main>
 
     <!-- Footer -->
     <footer class="bg-gray-100 border-t py-6">
@@ -79,6 +213,56 @@
     </footer>
 
     <!-- JavaScript -->
-    {% block extra_js %}{% endblock %}
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mobile menu toggle functionality
+        const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+        const mobileMenu = document.getElementById("mobile-menu");
+
+        if (mobileMenuToggle && mobileMenu) {
+          mobileMenuToggle.addEventListener("click", function () {
+            mobileMenu.classList.toggle("hidden");
+
+            // Change icon based on menu state
+            const icon = mobileMenuToggle.querySelector("i");
+            if (mobileMenu.classList.contains("hidden")) {
+              icon.setAttribute("data-lucide", "menu");
+            } else {
+              icon.setAttribute("data-lucide", "x");
+            }
+            lucide.createIcons();
+          });
+        }
+
+        // User dropdown menu functionality
+        const userMenuButton = document.getElementById("userMenuButton");
+        const userMenu = document.getElementById("userMenu");
+
+        if (userMenuButton && userMenu) {
+          userMenuButton.addEventListener("click", function () {
+            userMenu.classList.toggle("hidden");
+          });
+
+          // Close dropdown when clicking outside
+          document.addEventListener("click", function (event) {
+            const isClickInside = document
+              .getElementById("userMenuDropdown")
+              ?.contains(event.target);
+            if (
+              isClickInside === false &&
+              !userMenu.classList.contains("hidden")
+            ) {
+              userMenu.classList.add("hidden");
+            }
+          });
+        }
+      });
+    </script>
+
+    {% block scripts %}{% endblock %}
   </body>
 </html>
