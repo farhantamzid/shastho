@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback Filter - HealthBD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="flex h-screen bg-gray-50">
+    <!-- Desktop Sidebar -->
+    <div class="hidden md:flex md:flex-shrink-0">
+      <div class="flex flex-col w-64">
+        <div
+          class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r"
+        >
+          <div class="flex items-center flex-shrink-0 px-4 mb-6">
+            <span class="text-2xl font-bold text-gray-900">
+              Health<span class="text-cyan-600">BD</span>
+            </span>
+          </div>
+          <div class="flex flex-col flex-grow px-4 mt-5">
+            <nav class="flex-1 space-y-1">
+              <a
+                href="dashboard.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="home" class="h-5 w-5"></i>
+                </span>
+                Dashboard
+              </a>
+              <a
+                href="feedback-history.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md bg-cyan-50 text-cyan-700 transition-colors duration-150"
+              >
+                <span class="mr-3 text-cyan-600">
+                  <i data-lucide="message-square" class="h-5 w-5"></i>
+                </span>
+                Feedback Management
+              </a>
+              <a
+                href="reports.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="file-text" class="h-5 w-5"></i>
+                </span>
+                Reports
+              </a>
+              <a
+                href="login.html"
+                class="group flex items-center w-full px-4 py-3 mt-10 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="log-out" class="h-5 w-5"></i>
+                </span>
+                Logout
+              </a>
+            </nav>
+          </div>
+          <div class="flex-shrink-0 p-4">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+              <select
+                class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none"
+              >
+                <option value="en">English</option>
+                <option value="bn">বাংলা</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div
+      class="fixed inset-0 z-40 hidden bg-gray-600 bg-opacity-75"
+      id="mobile-overlay"
+    ></div>
+    <div
+      class="fixed inset-y-0 left-0 flex flex-col z-40 w-full max-w-xs bg-white hidden"
+      id="mobile-menu"
+    >
+      <div
+        class="flex items-center justify-between px-4 h-16 bg-white border-b"
+      >
+        <div class="flex items-center">
+          <span class="text-xl font-bold text-gray-900">
+            Health<span class="text-cyan-600">BD</span>
+          </span>
+        </div>
+        <button
+          id="close-mobile-menu"
+          class="text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <i data-lucide="x" class="h-6 w-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <header class="w-full">
+        <div
+          class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none"
+        >
+          <button
+            type="button"
+            id="open-mobile-menu"
+            class="px-4 border-r md:hidden focus:outline-none"
+          >
+            <i data-lucide="menu" class="h-6 w-6"></i>
+          </button>
+          <div class="flex flex-1 justify-between px-4 md:px-0">
+            <div class="flex flex-1 md:px-8">
+              <div class="flex items-center">
+                <h1 class="text-xl font-semibold text-gray-900">
+                  Filter Patient Feedback
+                </h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6">
+        <div class="max-w-4xl mx-auto">
+          <form class="bg-white shadow-sm rounded-lg p-6">
+            <!-- Date Range -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-900 mb-4">Date Range</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm text-gray-700 mb-2">From</label>
+                  <input
+                    type="date"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-700 mb-2">To</label>
+                  <input
+                    type="date"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Rating Filter -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-900 mb-4">Rating</h3>
+              <div class="flex flex-wrap gap-3">
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="1"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">1 Star</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="2"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">2 Stars</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="3"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">3 Stars</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="4"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">4 Stars</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="5"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">5 Stars</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Department Filter -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-900 mb-4">Department</h3>
+              <select
+                multiple
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500"
+                size="4"
+              >
+                <option value="cardiology">Cardiology</option>
+                <option value="neurology">Neurology</option>
+                <option value="orthopedics">Orthopedics</option>
+                <option value="pediatrics">Pediatrics</option>
+                <option value="gynecology">Gynecology</option>
+                <option value="dermatology">Dermatology</option>
+                <option value="ophthalmology">Ophthalmology</option>
+                <option value="dental">Dental</option>
+              </select>
+            </div>
+
+            <!-- Feedback Type -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-900 mb-4">
+                Feedback Type
+              </h3>
+              <div class="flex flex-wrap gap-3">
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="service"
+                  />
+                  <span class="ml-2 text-sm text-gray-700"
+                    >Service Quality</span
+                  >
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="staff"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">Staff Behavior</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="facilities"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">Facilities</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="cleanliness"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">Cleanliness</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    class="rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="waiting"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">Waiting Time</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Response Status -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-900 mb-4">
+                Response Status
+              </h3>
+              <div class="flex gap-4">
+                <label class="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="response_status"
+                    class="border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="all"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">All</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="response_status"
+                    class="border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="responded"
+                  />
+                  <span class="ml-2 text-sm text-gray-700">Responded</span>
+                </label>
+                <label class="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="response_status"
+                    class="border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                    value="pending"
+                  />
+                  <span class="ml-2 text-sm text-gray-700"
+                    >Pending Response</span
+                  >
+                </label>
+              </div>
+            </div>
+
+            <!-- Keyword Search -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-900 mb-4">
+                Keyword Search
+              </h3>
+              <div class="relative">
+                <input
+                  type="text"
+                  placeholder="Search in feedback content..."
+                  class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 pl-10"
+                />
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end space-x-4">
+              <button
+                type="reset"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              >
+                Reset Filters
+              </button>
+              <button
+                type="submit"
+                class="px-4 py-2 text-sm font-medium text-white bg-cyan-600 border border-transparent rounded-md shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+
+      // Mobile menu functionality
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+      const openMobileMenuButton = document.getElementById("open-mobile-menu");
+      const closeMobileMenuButton =
+        document.getElementById("close-mobile-menu");
+
+      function openMobileMenu() {
+        mobileMenu.classList.remove("hidden");
+        mobileOverlay.classList.remove("hidden");
+      }
+
+      function closeMobileMenu() {
+        mobileMenu.classList.add("hidden");
+        mobileOverlay.classList.add("hidden");
+      }
+
+      openMobileMenuButton.addEventListener("click", openMobileMenu);
+      closeMobileMenuButton.addEventListener("click", closeMobileMenu);
+      mobileOverlay.addEventListener("click", closeMobileMenu);
+    </script>
+  </body>
+</html>

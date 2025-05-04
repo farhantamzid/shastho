@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Doctors - HealthBD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="flex h-screen bg-gray-50">
+    <!-- Desktop Sidebar -->
+    <div class="hidden md:flex md:flex-shrink-0">
+      <div class="flex flex-col w-64">
+        <div
+          class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r"
+        >
+          <div class="flex items-center flex-shrink-0 px-4 mb-6">
+            <img
+              src="https://via.placeholder.com/40"
+              alt="Logo"
+              class="w-10 h-10 mr-2"
+            />
+            <span class="text-lg font-semibold text-gray-900">
+              Health<span class="text-cyan-600">BD</span>
+            </span>
+          </div>
+          <div class="flex flex-col flex-grow px-4 mt-5">
+            <nav class="flex-1 space-y-1">
+              <a
+                href="dashboard.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="home" class="h-5 w-5"></i>
+                </span>
+                Dashboard
+              </a>
+              <a
+                href="manage-doctors.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md bg-cyan-50 text-cyan-700 transition-colors duration-150"
+              >
+                <span class="mr-3 text-cyan-600">
+                  <i data-lucide="users" class="h-5 w-5"></i>
+                </span>
+                Manage Doctors
+              </a>
+              <a
+                href="appointments.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="calendar" class="h-5 w-5"></i>
+                </span>
+                Appointments
+              </a>
+              <a
+                href="login.html"
+                class="group flex items-center w-full px-4 py-3 mt-10 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="log-out" class="h-5 w-5"></i>
+                </span>
+                Logout
+              </a>
+            </nav>
+          </div>
+          <div class="flex-shrink-0 p-4">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+              <select
+                class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none"
+              >
+                <option value="en">English</option>
+                <option value="bn">বাংলা</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div
+      class="fixed inset-0 z-40 hidden bg-gray-600 bg-opacity-75"
+      id="mobile-overlay"
+    ></div>
+    <div
+      class="fixed inset-y-0 left-0 flex flex-col z-40 w-full max-w-xs bg-white hidden"
+      id="mobile-menu"
+    >
+      <div
+        class="flex items-center justify-between px-4 h-16 bg-white border-b"
+      >
+        <div class="flex items-center">
+          <img
+            src="https://via.placeholder.com/40"
+            alt="Logo"
+            class="w-8 h-8 mr-2"
+          />
+          <span class="text-lg font-semibold text-gray-900">
+            Health<span class="text-cyan-600">BD</span>
+          </span>
+        </div>
+        <button
+          id="close-mobile-menu"
+          class="text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <i data-lucide="x" class="h-6 w-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <header class="w-full">
+        <div
+          class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none"
+        >
+          <button
+            type="button"
+            id="open-mobile-menu"
+            class="px-4 border-r md:hidden focus:outline-none"
+          >
+            <i data-lucide="menu" class="h-6 w-6"></i>
+          </button>
+          <div class="flex flex-1 justify-between px-4 md:px-0">
+            <div class="flex flex-1 md:px-8">
+              <div class="hidden sm:flex items-center">
+                <h1 class="text-xl font-semibold text-gray-900">
+                  Manage Doctors
+                </h1>
+              </div>
+            </div>
+            <div class="ml-2 flex items-center md:ml-6 pr-2 md:pr-4">
+              <div class="flex items-center">
+                <div class="hidden md:block ml-3 mr-4">
+                  <div class="text-right">
+                    <div class="text-sm font-medium text-gray-900">
+                      Admin Name
+                    </div>
+                    <div class="text-xs text-gray-500 capitalize">
+                      administrator
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 uppercase font-medium"
+                >
+                  A
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8">
+        <div class="max-w-5xl mx-auto">
+          <!-- Add New Doctor Button -->
+          <div class="mb-6">
+            <button
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700"
+            >
+              <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
+              Add New Doctor
+            </button>
+          </div>
+
+          <!-- Doctor List -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+              <div class="flex items-center">
+                <i data-lucide="users" class="h-5 w-5 text-cyan-600 mr-2"></i>
+                <h3 class="text-lg font-medium text-gray-900">Doctor List</h3>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="space-y-6">
+                <!-- Doctor Entry -->
+                <div
+                  class="flex items-start p-4 border border-gray-200 rounded-lg"
+                >
+                  <div
+                    class="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 uppercase font-semibold mr-4"
+                  >
+                    F
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <h4 class="text-sm font-medium text-gray-900">
+                        Dr. Farida Rahman
+                      </h4>
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                      >
+                        Active
+                      </span>
+                    </div>
+                    <p class="text-sm text-gray-500">Cardiology</p>
+                    <div class="mt-2 flex items-center text-xs text-gray-500">
+                      <i
+                        data-lucide="mail"
+                        class="h-3 w-3 mr-1 text-gray-400"
+                      ></i>
+                      farida.rahman@healthbd.com
+                    </div>
+                    <div class="mt-1 flex items-center text-xs text-gray-500">
+                      <i
+                        data-lucide="phone"
+                        class="h-3 w-3 mr-1 text-gray-400"
+                      ></i>
+                      +880 1712-345678
+                    </div>
+
+                    <div class="mt-3 flex space-x-2">
+                      <button
+                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        Edit Profile
+                      </button>
+                      <button
+                        class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-cyan-600 hover:bg-cyan-700"
+                      >
+                        View Schedule
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Another Doctor Entry -->
+                <div
+                  class="flex items-start p-4 border border-gray-200 rounded-lg"
+                >
+                  <div
+                    class="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 uppercase font-semibold mr-4"
+                  >
+                    K
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <h4 class="text-sm font-medium text-gray-900">
+                        Dr. Kamal Hossain
+                      </h4>
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                      >
+                        Active
+                      </span>
+                    </div>
+                    <p class="text-sm text-gray-500">Neurology</p>
+                    <div class="mt-2 flex items-center text-xs text-gray-500">
+                      <i
+                        data-lucide="mail"
+                        class="h-3 w-3 mr-1 text-gray-400"
+                      ></i>
+                      kamal.hossain@healthbd.com
+                    </div>
+                    <div class="mt-1 flex items-center text-xs text-gray-500">
+                      <i
+                        data-lucide="phone"
+                        class="h-3 w-3 mr-1 text-gray-400"
+                      ></i>
+                      +880 1812-345678
+                    </div>
+
+                    <div class="mt-3 flex space-x-2">
+                      <button
+                        class="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        Edit Profile
+                      </button>
+                      <button
+                        class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-cyan-600 hover:bg-cyan-700"
+                      >
+                        View Schedule
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+
+      // Mobile menu functionality
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+      const openMobileMenuButton = document.getElementById("open-mobile-menu");
+      const closeMobileMenuButton =
+        document.getElementById("close-mobile-menu");
+
+      function openMobileMenu() {
+        mobileMenu.classList.remove("hidden");
+        mobileOverlay.classList.remove("hidden");
+      }
+
+      function closeMobileMenu() {
+        mobileMenu.classList.add("hidden");
+        mobileOverlay.classList.add("hidden");
+      }
+
+      openMobileMenuButton.addEventListener("click", openMobileMenu);
+      closeMobileMenuButton.addEventListener("click", closeMobileMenu);
+      mobileOverlay.addEventListener("click", closeMobileMenu);
+    </script>
+  </body>
+</html>

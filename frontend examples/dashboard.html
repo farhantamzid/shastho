@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthBD - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="flex h-screen bg-gray-50">
+  <!-- Desktop Sidebar -->
+  <div class="hidden md:flex md:flex-shrink-0">
+    <div class="flex flex-col w-64">
+      <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r">
+        <div class="flex items-center flex-shrink-0 px-4 mb-6">
+          <img src="https://via.placeholder.com/40" alt="Logo" class="w-10 h-10 mr-2">
+          <span class="text-lg font-semibold text-gray-900">
+            Health<span class="text-cyan-600">BD</span>
+          </span>
+        </div>
+        <div class="flex flex-col flex-grow px-4 mt-5">
+          <nav class="flex-1 space-y-1">
+            <a
+              href="dashboard.html"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-md bg-cyan-50 text-cyan-700 transition-colors duration-150"
+            >
+              <span class="mr-3 text-cyan-600">
+                <i data-lucide="home" class="h-5 w-5"></i>
+              </span>
+              Dashboard
+            </a>
+            <a
+              href="profile.html"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="mr-3 text-gray-500">
+                <i data-lucide="user" class="h-5 w-5"></i>
+              </span>
+              My Profile
+            </a>
+            <a
+              href="appointments.html"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="mr-3 text-gray-500">
+                <i data-lucide="calendar" class="h-5 w-5"></i>
+              </span>
+              Appointments
+            </a>
+            <a
+              href="medical-records.html"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="mr-3 text-gray-500">
+                <i data-lucide="file-text" class="h-5 w-5"></i>
+              </span>
+              Medical Records
+            </a>
+            <a
+              href="doctor-portal.html"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="mr-3 text-gray-500">
+                <i data-lucide="activity" class="h-5 w-5"></i>
+              </span>
+              Doctor Portal
+            </a>
+            <a
+              href="analytics.html"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="mr-3 text-gray-500">
+                <i data-lucide="pie-chart" class="h-5 w-5"></i>
+              </span>
+              Analytics
+            </a>
+            <a
+              href="login.html"
+              class="group flex items-center w-full px-4 py-3 mt-10 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="mr-3 text-gray-500">
+                <i data-lucide="log-out" class="h-5 w-5"></i>
+              </span>
+              Logout
+            </a>
+          </nav>
+        </div>
+        <div class="flex-shrink-0 p-4">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+            <select class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none">
+              <option value="en">English</option>
+              <option value="bn">বাংলা</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu button -->
+  <div class="fixed inset-0 z-40 hidden bg-gray-600 bg-opacity-75" id="mobile-overlay"></div>
+  <div class="fixed inset-y-0 left-0 flex flex-col z-40 w-full max-w-xs bg-white hidden" id="mobile-menu">
+    <div class="flex items-center justify-between px-4 h-16 bg-white border-b">
+      <div class="flex items-center">
+        <img src="https://via.placeholder.com/40" alt="Logo" class="w-8 h-8 mr-2">
+        <span class="text-lg font-semibold text-gray-900">
+          Health<span class="text-cyan-600">BD</span>
+        </span>
+      </div>
+      <button id="close-mobile-menu" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+        <i data-lucide="x" class="h-6 w-6"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto pt-5 pb-4">
+      <nav class="mt-5 px-2 space-y-1">
+        <a
+          href="dashboard.html"
+          class="group flex items-center px-4 py-3 text-base font-medium rounded-md bg-cyan-50 text-cyan-700 transition-colors duration-150"
+        >
+          <span class="mr-3 text-cyan-600">
+            <i data-lucide="home" class="h-5 w-5"></i>
+          </span>
+          Dashboard
+        </a>
+        <a
+          href="profile.html"
+          class="group flex items-center px-4 py-3 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+        >
+          <span class="mr-3 text-gray-500">
+            <i data-lucide="user" class="h-5 w-5"></i>
+          </span>
+          My Profile
+        </a>
+        <a
+          href="appointments.html"
+          class="group flex items-center px-4 py-3 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+        >
+          <span class="mr-3 text-gray-500">
+            <i data-lucide="calendar" class="h-5 w-5"></i>
+          </span>
+          Appointments
+        </a>
+        <a
+          href="medical-records.html"
+          class="group flex items-center px-4 py-3 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+        >
+          <span class="mr-3 text-gray-500">
+            <i data-lucide="file-text" class="h-5 w-5"></i>
+          </span>
+          Medical Records
+        </a>
+        <a
+          href="doctor-portal.html"
+          class="group flex items-center px-4 py-3 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+        >
+          <span class="mr-3 text-gray-500">
+            <i data-lucide="activity" class="h-5 w-5"></i>
+          </span>
+          Doctor Portal
+        </a>
+        <a
+          href="analytics.html"
+          class="group flex items-center px-4 py-3 text-base font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+        >
+          <span class="mr-3 text-gray-500">
+            <i data-lucide="pie-chart" class="h-5 w-5"></i>
+          </span>
+          Analytics
+        </a>
+        <a
+          href="login.html"
+          class="group flex items-center w-full px-4 py-3 mt-10 text-base font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors duration-150"
+        >
+          <span class="mr-3 text-gray-500">
+            <i data-lucide="log-out" class="h-5 w-5"></i>
+          </span>
+          Logout
+        </a>
+      </nav>
+    </div>
+    <div class="flex-shrink-0 p-4 border-t">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+        <select class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none">
+          <option value="en">English</option>
+          <option value="bn">বাংলা</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content area -->
+  <div class="flex flex-col flex-1 overflow-hidden">
+    <header class="w-full">
+      <div class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none">
+        <button
+          type="button"
+          id="open-mobile-menu"
+          class="px-4 border-r md:hidden focus:outline-none"
+        >
+          <i data-lucide="menu" class="h-6 w-6"></i>
+        </button>
+        <div class="flex flex-1 justify-between px-4 md:px-0">
+          <div class="flex flex-1 md:px-8">
+            <div class="hidden sm:flex items-center">
+              <h1 class="text-xl font-semibold text-gray-900">Dashboard</h1>
+            </div>
+          </div>
+          <div class="ml-2 flex items-center md:ml-6 pr-2 md:pr-4">
+            <div class="flex items-center">
+              <div class="hidden md:block ml-3 mr-4">
+                <div class="text-right">
+                  <div class="text-sm font-medium text-gray-900">Ahmed Khan</div>
+                  <div class="text-xs text-gray-500 capitalize">patient</div>
+                </div>
+              </div>
+              <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 uppercase font-medium">
+                A
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8">
+      <!-- Page content will go here -->
+      <!-- This is a placeholder for the content -->
+      <div class="text-center py-10 text-gray-500">
+        Page content will be inserted here
+      </div>
+    </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    
+    // Mobile menu toggle
+    document.getElementById('open-mobile-menu').addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.remove('hidden');
+      document.getElementById('mobile-overlay').classList.remove('hidden');
+    });
+    
+    document.getElementById('close-mobile-menu').addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.add('hidden');
+      document.getElementById('mobile-overlay').classList.add('hidden');
+    });
+    
+    document.getElementById('mobile-overlay').addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.add('hidden');
+      document.getElementById('mobile-overlay').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

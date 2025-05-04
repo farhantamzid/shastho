@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EHR Updated - HealthBD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="flex h-screen bg-gray-50">
+    <!-- Desktop Sidebar -->
+    <div class="hidden md:flex md:flex-shrink-0">
+      <div class="flex flex-col w-64">
+        <div
+          class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r"
+        >
+          <div class="flex items-center flex-shrink-0 px-4 mb-6">
+            <span class="text-2xl font-bold text-gray-900">
+              Health<span class="text-cyan-600">BD</span>
+            </span>
+          </div>
+          <div class="flex flex-col flex-grow px-4 mt-5">
+            <nav class="flex-1 space-y-1">
+              <!-- Same navigation items -->
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <header class="w-full">
+        <div
+          class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none"
+        >
+          <button
+            type="button"
+            id="open-mobile-menu"
+            class="px-4 border-r md:hidden focus:outline-none"
+          >
+            <i data-lucide="menu" class="h-6 w-6"></i>
+          </button>
+          <div class="flex flex-1 justify-between px-4 md:px-0">
+            <div class="flex flex-1 md:px-8">
+              <div class="flex items-center">
+                <a
+                  href="ehr-update-search.html"
+                  class="mr-2 text-gray-500 hover:text-gray-700"
+                >
+                  <i data-lucide="arrow-left" class="h-5 w-5"></i>
+                </a>
+                <h1 class="text-xl font-semibold text-gray-900">
+                  Updated Patient Record
+                </h1>
+              </div>
+            </div>
+            <div class="ml-2 flex items-center md:ml-6 pr-2 md:pr-4">
+              <button
+                onclick="window.print()"
+                class="text-gray-500 hover:text-gray-700 mr-4"
+              >
+                <i data-lucide="printer" class="h-5 w-5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6">
+        <div class="max-w-7xl mx-auto">
+          <!-- Success Message -->
+          <div class="rounded-md bg-green-50 p-4 mb-6">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i
+                  data-lucide="check-circle"
+                  class="h-5 w-5 text-green-400"
+                ></i>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-green-800">
+                  EHR Successfully Updated
+                </h3>
+                <div class="mt-2 text-sm text-green-700">
+                  <p>
+                    The patient's electronic health record has been updated.
+                    Last modified on March 15, 2024 at 09:30 AM.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patient Overview -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center">
+                <div
+                  class="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 uppercase font-medium text-xl"
+                >
+                  R
+                </div>
+                <div class="ml-4">
+                  <h2 class="text-2xl font-semibold text-gray-900">
+                    Rahim Khan
+                  </h2>
+                  <div class="mt-1 flex items-center text-sm text-gray-500">
+                    <span class="mr-3">Male, 45 years</span>
+                    <span class="mr-3">|</span>
+                    <span>ID: P-20240315-001</span>
+                  </div>
+                  <div class="mt-2">
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800"
+                    >
+                      Blood Type: B+
+                    </span>
+                    <span
+                      class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                    >
+                      Allergies: Penicillin
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-sm text-gray-500">Last Updated</div>
+                <div class="text-sm font-medium text-gray-900">
+                  March 15, 2024
+                </div>
+                <div class="text-sm text-gray-500">09:30 AM</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visit Details -->
+          <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+            <div class="p-4 border-b border-gray-200">
+              <h3 class="text-lg font-medium text-gray-900">
+                Current Visit Details
+              </h3>
+            </div>
+            <div class="p-4">
+              <dl class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Visit Date</dt>
+                  <dd class="mt-1 text-sm text-gray-900">
+                    March 15, 2024 09:30 AM
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Visit Type</dt>
+                  <dd class="mt-1 text-sm text-gray-900">Regular Checkup</dd>
+                </div>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Department</dt>
+                  <dd class="mt-1 text-sm text-gray-900">Cardiology</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <!-- Updated Information -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Left Column -->
+            <div class="md:col-span-2 space-y-6">
+              <!-- Vital Signs -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Latest Vital Signs
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                      <div class="text-sm text-gray-500">Blood Pressure</div>
+                      <div class="mt-1 text-lg font-semibold text-gray-900">
+                        120/80 mmHg
+                      </div>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                      <div class="text-sm text-gray-500">Heart Rate</div>
+                      <div class="mt-1 text-lg font-semibold text-gray-900">
+                        72 bpm
+                      </div>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                      <div class="text-sm text-gray-500">Temperature</div>
+                      <div class="mt-1 text-lg font-semibold text-gray-900">
+                        98.6°F
+                      </div>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                      <div class="text-sm text-gray-500">SpO2</div>
+                      <div class="mt-1 text-lg font-semibold text-gray-900">
+                        98%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Diagnosis and Treatment -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Diagnosis & Treatment
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <div class="space-y-4">
+                    <div>
+                      <h4 class="text-sm font-medium text-gray-700">
+                        Chief Complaint
+                      </h4>
+                      <p class="mt-1 text-sm text-gray-900">
+                        Occasional chest pain and shortness of breath during
+                        physical activity
+                      </p>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-medium text-gray-700">
+                        Diagnosis
+                      </h4>
+                      <p class="mt-1 text-sm text-gray-900">
+                        Stable Angina; Hypertension under control
+                      </p>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-medium text-gray-700">
+                        Treatment Plan
+                      </h4>
+                      <p class="mt-1 text-sm text-gray-900">
+                        Continue current medications. Lifestyle modifications
+                        including regular exercise and low-sodium diet
+                        recommended. Monitor blood pressure daily.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Updated Medications -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Current Medications
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <div class="space-y-4">
+                    <div class="flex items-start">
+                      <div class="flex-shrink-0">
+                        <i data-lucide="pill" class="h-5 w-5 text-gray-400"></i>
+                      </div>
+                      <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">
+                          Amlodipine 5mg
+                        </p>
+                        <p class="mt-1 text-sm text-gray-500">
+                          1 tablet once daily
+                        </p>
+                      </div>
+                      <div class="ml-auto text-sm text-gray-500">
+                        Started: Jan 15, 2024
+                      </div>
+                    </div>
+                    <div class="flex items-start">
+                      <div class="flex-shrink-0">
+                        <i data-lucide="pill" class="h-5 w-5 text-gray-400"></i>
+                      </div>
+                      <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">
+                          Aspirin 81mg
+                        </p>
+                        <p class="mt-1 text-sm text-gray-500">1 tablet daily</p>
+                      </div>
+                      <div class="ml-auto text-sm text-gray-500">
+                        Started: Mar 15, 2024
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+              <!-- Lab Results -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    New Lab Results
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <div class="space-y-4">
+                    <div>
+                      <div class="flex justify-between">
+                        <span class="text-sm font-medium text-gray-900"
+                          >Lipid Panel</span
+                        >
+                        <span class="text-sm text-gray-500">Mar 15, 2024</span>
+                      </div>
+                      <ul class="mt-2 text-sm text-gray-500 space-y-1">
+                        <li>Total Cholesterol: 185 mg/dL</li>
+                        <li>HDL: 45 mg/dL</li>
+                        <li>LDL: 110 mg/dL</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <div class="flex justify-between">
+                        <span class="text-sm font-medium text-gray-900"
+                          >ECG</span
+                        >
+                        <span class="text-sm text-gray-500">Mar 15, 2024</span>
+                      </div>
+                      <p class="mt-1 text-sm text-gray-500">
+                        Normal sinus rhythm
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Follow-up Plan -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Follow-up Plan
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <div class="space-y-3">
+                    <div>
+                      <dt class="text-sm font-medium text-gray-500">
+                        Next Visit
+                      </dt>
+                      <dd class="mt-1 text-sm text-gray-900">April 15, 2024</dd>
+                    </div>
+                    <div>
+                      <dt class="text-sm font-medium text-gray-500">
+                        Instructions
+                      </dt>
+                      <dd class="mt-1 text-sm text-gray-900">
+                        Monitor blood pressure daily. Return sooner if chest
+                        pain worsens or becomes more frequent.
+                      </dd>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Additional Notes -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Additional Notes
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <p class="text-sm text-gray-700">
+                    Patient reports improved exercise tolerance. Encouraged to
+                    continue with cardiac rehabilitation program. Discussed
+                    importance of medication adherence.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+
+      // Mobile menu functionality
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+      const openMobileMenuButton = document.getElementById("open-mobile-menu");
+      const closeMobileMenuButton =
+        document.getElementById("close-mobile-menu");
+
+      function openMobileMenu() {
+        mobileMenu.classList.remove("hidden");
+        mobileOverlay.classList.remove("hidden");
+      }
+
+      function closeMobileMenu() {
+        mobileMenu.classList.add("hidden");
+        mobileOverlay.classList.add("hidden");
+      }
+
+      openMobileMenuButton.addEventListener("click", openMobileMenu);
+      closeMobileMenuButton.addEventListener("click", closeMobileMenu);
+      mobileOverlay.addEventListener("click", closeMobileMenu);
+    </script>
+  </body>
+</html>

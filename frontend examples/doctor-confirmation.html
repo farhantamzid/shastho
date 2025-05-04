@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Added Successfully - HealthBD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="flex h-screen bg-gray-50">
+    <!-- Desktop Sidebar -->
+    <div class="hidden md:flex md:flex-shrink-0">
+      <div class="flex flex-col w-64">
+        <div
+          class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r"
+        >
+          <div class="flex items-center flex-shrink-0 px-4 mb-6">
+            <span class="text-2xl font-bold text-gray-900">
+              Health<span class="text-cyan-600">BD</span>
+            </span>
+          </div>
+          <div class="flex flex-col flex-grow px-4 mt-5">
+            <nav class="flex-1 space-y-1">
+              <a
+                href="dashboard.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="home" class="h-5 w-5"></i>
+                </span>
+                Dashboard
+              </a>
+              <a
+                href="manage-doctors.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md bg-cyan-50 text-cyan-700 transition-colors duration-150"
+              >
+                <span class="mr-3 text-cyan-600">
+                  <i data-lucide="users" class="h-5 w-5"></i>
+                </span>
+                Manage Doctors
+              </a>
+              <a
+                href="appointments.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="calendar" class="h-5 w-5"></i>
+                </span>
+                Appointments
+              </a>
+              <a
+                href="login.html"
+                class="group flex items-center w-full px-4 py-3 mt-10 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="log-out" class="h-5 w-5"></i>
+                </span>
+                Logout
+              </a>
+            </nav>
+          </div>
+          <div class="flex-shrink-0 p-4">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+              <select
+                class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none"
+              >
+                <option value="en">English</option>
+                <option value="bn">বাংলা</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div
+      class="fixed inset-0 z-40 hidden bg-gray-600 bg-opacity-75"
+      id="mobile-overlay"
+    ></div>
+    <div
+      class="fixed inset-y-0 left-0 flex flex-col z-40 w-full max-w-xs bg-white hidden"
+      id="mobile-menu"
+    >
+      <div
+        class="flex items-center justify-between px-4 h-16 bg-white border-b"
+      >
+        <div class="flex items-center">
+          <span class="text-xl font-bold text-gray-900">
+            Health<span class="text-cyan-600">BD</span>
+          </span>
+        </div>
+        <button
+          id="close-mobile-menu"
+          class="text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <i data-lucide="x" class="h-6 w-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <header class="w-full">
+        <div
+          class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none"
+        >
+          <button
+            type="button"
+            id="open-mobile-menu"
+            class="px-4 border-r md:hidden focus:outline-none"
+          >
+            <i data-lucide="menu" class="h-6 w-6"></i>
+          </button>
+          <div class="flex flex-1 justify-between px-4 md:px-0">
+            <div class="flex flex-1 md:px-8">
+              <div class="hidden sm:flex items-center">
+                <h1 class="text-xl font-semibold text-gray-900">
+                  Doctor Added Successfully
+                </h1>
+              </div>
+            </div>
+            <div class="ml-2 flex items-center md:ml-6 pr-2 md:pr-4">
+              <div class="flex items-center">
+                <div class="hidden md:block ml-3 mr-4">
+                  <div class="text-right">
+                    <div class="text-sm font-medium text-gray-900">
+                      Admin Name
+                    </div>
+                    <div class="text-xs text-gray-500 capitalize">
+                      administrator
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 uppercase font-medium"
+                >
+                  A
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8">
+        <div class="max-w-3xl mx-auto">
+          <!-- Success Message -->
+          <div class="mb-6 bg-green-50 border border-green-200 rounded-xl p-6">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <i
+                  data-lucide="check-circle"
+                  class="h-8 w-8 text-green-600"
+                ></i>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-lg font-medium text-green-800">
+                  Doctor Added Successfully
+                </h3>
+                <p class="mt-1 text-sm text-green-700">
+                  The doctor has been added to the system and login credentials
+                  have been generated.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Doctor Information Card -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+              <div class="flex items-center">
+                <i data-lucide="user" class="h-5 w-5 text-cyan-600 mr-2"></i>
+                <h3 class="text-lg font-medium text-gray-900">
+                  Doctor Information
+                </h3>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Basic Details -->
+                <div class="space-y-4">
+                  <h4 class="text-sm font-medium text-gray-900">
+                    Basic Details
+                  </h4>
+                  <div class="space-y-2">
+                    <div>
+                      <label class="text-xs text-gray-500">Full Name</label>
+                      <p class="text-sm font-medium text-gray-900">
+                        Dr. Farida Rahman
+                      </p>
+                    </div>
+                    <div>
+                      <label class="text-xs text-gray-500">Email</label>
+                      <p class="text-sm font-medium text-gray-900">
+                        farida.rahman@healthbd.com
+                      </p>
+                    </div>
+                    <div>
+                      <label class="text-xs text-gray-500">Phone</label>
+                      <p class="text-sm font-medium text-gray-900">
+                        +880 1712-345678
+                      </p>
+                    </div>
+                    <div>
+                      <label class="text-xs text-gray-500"
+                        >Specialization</label
+                      >
+                      <p class="text-sm font-medium text-gray-900">
+                        Cardiology
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Hospital Details -->
+                <div class="space-y-4">
+                  <h4 class="text-sm font-medium text-gray-900">
+                    Hospital Details
+                  </h4>
+                  <div class="space-y-2">
+                    <div>
+                      <label class="text-xs text-gray-500">Hospital</label>
+                      <p class="text-sm font-medium text-gray-900">
+                        Dhaka Medical College Hospital
+                      </p>
+                    </div>
+                    <div>
+                      <label class="text-xs text-gray-500">Department</label>
+                      <p class="text-sm font-medium text-gray-900">
+                        Cardiology Department
+                      </p>
+                    </div>
+                    <div>
+                      <label class="text-xs text-gray-500"
+                        >BMDC Registration</label
+                      >
+                      <p class="text-sm font-medium text-gray-900">A-12345</p>
+                    </div>
+                    <div>
+                      <label class="text-xs text-gray-500"
+                        >License Number</label
+                      >
+                      <p class="text-sm font-medium text-gray-900">ML-98765</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- System Generated Credentials -->
+              <div
+                class="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200"
+              >
+                <h4 class="text-sm font-medium text-gray-900 mb-4">
+                  System Generated Credentials
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="text-xs text-gray-500">Username</label>
+                    <div class="mt-1 flex items-center">
+                      <input
+                        type="text"
+                        value="dr.farida.rahman"
+                        readonly
+                        class="block w-full rounded-md border-gray-300 bg-gray-100 text-sm"
+                      />
+                      <button
+                        class="ml-2 text-cyan-600 hover:text-cyan-700"
+                        title="Copy to clipboard"
+                      >
+                        <i data-lucide="copy" class="h-4 w-4"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="text-xs text-gray-500"
+                      >Temporary Password</label
+                    >
+                    <div class="mt-1 flex items-center">
+                      <input
+                        type="text"
+                        value="HealthBD@2024"
+                        readonly
+                        class="block w-full rounded-md border-gray-300 bg-gray-100 text-sm"
+                      />
+                      <button
+                        class="ml-2 text-cyan-600 hover:text-cyan-700"
+                        title="Copy to clipboard"
+                      >
+                        <i data-lucide="copy" class="h-4 w-4"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <p class="mt-2 text-xs text-gray-500">
+                  <i
+                    data-lucide="alert-circle"
+                    class="inline-block h-3 w-3 mr-1"
+                  ></i>
+                  The doctor will be required to change their password upon
+                  first login
+                </p>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="mt-6 flex justify-between items-center pt-6 border-t">
+                <div class="flex space-x-3">
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  >
+                    <i data-lucide="printer" class="h-4 w-4 mr-2"></i>
+                    Print Details
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  >
+                    <i data-lucide="mail" class="h-4 w-4 mr-2"></i>
+                    Email Credentials
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onclick="window.location.href='manage-doctors.html'"
+                  class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700"
+                >
+                  Back to Doctor List
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+
+      // Mobile menu functionality
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+      const openMobileMenuButton = document.getElementById("open-mobile-menu");
+      const closeMobileMenuButton =
+        document.getElementById("close-mobile-menu");
+
+      function openMobileMenu() {
+        mobileMenu.classList.remove("hidden");
+        mobileOverlay.classList.remove("hidden");
+      }
+
+      function closeMobileMenu() {
+        mobileMenu.classList.add("hidden");
+        mobileOverlay.classList.add("hidden");
+      }
+
+      openMobileMenuButton.addEventListener("click", openMobileMenu);
+      closeMobileMenuButton.addEventListener("click", closeMobileMenu);
+      mobileOverlay.addEventListener("click", closeMobileMenu);
+
+      // Copy to clipboard functionality
+      document
+        .querySelectorAll('[title="Copy to clipboard"]')
+        .forEach((button) => {
+          button.addEventListener("click", function () {
+            const input = this.parentElement.querySelector("input");
+            input.select();
+            document.execCommand("copy");
+
+            // Show feedback (you might want to add a proper tooltip)
+            const originalTitle = this.getAttribute("title");
+            this.setAttribute("title", "Copied!");
+            setTimeout(() => {
+              this.setAttribute("title", originalTitle);
+            }, 1500);
+          });
+        });
+    </script>
+  </body>
+</html>

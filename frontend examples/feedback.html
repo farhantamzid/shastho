@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submit Feedback - HealthBD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="flex h-screen bg-gray-50">
+    <!-- Desktop Sidebar - Same as in other pages -->
+    <div class="hidden md:flex md:flex-shrink-0">
+      <div class="flex flex-col w-64">
+        <div
+          class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r"
+        >
+          <div class="flex items-center flex-shrink-0 px-4 mb-6">
+            <span class="text-xl font-semibold text-gray-900">
+              Health<span class="text-cyan-600">BD</span>
+            </span>
+          </div>
+          <div class="flex flex-col flex-grow px-4 mt-5">
+            <nav class="flex-1 space-y-1">
+              <a
+                href="dashboard.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="home" class="h-5 w-5"></i>
+                </span>
+                Dashboard
+              </a>
+              <a
+                href="profile.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="user" class="h-5 w-5"></i>
+                </span>
+                My Profile
+              </a>
+              <a
+                href="appointments.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="calendar" class="h-5 w-5"></i>
+                </span>
+                Appointments
+              </a>
+              <a
+                href="medical-records.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="file-text" class="h-5 w-5"></i>
+                </span>
+                Medical Records
+              </a>
+              <a
+                href="feedback.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md bg-cyan-50 text-cyan-700 transition-colors duration-150"
+              >
+                <span class="mr-3 text-cyan-600">
+                  <i data-lucide="message-square" class="h-5 w-5"></i>
+                </span>
+                Feedback
+              </a>
+              <a
+                href="login.html"
+                class="group flex items-center w-full px-4 py-3 mt-10 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="log-out" class="h-5 w-5"></i>
+                </span>
+                Logout
+              </a>
+            </nav>
+          </div>
+          <div class="flex-shrink-0 p-4">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+              <select
+                class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none"
+              >
+                <option value="en">English</option>
+                <option value="bn">বাংলা</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu - Same as in other pages -->
+    <div
+      class="fixed inset-0 z-40 hidden bg-gray-600 bg-opacity-75"
+      id="mobile-overlay"
+    ></div>
+    <div
+      class="fixed inset-y-0 left-0 flex flex-col z-40 w-full max-w-xs bg-white hidden"
+      id="mobile-menu"
+    >
+      <!-- Mobile menu content - same as in other pages -->
+      <div
+        class="flex items-center justify-between px-4 h-16 bg-white border-b"
+      >
+        <div class="flex items-center">
+          <span class="text-xl font-semibold text-gray-900">
+            Health<span class="text-cyan-600">BD</span>
+          </span>
+        </div>
+        <button
+          id="close-mobile-menu"
+          class="text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <i data-lucide="x" class="h-6 w-6"></i>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto pt-5 pb-4">
+        <nav class="mt-5 px-2 space-y-1">
+          <!-- Mobile navigation items - same as in other pages -->
+        </nav>
+      </div>
+      <div class="flex-shrink-0 p-4 border-t">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+          <select
+            class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none"
+          >
+            <option value="en">English</option>
+            <option value="bn">বাংলা</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <header class="w-full">
+        <div
+          class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none"
+        >
+          <button
+            type="button"
+            id="open-mobile-menu"
+            class="px-4 border-r md:hidden focus:outline-none"
+          >
+            <i data-lucide="menu" class="h-6 w-6"></i>
+          </button>
+          <div class="flex flex-1 justify-between px-4 md:px-0">
+            <div class="flex flex-1 md:px-8">
+              <div class="hidden sm:flex items-center">
+                <h1 class="text-xl font-semibold text-gray-900">
+                  Submit Feedback
+                </h1>
+              </div>
+            </div>
+            <div class="ml-2 flex items-center md:ml-6 pr-2 md:pr-4">
+              <div class="flex items-center">
+                <div class="hidden md:block ml-3 mr-4">
+                  <div class="text-right">
+                    <div class="text-sm font-medium text-gray-900">
+                      Ahmed Khan
+                    </div>
+                    <div class="text-xs text-gray-500 capitalize">Patient</div>
+                  </div>
+                </div>
+                <div
+                  class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 uppercase font-medium"
+                >
+                  A
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8">
+        <div class="max-w-3xl mx-auto">
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+              <div class="flex items-center">
+                <i
+                  data-lucide="message-square"
+                  class="h-5 w-5 text-cyan-600 mr-2"
+                ></i>
+                <h3 class="text-lg font-medium text-gray-900">
+                  Submit Feedback
+                </h3>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <p class="text-sm text-gray-500 mb-6">
+                Your feedback helps us improve our services. All feedback is
+                reviewed by our quality improvement team.
+              </p>
+
+              <form>
+                <!-- Feedback Type Selection -->
+                <div class="mb-6">
+                  <label
+                    for="feedback-type"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    What would you like to give feedback on?
+                  </label>
+                  <select
+                    id="feedback-type"
+                    name="feedback-type"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                  >
+                    <option value="">Select type</option>
+                    <option value="doctor">Doctor</option>
+                    <option value="hospital" selected>Hospital/Facility</option>
+                    <option value="appointment">Appointment Experience</option>
+                    <option value="test">Test/Procedure</option>
+                    <option value="staff">Staff/Administration</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <!-- Previous Interaction Selection -->
+                <div class="mb-6">
+                  <label
+                    for="interaction"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Select Related Appointment/Visit
+                  </label>
+                  <select
+                    id="interaction"
+                    name="interaction"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                  >
+                    <option value="">Select an appointment</option>
+                    <option value="1" selected>
+                      Cardiology Appointment - Dr. Farida Rahman (15 May 2025)
+                    </option>
+                    <option value="2">
+                      General Medicine - Dr. Mahmud Ahmed (24 April 2025)
+                    </option>
+                    <option value="3">
+                      Comprehensive Blood Work - Bangabandhu Sheikh Mujib
+                      Medical (10 Aug 2023)
+                    </option>
+                    <option value="4">
+                      Orthopedics - Dr. Nusrat Khan (10 April 2025)
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Hospital Selection - Shows when Hospital is selected -->
+                <div class="mb-6">
+                  <label
+                    for="hospital"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Hospital/Facility
+                  </label>
+                  <select
+                    id="hospital"
+                    name="hospital"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                  >
+                    <option value="">Select a hospital/facility</option>
+                    <option value="dhaka-medical">
+                      Dhaka Medical College Hospital
+                    </option>
+                    <option value="bangabandhu" selected>
+                      Bangabandhu Sheikh Mujib Medical University
+                    </option>
+                    <option value="chittagong">
+                      Chittagong Medical College Hospital
+                    </option>
+                    <option value="square">Square Hospitals Ltd</option>
+                    <option value="popular">Popular Diagnostic Centre</option>
+                  </select>
+                </div>
+
+                <!-- Rating Section -->
+                <div class="mb-6">
+                  <h4 class="text-sm font-medium text-gray-700 mb-4">
+                    Ratings
+                  </h4>
+
+                  <div class="space-y-4">
+                    <!-- Overall Rating -->
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Overall Experience
+                      </label>
+                      <div class="flex items-center">
+                        <div class="flex space-x-1">
+                          <button
+                            type="button"
+                            class="p-1 text-yellow-400 focus:outline-none"
+                          >
+                            <i
+                              data-lucide="star"
+                              class="h-6 w-6 fill-current"
+                            ></i>
+                          </button>
+                          <button
+                            type="button"
+                            class="p-1 text-yellow-400 focus:outline-none"
+                          >
+                            <i
+                              data-lucide="star"
+                              class="h-6 w-6 fill-current"
+                            ></i>
+                          </button>
+                          <button
+                            type="button"
+                            class="p-1 text-yellow-400 focus:outline-none"
+                          >
+                            <i
+                              data-lucide="star"
+                              class="h-6 w-6 fill-current"
+                            ></i>
+                          </button>
+                          <button
+                            type="button"
+                            class="p-1 text-yellow-400 focus:outline-none"
+                          >
+                            <i
+                              data-lucide="star"
+                              class="h-6 w-6 fill-current"
+                            ></i>
+                          </button>
+                          <button
+                            type="button"
+                            class="p-1 text-gray-300 focus:outline-none"
+                          >
+                            <i
+                              data-lucide="star"
+                              class="h-6 w-6 fill-current"
+                            ></i>
+                          </button>
+                        </div>
+                        <span class="ml-2 text-sm text-gray-500">4/5</span>
+                      </div>
+                    </div>
+
+                    <!-- Specific Ratings -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <!-- Cleanliness -->
+                      <div>
+                        <label
+                          for="cleanliness"
+                          class="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Cleanliness
+                        </label>
+                        <select
+                          id="cleanliness"
+                          name="cleanliness"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                        >
+                          <option value="5" selected>Excellent (5)</option>
+                          <option value="4">Good (4)</option>
+                          <option value="3">Average (3)</option>
+                          <option value="2">Poor (2)</option>
+                          <option value="1">Very Poor (1)</option>
+                        </select>
+                      </div>
+
+                      <!-- Staff Behavior -->
+                      <div>
+                        <label
+                          for="staff"
+                          class="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Staff Behavior
+                        </label>
+                        <select
+                          id="staff"
+                          name="staff"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                        >
+                          <option value="5">Excellent (5)</option>
+                          <option value="4" selected>Good (4)</option>
+                          <option value="3">Average (3)</option>
+                          <option value="2">Poor (2)</option>
+                          <option value="1">Very Poor (1)</option>
+                        </select>
+                      </div>
+
+                      <!-- Waiting Time -->
+                      <div>
+                        <label
+                          for="waiting"
+                          class="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Waiting Time
+                        </label>
+                        <select
+                          id="waiting"
+                          name="waiting"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                        >
+                          <option value="5">Excellent (5)</option>
+                          <option value="4">Good (4)</option>
+                          <option value="3" selected>Average (3)</option>
+                          <option value="2">Poor (2)</option>
+                          <option value="1">Very Poor (1)</option>
+                        </select>
+                      </div>
+
+                      <!-- Facilities & Amenities -->
+                      <div>
+                        <label
+                          for="facilities"
+                          class="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Facilities & Amenities
+                        </label>
+                        <select
+                          id="facilities"
+                          name="facilities"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                        >
+                          <option value="5">Excellent (5)</option>
+                          <option value="4" selected>Good (4)</option>
+                          <option value="3">Average (3)</option>
+                          <option value="2">Poor (2)</option>
+                          <option value="1">Very Poor (1)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Comments -->
+                <div class="mb-6">
+                  <label
+                    for="comments"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Detailed Feedback
+                  </label>
+                  <textarea
+                    id="comments"
+                    name="comments"
+                    rows="4"
+                    placeholder="Please share your experience, suggestions, or any concerns you had..."
+                    class="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  >
+The facility was clean and well-maintained. The staff was friendly, though there was a considerable wait time even with an appointment. Overall, the experience was good but could be improved with better scheduling.</textarea
+                  >
+                </div>
+
+                <!-- Anonymous Option -->
+                <div class="mb-6">
+                  <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                      <input
+                        id="anonymous"
+                        name="anonymous"
+                        type="checkbox"
+                        class="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                      />
+                    </div>
+                    <div class="ml-3 text-sm">
+                      <label for="anonymous" class="font-medium text-gray-700"
+                        >Submit anonymously</label
+                      >
+                      <p class="text-gray-500">
+                        Your name and personal information will not be shared
+                        with the hospital or staff.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Acknowledgement and Submission -->
+                <div class="mb-6">
+                  <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="flex">
+                      <div class="flex-shrink-0">
+                        <i data-lucide="info" class="h-5 w-5 text-cyan-500"></i>
+                      </div>
+                      <div class="ml-3">
+                        <p class="text-sm text-gray-700">
+                          By submitting this feedback, you consent to it being
+                          reviewed by our quality improvement team. We may
+                          contact you for further details.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                  >
+                    Submit Feedback
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      lucide.createIcons();
+
+      // Mobile menu toggle
+      document
+        .getElementById("open-mobile-menu")
+        .addEventListener("click", function () {
+          document.getElementById("mobile-menu").classList.remove("hidden");
+          document.getElementById("mobile-overlay").classList.remove("hidden");
+        });
+
+      document
+        .getElementById("close-mobile-menu")
+        .addEventListener("click", function () {
+          document.getElementById("mobile-menu").classList.add("hidden");
+          document.getElementById("mobile-overlay").classList.add("hidden");
+        });
+
+      document
+        .getElementById("mobile-overlay")
+        .addEventListener("click", function () {
+          document.getElementById("mobile-menu").classList.add("hidden");
+          document.getElementById("mobile-overlay").classList.add("hidden");
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - HealthBD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 to-blue-50 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8 space-y-8">
+    <div class="text-center">
+      <div class="flex justify-center">
+        <img src="https://via.placeholder.com/60" alt="HealthBD Logo" class="h-14 w-14">
+      </div>
+      <h2 class="mt-4 text-3xl font-bold text-gray-900">
+        Health<span class="text-cyan-600">BD</span>
+      </h2>
+      <p class="mt-2 text-sm text-gray-600">National Medical Record System</p>
+    </div>
+
+    <form class="mt-8 space-y-6">
+      <div class="space-y-5">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+            Email address
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i data-lucide="user" class="h-4 w-4 text-gray-400"></i>
+            </div>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              class="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
+              placeholder="Enter your email"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+            Password
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i data-lucide="lock" class="h-4 w-4 text-gray-400"></i>
+            </div>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              class="appearance-none block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
+              placeholder="Enter your password"
+            >
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <button
+                type="button"
+                class="text-gray-400 hover:text-gray-500 focus:outline-none"
+              >
+                <i data-lucide="eye" class="h-4 w-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <input
+            id="remember-me"
+            name="remember-me"
+            type="checkbox"
+            class="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded"
+          >
+          <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+            Remember me
+          </label>
+        </div>
+
+        <div class="text-sm">
+          <a href="#" class="font-medium text-cyan-600 hover:text-cyan-500">
+            Forgot password?
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          class="group relative w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-colors duration-150"
+        >
+          Sign in
+        </button>
+      </div>
+    </form>
+
+    <div class="text-center">
+      <p class="text-sm text-gray-600">
+        Don't have an account?
+        <a href="register.html" class="font-medium text-cyan-600 hover:text-cyan-500">
+          Register
+        </a>
+      </p>
+    </div>
+
+    <!-- Demo accounts -->
+    <div class="border-t border-gray-200 pt-4">
+      <p class="text-xs text-center text-gray-500 mb-3">Demo accounts:</p>
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="bg-gray-50 p-2 rounded">
+          <p class="font-semibold">Patient:</p>
+          <p>patient@example.com</p>
+          <p>password123</p>
+        </div>
+        <div class="bg-gray-50 p-2 rounded">
+          <p class="font-semibold">Doctor:</p>
+          <p>doctor@example.com</p>
+          <p>password123</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Health Analytics Dashboard - HealthBD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body class="flex h-screen bg-gray-50">
+    <!-- Desktop Sidebar -->
+    <div class="hidden md:flex md:flex-shrink-0">
+      <div class="flex flex-col w-64">
+        <div
+          class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r"
+        >
+          <div class="flex items-center flex-shrink-0 px-4 mb-6">
+            <span class="text-2xl font-bold text-gray-900">
+              Health<span class="text-cyan-600">BD</span>
+            </span>
+          </div>
+          <div class="flex flex-col flex-grow px-4 mt-5">
+            <nav class="flex-1 space-y-1">
+              <a
+                href="dashboard.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="home" class="h-5 w-5"></i>
+                </span>
+                Dashboard
+              </a>
+              <a
+                href="health-analytics-filter.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md bg-cyan-50 text-cyan-700 transition-colors duration-150"
+              >
+                <span class="mr-3 text-cyan-600">
+                  <i data-lucide="bar-chart-2" class="h-5 w-5"></i>
+                </span>
+                Health Analytics
+              </a>
+              <a
+                href="reports.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="file-text" class="h-5 w-5"></i>
+                </span>
+                Reports
+              </a>
+              <a
+                href="login.html"
+                class="group flex items-center w-full px-4 py-3 mt-10 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="log-out" class="h-5 w-5"></i>
+                </span>
+                Logout
+              </a>
+            </nav>
+          </div>
+          <div class="flex-shrink-0 p-4">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+              <select
+                class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none"
+              >
+                <option value="en">English</option>
+                <option value="bn">বাংলা</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div
+      class="fixed inset-0 z-40 hidden bg-gray-600 bg-opacity-75"
+      id="mobile-overlay"
+    ></div>
+    <div
+      class="fixed inset-y-0 left-0 flex flex-col z-40 w-full max-w-xs bg-white hidden"
+      id="mobile-menu"
+    >
+      <div
+        class="flex items-center justify-between px-4 h-16 bg-white border-b"
+      >
+        <div class="flex items-center">
+          <span class="text-xl font-bold text-gray-900">
+            Health<span class="text-cyan-600">BD</span>
+          </span>
+        </div>
+        <button
+          id="close-mobile-menu"
+          class="text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <i data-lucide="x" class="h-6 w-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <header class="w-full">
+        <div
+          class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none"
+        >
+          <button
+            type="button"
+            id="open-mobile-menu"
+            class="px-4 border-r md:hidden focus:outline-none"
+          >
+            <i data-lucide="menu" class="h-6 w-6"></i>
+          </button>
+          <div class="flex flex-1 justify-between px-4 md:px-0">
+            <div class="flex flex-1 md:px-8">
+              <div class="flex items-center">
+                <h1 class="text-xl font-semibold text-gray-900">
+                  Health Analytics Dashboard
+                </h1>
+              </div>
+            </div>
+            <div class="ml-2 flex items-center md:ml-6 pr-2 md:pr-4">
+              <!-- Filter Summary -->
+              <button
+                class="text-sm text-gray-500 hover:text-gray-700 mr-4"
+                id="showFilters"
+              >
+                <i data-lucide="filter" class="h-4 w-4 inline-block mr-1"></i>
+                View Applied Filters
+              </button>
+              <!-- Export Options -->
+              <div class="relative" id="exportDropdown">
+                <button class="text-sm text-gray-500 hover:text-gray-700">
+                  <i
+                    data-lucide="download"
+                    class="h-4 w-4 inline-block mr-1"
+                  ></i>
+                  Export
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6">
+        <!-- Alert Section for Critical Trends -->
+        <div class="mb-6">
+          <div class="bg-red-50 border-l-4 border-red-400 p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i
+                  data-lucide="alert-triangle"
+                  class="h-5 w-5 text-red-400"
+                ></i>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">
+                  Critical Alert: Dengue Outbreak
+                </h3>
+                <p class="text-sm text-red-700 mt-1">
+                  300% increase in dengue cases in Dhaka Division over the last
+                  month
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Metrics Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <h3 class="text-xs font-medium text-gray-500">
+                  Total Dengue Cases
+                </h3>
+                <p class="text-lg font-semibold text-gray-900">7,232</p>
+                <p class="text-xs text-red-600 mt-1">+32.5% ↑</p>
+              </div>
+              <div
+                class="h-8 w-8 bg-red-50 rounded-full flex items-center justify-center"
+              >
+                <i data-lucide="activity" class="h-4 w-4 text-red-600"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <h3 class="text-xs font-medium text-gray-500">
+                  Critical Cases
+                </h3>
+                <p class="text-lg font-semibold text-gray-900">245</p>
+                <p class="text-xs text-yellow-600 mt-1">+15.7% ↑</p>
+              </div>
+              <div
+                class="h-8 w-8 bg-yellow-50 rounded-full flex items-center justify-center"
+              >
+                <i
+                  data-lucide="thermometer"
+                  class="h-4 w-4 text-yellow-600"
+                ></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <h3 class="text-xs font-medium text-gray-500">Recovery Rate</h3>
+                <p class="text-lg font-semibold text-gray-900">92.5%</p>
+                <p class="text-xs text-green-600 mt-1">+2.3% ↑</p>
+              </div>
+              <div
+                class="h-8 w-8 bg-green-50 rounded-full flex items-center justify-center"
+              >
+                <i data-lucide="heart-pulse" class="h-4 w-4 text-green-600"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <h3 class="text-xs font-medium text-gray-500">Most Affected</h3>
+                <p class="text-lg font-semibold text-gray-900">Dhaka</p>
+                <p class="text-xs text-gray-600 mt-1">2,145 cases</p>
+              </div>
+              <div
+                class="h-8 w-8 bg-blue-50 rounded-full flex items-center justify-center"
+              >
+                <i data-lucide="map-pin" class="h-4 w-4 text-blue-600"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dengue Cases by City -->
+        <div class="bg-white rounded-lg p-4 shadow-sm">
+          <h3 class="text-sm font-medium text-gray-900 mb-4">
+            Dengue Cases by City
+          </h3>
+          <div class="space-y-4">
+            <div class="flex items-center">
+              <div class="flex-1">
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm font-medium text-gray-700"
+                    >Dhaka North</span
+                  >
+                  <span class="text-sm font-medium text-gray-900"
+                    >2,145 cases</span
+                  >
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    class="bg-red-600 h-2.5 rounded-full"
+                    style="width: 85%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center">
+              <div class="flex-1">
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm font-medium text-gray-700"
+                    >Dhaka South</span
+                  >
+                  <span class="text-sm font-medium text-gray-900"
+                    >1,879 cases</span
+                  >
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    class="bg-red-600 h-2.5 rounded-full"
+                    style="width: 75%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center">
+              <div class="flex-1">
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm font-medium text-gray-700"
+                    >Chittagong</span
+                  >
+                  <span class="text-sm font-medium text-gray-900"
+                    >1,456 cases</span
+                  >
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    class="bg-red-600 h-2.5 rounded-full"
+                    style="width: 60%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center">
+              <div class="flex-1">
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm font-medium text-gray-700">Gazipur</span>
+                  <span class="text-sm font-medium text-gray-900"
+                    >987 cases</span
+                  >
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    class="bg-red-600 h-2.5 rounded-full"
+                    style="width: 45%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center">
+              <div class="flex-1">
+                <div class="flex justify-between mb-1">
+                  <span class="text-sm font-medium text-gray-700">Sylhet</span>
+                  <span class="text-sm font-medium text-gray-900"
+                    >765 cases</span
+                  >
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    class="bg-red-600 h-2.5 rounded-full"
+                    style="width: 35%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Trend -->
+        <div class="mt-6 bg-white rounded-lg p-4 shadow-sm">
+          <h3 class="text-sm font-medium text-gray-900 mb-4">
+            Weekly Dengue Trend
+          </h3>
+          <div style="height: 200px">
+            <canvas id="dengueTrendChart"></canvas>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+
+      // Mobile menu functionality
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+      const openMobileMenuButton = document.getElementById("open-mobile-menu");
+      const closeMobileMenuButton =
+        document.getElementById("close-mobile-menu");
+
+      function openMobileMenu() {
+        mobileMenu.classList.remove("hidden");
+        mobileOverlay.classList.remove("hidden");
+      }
+
+      function closeMobileMenu() {
+        mobileMenu.classList.add("hidden");
+        mobileOverlay.classList.add("hidden");
+      }
+
+      openMobileMenuButton.addEventListener("click", openMobileMenu);
+      closeMobileMenuButton.addEventListener("click", closeMobileMenu);
+      mobileOverlay.addEventListener("click", closeMobileMenu);
+
+      // Weekly Dengue Trend Chart
+      const ctx = document.getElementById("dengueTrendChart").getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: ["Week 1", "Week 2", "Week 3", "Week 4"],
+          datasets: [
+            {
+              label: "New Cases",
+              data: [520, 780, 1200, 1645],
+              borderColor: "rgb(220, 38, 38)",
+              backgroundColor: "rgba(220, 38, 38, 0.1)",
+              fill: true,
+              tension: 0.4,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                display: false,
+              },
+            },
+            x: {
+              grid: {
+                display: false,
+              },
+            },
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

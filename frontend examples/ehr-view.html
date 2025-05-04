@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient EHR - HealthBD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="flex h-screen bg-gray-50">
+    <!-- Desktop Sidebar - Same as ehr-search.html -->
+    <div class="hidden md:flex md:flex-shrink-0">
+      <div class="flex flex-col w-64">
+        <div
+          class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r"
+        >
+          <div class="flex items-center flex-shrink-0 px-4 mb-6">
+            <span class="text-2xl font-bold text-gray-900">
+              Health<span class="text-cyan-600">BD</span>
+            </span>
+          </div>
+          <div class="flex flex-col flex-grow px-4 mt-5">
+            <nav class="flex-1 space-y-1">
+              <!-- Same navigation items as ehr-search.html -->
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <header class="w-full">
+        <div
+          class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none"
+        >
+          <button
+            type="button"
+            id="open-mobile-menu"
+            class="px-4 border-r md:hidden focus:outline-none"
+          >
+            <i data-lucide="menu" class="h-6 w-6"></i>
+          </button>
+          <div class="flex flex-1 justify-between px-4 md:px-0">
+            <div class="flex flex-1 md:px-8">
+              <div class="flex items-center">
+                <a
+                  href="ehr-search.html"
+                  class="mr-2 text-gray-500 hover:text-gray-700"
+                >
+                  <i data-lucide="arrow-left" class="h-5 w-5"></i>
+                </a>
+                <h1 class="text-xl font-semibold text-gray-900">
+                  Electronic Health Record
+                </h1>
+              </div>
+            </div>
+            <div class="ml-2 flex items-center md:ml-6 pr-2 md:pr-4">
+              <button class="text-gray-500 hover:text-gray-700 mr-4">
+                <i data-lucide="printer" class="h-5 w-5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6">
+        <div class="max-w-7xl mx-auto">
+          <!-- Patient Overview -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center">
+                <div
+                  class="h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 uppercase font-medium text-xl"
+                >
+                  R
+                </div>
+                <div class="ml-4">
+                  <h2 class="text-2xl font-semibold text-gray-900">
+                    Rahim Khan
+                  </h2>
+                  <div class="mt-1 flex items-center text-sm text-gray-500">
+                    <span class="mr-3">Male, 45 years</span>
+                    <span class="mr-3">|</span>
+                    <span>ID: P-20240315-001</span>
+                  </div>
+                  <div class="mt-2">
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800"
+                    >
+                      Blood Type: B+
+                    </span>
+                    <span
+                      class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                    >
+                      Allergies: Penicillin
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-sm text-gray-500">Last Updated</div>
+                <div class="text-sm font-medium text-gray-900">
+                  March 15, 2024
+                </div>
+                <div class="text-sm text-gray-500">09:30 AM</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Left Column -->
+            <div class="md:col-span-2 space-y-6">
+              <!-- Vital Signs -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Latest Vital Signs
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                      <div class="text-sm text-gray-500">Blood Pressure</div>
+                      <div class="mt-1 text-lg font-semibold text-gray-900">
+                        120/80 mmHg
+                      </div>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                      <div class="text-sm text-gray-500">Heart Rate</div>
+                      <div class="mt-1 text-lg font-semibold text-gray-900">
+                        72 bpm
+                      </div>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                      <div class="text-sm text-gray-500">Temperature</div>
+                      <div class="mt-1 text-lg font-semibold text-gray-900">
+                        98.6°F
+                      </div>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                      <div class="text-sm text-gray-500">SpO2</div>
+                      <div class="mt-1 text-lg font-semibold text-gray-900">
+                        98%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Current Medications -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Current Medications
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <div class="space-y-4">
+                    <div class="flex items-start">
+                      <div class="flex-shrink-0">
+                        <i data-lucide="pill" class="h-5 w-5 text-gray-400"></i>
+                      </div>
+                      <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">
+                          Amlodipine 5mg
+                        </p>
+                        <p class="mt-1 text-sm text-gray-500">
+                          1 tablet once daily
+                        </p>
+                      </div>
+                      <div class="ml-auto text-sm text-gray-500">
+                        Started: Jan 15, 2024
+                      </div>
+                    </div>
+                    <div class="flex items-start">
+                      <div class="flex-shrink-0">
+                        <i data-lucide="pill" class="h-5 w-5 text-gray-400"></i>
+                      </div>
+                      <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">
+                          Metformin 500mg
+                        </p>
+                        <p class="mt-1 text-sm text-gray-500">
+                          1 tablet twice daily
+                        </p>
+                      </div>
+                      <div class="ml-auto text-sm text-gray-500">
+                        Started: Feb 1, 2024
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Lab Results -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Recent Lab Results
+                  </h3>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Test
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Result
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Range
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Date
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                      <tr>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                        >
+                          Blood Glucose
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          126 mg/dL
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                        >
+                          70-100 mg/dL
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                        >
+                          Mar 15, 2024
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                        >
+                          HbA1c
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          6.8%
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                        >
+                          &lt; 5.7%
+                        </td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                        >
+                          Mar 15, 2024
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+              <!-- Medical History -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Medical History
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <div class="space-y-4">
+                    <div>
+                      <h4 class="text-sm font-medium text-gray-900">
+                        Chronic Conditions
+                      </h4>
+                      <ul
+                        class="mt-2 text-sm text-gray-500 list-disc list-inside"
+                      >
+                        <li>Type 2 Diabetes (Diagnosed 2020)</li>
+                        <li>Hypertension (Diagnosed 2019)</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-medium text-gray-900">
+                        Surgeries
+                      </h4>
+                      <ul
+                        class="mt-2 text-sm text-gray-500 list-disc list-inside"
+                      >
+                        <li>Appendectomy (2010)</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Immunizations -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Immunizations
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <div class="space-y-3">
+                    <div class="flex justify-between">
+                      <div class="text-sm font-medium text-gray-900">
+                        COVID-19
+                      </div>
+                      <div class="text-sm text-gray-500">Dec 15, 2023</div>
+                    </div>
+                    <div class="flex justify-between">
+                      <div class="text-sm font-medium text-gray-900">
+                        Influenza
+                      </div>
+                      <div class="text-sm text-gray-500">Nov 1, 2023</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Family History -->
+              <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-200">
+                  <h3 class="text-lg font-medium text-gray-900">
+                    Family History
+                  </h3>
+                </div>
+                <div class="p-4">
+                  <div class="space-y-3">
+                    <div>
+                      <div class="text-sm font-medium text-gray-900">
+                        Father
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        Type 2 Diabetes, Hypertension
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-gray-900">
+                        Mother
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        No significant conditions
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visit History -->
+          <div class="mt-6">
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div class="p-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Visit History</h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                      >
+                        Date
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                      >
+                        Provider
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                      >
+                        Department
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                      >
+                        Diagnosis
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                      >
+                        Notes
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        Mar 15, 2024
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        Dr. Sarah Rahman
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                      >
+                        Cardiology
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                      >
+                        Hypertension follow-up
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-500">
+                        Blood pressure well controlled. Continue current
+                        medications.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        Feb 1, 2024
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                      >
+                        Dr. Kamal Hasan
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                      >
+                        Endocrinology
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                      >
+                        Diabetes follow-up
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-500">
+                        HbA1c improved. Adjusted Metformin dosage.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+
+      // Mobile menu functionality
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+      const openMobileMenuButton = document.getElementById("open-mobile-menu");
+      const closeMobileMenuButton =
+        document.getElementById("close-mobile-menu");
+
+      function openMobileMenu() {
+        mobileMenu.classList.remove("hidden");
+        mobileOverlay.classList.remove("hidden");
+      }
+
+      function closeMobileMenu() {
+        mobileMenu.classList.add("hidden");
+        mobileOverlay.classList.add("hidden");
+      }
+
+      openMobileMenuButton.addEventListener("click", openMobileMenu);
+      closeMobileMenuButton.addEventListener("click", closeMobileMenu);
+      mobileOverlay.addEventListener("click", closeMobileMenu);
+    </script>
+  </body>
+</html>

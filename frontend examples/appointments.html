@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointments - HealthBD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="flex h-screen bg-gray-50">
+  <!-- Desktop Sidebar - Same as in other pages -->
+  <div class="hidden md:flex md:flex-shrink-0">
+    <div class="flex flex-col w-64">
+      <div class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r">
+        <div class="flex items-center flex-shrink-0 px-4 mb-6">
+          <img src="https://via.placeholder.com/40" alt="Logo" class="w-10 h-10 mr-2">
+          <span class="text-lg font-semibold text-gray-900">
+            Health<span class="text-cyan-600">BD</span>
+          </span>
+        </div>
+        <div class="flex flex-col flex-grow px-4 mt-5">
+          <nav class="flex-1 space-y-1">
+            <a
+              href="dashboard.html"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="mr-3 text-gray-500">
+                <i data-lucide="home" class="h-5 w-5"></i>
+              </span>
+              Dashboard
+            </a>
+            <a
+              href="profile.html"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="mr-3 text-gray-500">
+                <i data-lucide="user" class="h-5 w-5"></i>
+              </span>
+              My Profile
+            </a>
+            <a
+              href="appointments.html"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-md bg-cyan-50 text-cyan-700 transition-colors duration-150"
+            >
+              <span class="mr-3 text-cyan-600">
+                <i data-lucide="calendar" class="h-5 w-5"></i>
+              </span>
+              Appointments
+            </a>
+            <a
+              href="medical-records.html"
+              class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="mr-3 text-gray-500">
+                <i data-lucide="file-text" class="h-5 w-5"></i>
+              </span>
+              Medical Records
+            </a>
+            <a
+              href="login.html"
+              class="group flex items-center w-full px-4 py-3 mt-10 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors duration-150"
+            >
+              <span class="mr-3 text-gray-500">
+                <i data-lucide="log-out" class="h-5 w-5"></i>
+              </span>
+              Logout
+            </a>
+          </nav>
+        </div>
+        <div class="flex-shrink-0 p-4">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+            <select class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none">
+              <option value="en">English</option>
+              <option value="bn">বাংলা</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu - Same as in other pages -->
+  <div class="fixed inset-0 z-40 hidden bg-gray-600 bg-opacity-75" id="mobile-overlay"></div>
+  <div class="fixed inset-y-0 left-0 flex flex-col z-40 w-full max-w-xs bg-white hidden" id="mobile-menu">
+    <!-- Mobile menu content - same as in other pages -->
+    <div class="flex items-center justify-between px-4 h-16 bg-white border-b">
+      <div class="flex items-center">
+        <img src="https://via.placeholder.com/40" alt="Logo" class="w-8 h-8 mr-2">
+        <span class="text-lg font-semibold text-gray-900">
+          Health<span class="text-cyan-600">BD</span>
+        </span>
+      </div>
+      <button id="close-mobile-menu" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+        <i data-lucide="x" class="h-6 w-6"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto pt-5 pb-4">
+      <nav class="mt-5 px-2 space-y-1">
+        <!-- Mobile navigation items - same as in other pages -->
+      </nav>
+    </div>
+    <div class="flex-shrink-0 p-4 border-t">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+        <select class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none">
+          <option value="en">English</option>
+          <option value="bn">বাংলা</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content area -->
+  <div class="flex flex-col flex-1 overflow-hidden">
+    <header class="w-full">
+      <div class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none">
+        <button
+          type="button"
+          id="open-mobile-menu"
+          class="px-4 border-r md:hidden focus:outline-none"
+        >
+          <i data-lucide="menu" class="h-6 w-6"></i>
+        </button>
+        <div class="flex flex-1 justify-between px-4 md:px-0">
+          <div class="flex flex-1 md:px-8">
+            <div class="hidden sm:flex items-center">
+              <h1 class="text-xl font-semibold text-gray-900">Appointments</h1>
+            </div>
+          </div>
+          <div class="ml-2 flex items-center md:ml-6 pr-2 md:pr-4">
+            <div class="flex items-center">
+              <div class="hidden md:block ml-3 mr-4">
+                <div class="text-right">
+                  <div class="text-sm font-medium text-gray-900">Ahmed Khan</div>
+                  <div class="text-xs text-gray-500 capitalize">patient</div>
+                </div>
+              </div>
+              <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 uppercase font-medium">
+                A
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8">
+      <div class="max-w-5xl mx-auto">
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div class="px-6 py-5 border-b border-gray-200 flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h3 class="text-lg font-medium text-gray-900">Appointments</h3>
+            </div>
+
+            <div class="flex space-x-2">
+              <button
+                class="px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150 bg-cyan-100 text-cyan-700"
+              >
+                Upcoming
+              </button>
+              <button
+                class="px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150 bg-white text-gray-700 hover:bg-gray-50"
+              >
+                Past
+              </button>
+              <button
+                class="px-4 py-2 bg-cyan-600 text-white rounded-md text-sm font-medium hover:bg-cyan-700 transition-colors duration-150"
+              >
+                New Appointment
+              </button>
+            </div>
+          </div>
+
+          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4">
+              <div class="relative rounded-md w-full md:w-72">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i data-lucide="search" class="h-4 w-4 text-gray-400"></i>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search appointments"
+                  class="focus:ring-cyan-500 focus:border-cyan-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                >
+              </div>
+
+              <div class="flex items-center space-x-2 text-sm text-gray-500">
+                <i data-lucide="filter" class="h-4 w-4"></i>
+                <span>Filter by:</span>
+              </div>
+
+              <select class="rounded-md border-gray-300 text-sm focus:ring-cyan-500 focus:border-cyan-500">
+                <option value="">All Status</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+
+              <select class="rounded-md border-gray-300 text-sm focus:ring-cyan-500 focus:border-cyan-500">
+                <option value="">All Hospitals</option>
+                <option value="dhaka-medical">Dhaka Medical College Hospital</option>
+                <option value="bangabandhu">Bangabandhu Sheikh Mujib Medical University</option>
+                <option value="chittagong">Chittagong Medical College Hospital</option>
+                <option value="neurosciences">National Institute of Neurosciences & Hospital</option>
+              </select>
+
+              <select class="rounded-md border-gray-300 text-sm focus:ring-cyan-500 focus:border-cyan-500">
+                <option value="">All Departments</option>
+                <option value="cardiology">Cardiology</option>
+                <option value="neurology">Neurology</option>
+                <option value="orthopedics">Orthopedics</option>
+                <option value="general-medicine">General Medicine</option>
+                <option value="pediatrics">Pediatrics</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <div class="overflow-hidden">
+              <div class="flex flex-col md:flex-row md:items-center justify-between py-4 border-b border-gray-200">
+                <div class="flex flex-col md:flex-row md:items-center">
+                  <div class="h-10 w-10 rounded-full bg-cyan-100 flex items-center justify-center mr-4 mb-2 md:mb-0">
+                    <i data-lucide="calendar" class="h-5 w-5 text-cyan-600"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-medium text-gray-900">Dr. Farida Rahman</h4>
+                    <p class="text-sm text-gray-500">Cardiology</p>
+                    <div class="mt-1 flex items-center text-xs text-gray-500">
+                      <i data-lucide="clock" class="h-3 w-3 mr-1 text-gray-400"></i>
+                      2025-05-15, 10:30 AM
+                    </div>
+                    <div class="mt-1 flex items-center text-xs text-gray-500">
+                      <i data-lucide="map-pin" class="h-3 w-3 mr-1 text-gray-400"></i>
+                      Dhaka Medical College Hospital
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center mt-3 md:mt-0">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-2 bg-green-100 text-green-800">
+                    Confirmed
+                  </span>
+                  <div class="flex space-x-2">
+                    <button class="px-2.5 py-1.5 text-xs font-medium text-cyan-700 bg-cyan-100 hover:bg-cyan-200 rounded transition-colors duration-150">
+                      Reschedule
+                    </button>
+                    <button class="px-2.5 py-1.5 text-xs font-medium text-red-700 bg-red-100 hover:bg-red-200 rounded transition-colors duration-150">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-col md:flex-row md:items-center justify-between py-4 border-b border-gray-200">
+                <div class="flex flex-col md:flex-row md:items-center">
+                  <div class="h-10 w-10 rounded-full bg-cyan-100 flex items-center justify-center mr-4 mb-2 md:mb-0">
+                    <i data-lucide="calendar" class="h-5 w-5 text-cyan-600"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-medium text-gray-900">Dr. Mahmud Ahmed</h4>
+                    <p class="text-sm text-gray-500">General Medicine</p>
+                    <div class="mt-1 flex items-center text-xs text-gray-500">
+                      <i data-lucide="clock" class="h-3 w-3 mr-1 text-gray-400"></i>
+                      Today, 02:15 PM
+                    </div>
+                    <div class="mt-1 flex items-center text-xs text-gray-500">
+                      <i data-lucide="map-pin" class="h-3 w-3 mr-1 text-gray-400"></i>
+                      Bangabandhu Sheikh Mujib Medical University
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center mt-3 md:mt-0">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-2 bg-green-100 text-green-800">
+                    Confirmed
+                  </span>
+                  <div class="flex space-x-2">
+                    <button class="px-2.5 py-1.5 text-xs font-medium text-cyan-700 bg-cyan-100 hover:bg-cyan-200 rounded transition-colors duration-150">
+                      Reschedule
+                    </button>
+                    <button class="px-2.5 py-1.5 text-xs font-medium text-red-700 bg-red-100 hover:bg-red-200 rounded transition-colors duration-150">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-col md:flex-row md:items-center justify-between py-4 border-b border-gray-200">
+                <div class="flex flex-col md:flex-row md:items-center">
+                  <div class="h-10 w-10 rounded-full bg-cyan-100 flex items-center justify-center mr-4 mb-2 md:mb-0">
+                    <i data-lucide="calendar" class="h-5 w-5 text-cyan-600"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-medium text-gray-900">Dr. Nusrat Khan</h4>
+                    <p class="text-sm text-gray-500">Orthopedics</p>
+                    <div class="mt-1 flex items-center text-xs text-gray-500">
+                      <i data-lucide="clock" class="h-3 w-3 mr-1 text-gray-400"></i>
+                      2025-04-10, 09:00 AM
+                    </div>
+                    <div class="mt-1 flex items-center text-xs text-gray-500">
+                      <i data-lucide="map-pin" class="h-3 w-3 mr-1 text-gray-400"></i>
+                      Chittagong Medical College Hospital
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center mt-3 md:mt-0">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mr-2 bg-yellow-100 text-yellow-800">
+                    Pending
+                  </span>
+                  <div class="flex space-x-2">
+                    <button class="px-2.5 py-1.5 text-xs font-medium text-cyan-700 bg-cyan-100 hover:bg-cyan-200 rounded transition-colors duration-150">
+                      Reschedule
+                    </button>
+                    <button class="px-2.5 py-1.5 text-xs font-medium text-red-700 bg-red-100 hover:bg-red-200 rounded transition-colors duration-150">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    
+    // Mobile menu toggle
+    document.getElementById('open-mobile-menu').addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.remove('hidden');
+      document.getElementById('mobile-overlay').classList.remove('hidden');
+    });
+    
+    document.getElementById('close-mobile-menu').addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.add('hidden');
+      document.getElementById('mobile-overlay').classList.add('hidden');
+    });
+    
+    document.getElementById('mobile-overlay').addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.add('hidden');
+      document.getElementById('mobile-overlay').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>

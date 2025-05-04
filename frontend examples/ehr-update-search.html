@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update EHR - HealthBD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="flex h-screen bg-gray-50">
+    <!-- Desktop Sidebar -->
+    <div class="hidden md:flex md:flex-shrink-0">
+      <div class="flex flex-col w-64">
+        <div
+          class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r"
+        >
+          <div class="flex items-center flex-shrink-0 px-4 mb-6">
+            <span class="text-2xl font-bold text-gray-900">
+              Health<span class="text-cyan-600">BD</span>
+            </span>
+          </div>
+          <div class="flex flex-col flex-grow px-4 mt-5">
+            <nav class="flex-1 space-y-1">
+              <a
+                href="dashboard.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="home" class="h-5 w-5"></i>
+                </span>
+                Dashboard
+              </a>
+              <a
+                href="ehr-search.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md bg-cyan-50 text-cyan-700 transition-colors duration-150"
+              >
+                <span class="mr-3 text-cyan-600">
+                  <i data-lucide="file-text" class="h-5 w-5"></i>
+                </span>
+                EHR Records
+              </a>
+              <a
+                href="appointments.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="calendar" class="h-5 w-5"></i>
+                </span>
+                Appointments
+              </a>
+              <a
+                href="patients.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="users" class="h-5 w-5"></i>
+                </span>
+                My Patients
+              </a>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <header class="w-full">
+        <div
+          class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none"
+        >
+          <button
+            type="button"
+            id="open-mobile-menu"
+            class="px-4 border-r md:hidden focus:outline-none"
+          >
+            <i data-lucide="menu" class="h-6 w-6"></i>
+          </button>
+          <div class="flex flex-1 justify-between px-4 md:px-0">
+            <div class="flex flex-1 md:px-8">
+              <div class="flex items-center">
+                <h1 class="text-xl font-semibold text-gray-900">
+                  Update Electronic Health Records
+                </h1>
+              </div>
+            </div>
+            <div class="ml-2 flex items-center md:ml-6 pr-2 md:pr-4">
+              <div class="flex items-center">
+                <div class="hidden md:block ml-3">
+                  <div class="text-right">
+                    <div class="text-sm font-medium text-gray-900">
+                      Dr. Sarah Rahman
+                    </div>
+                    <div class="text-xs text-gray-500">Cardiologist</div>
+                  </div>
+                </div>
+                <div
+                  class="h-8 w-8 ml-3 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-600 uppercase font-medium"
+                >
+                  S
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6">
+        <div class="max-w-7xl mx-auto">
+          <!-- Search Filters -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label
+                  for="search"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Search Patient</label
+                >
+                <div class="relative">
+                  <input
+                    type="text"
+                    id="search"
+                    class="block w-full rounded-md border-gray-300 pr-10 focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                    placeholder="Name or ID"
+                  />
+                  <div
+                    class="absolute inset-y-0 right-0 flex items-center pr-3"
+                  >
+                    <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label
+                  for="department"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Department</label
+                >
+                <select
+                  id="department"
+                  class="block w-full rounded-md border-gray-300 focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                >
+                  <option value="">All Departments</option>
+                  <option value="cardiology">Cardiology</option>
+                  <option value="endocrinology">Endocrinology</option>
+                  <option value="neurology">Neurology</option>
+                  <option value="orthopedics">Orthopedics</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  for="visit-date"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Last Visit</label
+                >
+                <select
+                  id="visit-date"
+                  class="block w-full rounded-md border-gray-300 focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                >
+                  <option value="">Any Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="3months">Last 3 Months</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  for="status"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Record Status</label
+                >
+                <select
+                  id="status"
+                  class="block w-full rounded-md border-gray-300 focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                >
+                  <option value="">All Status</option>
+                  <option value="pending">Update Pending</option>
+                  <option value="recent">Recently Updated</option>
+                  <option value="followup">Follow-up Required</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patient List -->
+          <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-medium text-gray-900">
+                  Patient Records
+                </h2>
+                <div class="text-sm text-gray-500">Showing 45 records</div>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Patient
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      ID
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Last Visit
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Department
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Status
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 uppercase font-medium text-sm"
+                        >
+                          R
+                        </div>
+                        <div class="ml-3">
+                          <div class="text-sm font-medium text-gray-900">
+                            Rahim Khan
+                          </div>
+                          <div class="text-sm text-gray-500">Male, 45</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">P-20240315-001</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">March 15, 2024</div>
+                      <div class="text-sm text-gray-500">09:30 AM</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">Cardiology</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span
+                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                        >Update Pending</span
+                      >
+                    </td>
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                    >
+                      <a
+                        href="ehr-view.html"
+                        class="text-cyan-600 hover:text-cyan-900 mr-3"
+                        >View</a
+                      >
+                      <button class="text-cyan-600 hover:text-cyan-900">
+                        Update EHR
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 uppercase font-medium text-sm"
+                        >
+                          F
+                        </div>
+                        <div class="ml-3">
+                          <div class="text-sm font-medium text-gray-900">
+                            Fatima Begum
+                          </div>
+                          <div class="text-sm text-gray-500">Female, 62</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">P-20240314-003</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">March 14, 2024</div>
+                      <div class="text-sm text-gray-500">02:15 PM</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">Cardiology</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span
+                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                        >Recently Updated</span
+                      >
+                    </td>
+                    <td
+                      class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                    >
+                      <a
+                        href="ehr-view.html"
+                        class="text-cyan-600 hover:text-cyan-900 mr-3"
+                        >View</a
+                      >
+                      <button class="text-cyan-600 hover:text-cyan-900">
+                        Update EHR
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+              <div class="flex items-center justify-between">
+                <div class="flex-1 flex justify-between sm:hidden">
+                  <button
+                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  >
+                    Next
+                  </button>
+                </div>
+                <div
+                  class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p class="text-sm text-gray-700">
+                      Showing <span class="font-medium">1</span> to
+                      <span class="font-medium">10</span> of
+                      <span class="font-medium">45</span> results
+                    </p>
+                  </div>
+                  <div>
+                    <nav
+                      class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                      aria-label="Pagination"
+                    >
+                      <button
+                        class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                      >
+                        <span class="sr-only">Previous</span>
+                        <i data-lucide="chevron-left" class="h-5 w-5"></i>
+                      </button>
+                      <button
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-cyan-50 text-sm font-medium text-cyan-600"
+                      >
+                        1
+                      </button>
+                      <button
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        2
+                      </button>
+                      <button
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        3
+                      </button>
+                      <span
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                        >...</span
+                      >
+                      <button
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        5
+                      </button>
+                      <button
+                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                      >
+                        <span class="sr-only">Next</span>
+                        <i data-lucide="chevron-right" class="h-5 w-5"></i>
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+
+      // Mobile menu functionality
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+      const openMobileMenuButton = document.getElementById("open-mobile-menu");
+      const closeMobileMenuButton =
+        document.getElementById("close-mobile-menu");
+
+      function openMobileMenu() {
+        mobileMenu.classList.remove("hidden");
+        mobileOverlay.classList.remove("hidden");
+      }
+
+      function closeMobileMenu() {
+        mobileMenu.classList.add("hidden");
+        mobileOverlay.classList.add("hidden");
+      }
+
+      openMobileMenuButton.addEventListener("click", openMobileMenu);
+      closeMobileMenuButton.addEventListener("click", closeMobileMenu);
+      mobileOverlay.addEventListener("click", closeMobileMenu);
+    </script>
+  </body>
+</html>

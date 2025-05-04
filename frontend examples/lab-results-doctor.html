@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Lab Results - HealthBD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="flex h-screen bg-gray-50">
+    <!-- Desktop Sidebar - Same as in other pages -->
+    <div class="hidden md:flex md:flex-shrink-0">
+      <div class="flex flex-col w-64">
+        <div
+          class="flex flex-col flex-grow pt-5 overflow-y-auto bg-white border-r"
+        >
+          <div class="flex items-center flex-shrink-0 px-4 mb-6">
+            <span class="text-xl font-semibold text-gray-900">
+              Health<span class="text-cyan-600">BD</span>
+            </span>
+          </div>
+          <div class="flex flex-col flex-grow px-4 mt-5">
+            <nav class="flex-1 space-y-1">
+              <a
+                href="dashboard.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="home" class="h-5 w-5"></i>
+                </span>
+                Dashboard
+              </a>
+              <a
+                href="profile.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="user" class="h-5 w-5"></i>
+                </span>
+                My Profile
+              </a>
+              <a
+                href="appointments.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="calendar" class="h-5 w-5"></i>
+                </span>
+                Appointments
+              </a>
+              <a
+                href="medical-records.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md bg-cyan-50 text-cyan-700 transition-colors duration-150"
+              >
+                <span class="mr-3 text-cyan-600">
+                  <i data-lucide="file-text" class="h-5 w-5"></i>
+                </span>
+                Medical Records
+              </a>
+              <a
+                href="doctor-portal.html"
+                class="group flex items-center px-4 py-3 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="activity" class="h-5 w-5"></i>
+                </span>
+                Doctor Portal
+              </a>
+              <a
+                href="login.html"
+                class="group flex items-center w-full px-4 py-3 mt-10 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-100 transition-colors duration-150"
+              >
+                <span class="mr-3 text-gray-500">
+                  <i data-lucide="log-out" class="h-5 w-5"></i>
+                </span>
+                Logout
+              </a>
+            </nav>
+          </div>
+          <div class="flex-shrink-0 p-4">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+              <select
+                class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none"
+              >
+                <option value="en">English</option>
+                <option value="bn">বাংলা</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu - Same as in other pages -->
+    <div
+      class="fixed inset-0 z-40 hidden bg-gray-600 bg-opacity-75"
+      id="mobile-overlay"
+    ></div>
+    <div
+      class="fixed inset-y-0 left-0 flex flex-col z-40 w-full max-w-xs bg-white hidden"
+      id="mobile-menu"
+    >
+      <!-- Mobile menu content - same as in other pages -->
+      <div
+        class="flex items-center justify-between px-4 h-16 bg-white border-b"
+      >
+        <div class="flex items-center">
+          <span class="text-xl font-semibold text-gray-900">
+            Health<span class="text-cyan-600">BD</span>
+          </span>
+        </div>
+        <button
+          id="close-mobile-menu"
+          class="text-gray-500 hover:text-gray-700 focus:outline-none"
+        >
+          <i data-lucide="x" class="h-6 w-6"></i>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto pt-5 pb-4">
+        <nav class="mt-5 px-2 space-y-1">
+          <!-- Mobile navigation items - same as in other pages -->
+        </nav>
+      </div>
+      <div class="flex-shrink-0 p-4 border-t">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="globe" class="h-4 w-4 text-gray-500"></i>
+          <select
+            class="text-sm border-0 bg-transparent text-gray-600 focus:ring-0 focus:outline-none"
+          >
+            <option value="en">English</option>
+            <option value="bn">বাংলা</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <header class="w-full">
+        <div
+          class="relative z-10 flex h-16 flex-shrink-0 bg-white shadow md:border-b md:shadow-none"
+        >
+          <button
+            type="button"
+            id="open-mobile-menu"
+            class="px-4 border-r md:hidden focus:outline-none"
+          >
+            <i data-lucide="menu" class="h-6 w-6"></i>
+          </button>
+          <div class="flex flex-1 justify-between px-4 md:px-0">
+            <div class="flex flex-1 md:px-8">
+              <div class="hidden sm:flex items-center">
+                <h1 class="text-xl font-semibold text-gray-900">
+                  Upload Lab Results
+                </h1>
+              </div>
+            </div>
+            <div class="ml-2 flex items-center md:ml-6 pr-2 md:pr-4">
+              <div class="flex items-center">
+                <div class="hidden md:block ml-3 mr-4">
+                  <div class="text-right">
+                    <div class="text-sm font-medium text-gray-900">
+                      Dr. Farida Rahman
+                    </div>
+                    <div class="text-xs text-gray-500 capitalize">doctor</div>
+                  </div>
+                </div>
+                <div
+                  class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 uppercase font-medium"
+                >
+                  F
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8">
+        <div class="max-w-5xl mx-auto">
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+              <div class="flex items-center">
+                <i
+                  data-lucide="clipboard-list"
+                  class="h-5 w-5 text-cyan-600 mr-2"
+                ></i>
+                <h3 class="text-lg font-medium text-gray-900">
+                  Upload Lab Results
+                </h3>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <!-- Patient Selection -->
+              <div class="mb-6">
+                <h4 class="text-sm font-medium text-gray-700 mb-4">
+                  Patient Information
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      for="patient-id"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Patient ID
+                    </label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                      <input
+                        type="text"
+                        id="patient-id"
+                        name="patient-id"
+                        placeholder="Enter patient ID"
+                        value="P-103428"
+                        class="focus:ring-cyan-500 focus:border-cyan-500 flex-1 block w-full rounded-l-md sm:text-sm border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 bg-gray-50 text-gray-500 rounded-r-md hover:text-gray-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+                      >
+                        <i data-lucide="search" class="h-4 w-4"></i>
+                      </button>
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">Ahmed Khan</p>
+                  </div>
+
+                  <div>
+                    <label
+                      for="test-type"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Test Type
+                    </label>
+                    <select
+                      id="test-type"
+                      name="test-type"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                    >
+                      <option value="">Select test type</option>
+                      <option value="blood" selected>
+                        Comprehensive Blood Work
+                      </option>
+                      <option value="urine">Urine Analysis</option>
+                      <option value="lipid">Lipid Panel</option>
+                      <option value="liver">Liver Function</option>
+                      <option value="kidney">Kidney Function</option>
+                      <option value="thyroid">Thyroid Panel</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                  <div>
+                    <label
+                      for="test-date"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Test Date
+                    </label>
+                    <input
+                      type="date"
+                      id="test-date"
+                      name="test-date"
+                      value="2023-08-10"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="hospital"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Hospital/Lab
+                    </label>
+                    <select
+                      id="hospital"
+                      name="hospital"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                    >
+                      <option value="">Select hospital/lab</option>
+                      <option value="bangabandhu" selected>
+                        Bangabandhu Sheikh Mujib Medical University
+                      </option>
+                      <option value="dhaka-medical">
+                        Dhaka Medical College Hospital
+                      </option>
+                      <option value="square">Square Hospitals Ltd</option>
+                      <option value="popular">Popular Diagnostic Centre</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      for="department"
+                      class="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Department
+                    </label>
+                    <select
+                      id="department"
+                      name="department"
+                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                    >
+                      <option value="">Select department</option>
+                      <option value="general" selected>General Medicine</option>
+                      <option value="cardiology">Cardiology</option>
+                      <option value="neurology">Neurology</option>
+                      <option value="orthopedics">Orthopedics</option>
+                      <option value="pediatrics">Pediatrics</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Test Results Input -->
+              <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                  <h4 class="text-sm font-medium text-gray-700">
+                    Test Results
+                  </h4>
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded text-cyan-700 bg-cyan-100 hover:bg-cyan-200"
+                  >
+                    <i data-lucide="plus" class="h-3 w-3 mr-1"></i>
+                    Add Test
+                  </button>
+                </div>
+
+                <div class="overflow-hidden border border-gray-200 rounded-lg">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          scope="col"
+                          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Test
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Result
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Reference Range
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Status
+                        </th>
+                        <th
+                          scope="col"
+                          class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                      <tr>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value="Hemoglobin"
+                            class="border-0 p-0 w-full focus:ring-0 text-sm"
+                          />
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <input
+                              type="text"
+                              value="14.2"
+                              class="border-0 p-0 w-20 focus:ring-0 text-sm"
+                            />
+                            <span class="ml-1 text-sm text-gray-500">g/dL</span>
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center space-x-1">
+                            <input
+                              type="text"
+                              value="13.0"
+                              class="border-0 p-0 w-14 focus:ring-0 text-sm"
+                            />
+                            <span class="text-sm text-gray-500">-</span>
+                            <input
+                              type="text"
+                              value="17.0"
+                              class="border-0 p-0 w-14 focus:ring-0 text-sm"
+                            />
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <select
+                            class="border-0 p-0 w-full focus:ring-0 text-sm bg-transparent"
+                          >
+                            <option value="normal" selected>Normal</option>
+                            <option value="abnormal">Abnormal</option>
+                          </select>
+                        </td>
+                        <td
+                          class="px-4 py-3 whitespace-nowrap text-right text-sm"
+                        >
+                          <button class="text-gray-400 hover:text-gray-500">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value="White Blood Cell Count"
+                            class="border-0 p-0 w-full focus:ring-0 text-sm"
+                          />
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <input
+                              type="text"
+                              value="7.5"
+                              class="border-0 p-0 w-20 focus:ring-0 text-sm"
+                            />
+                            <span class="ml-1 text-sm text-gray-500">K/μL</span>
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center space-x-1">
+                            <input
+                              type="text"
+                              value="4.5"
+                              class="border-0 p-0 w-14 focus:ring-0 text-sm"
+                            />
+                            <span class="text-sm text-gray-500">-</span>
+                            <input
+                              type="text"
+                              value="11.0"
+                              class="border-0 p-0 w-14 focus:ring-0 text-sm"
+                            />
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <select
+                            class="border-0 p-0 w-full focus:ring-0 text-sm bg-transparent"
+                          >
+                            <option value="normal" selected>Normal</option>
+                            <option value="abnormal">Abnormal</option>
+                          </select>
+                        </td>
+                        <td
+                          class="px-4 py-3 whitespace-nowrap text-right text-sm"
+                        >
+                          <button class="text-gray-400 hover:text-gray-500">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value="Total Cholesterol"
+                            class="border-0 p-0 w-full focus:ring-0 text-sm"
+                          />
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <input
+                              type="text"
+                              value="210"
+                              class="border-0 p-0 w-20 focus:ring-0 text-sm"
+                            />
+                            <span class="ml-1 text-sm text-gray-500"
+                              >mg/dL</span
+                            >
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center space-x-1">
+                            <span class="text-sm text-gray-500">&lt;</span>
+                            <input
+                              type="text"
+                              value="200"
+                              class="border-0 p-0 w-14 focus:ring-0 text-sm"
+                            />
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <select
+                            class="border-0 p-0 w-full focus:ring-0 text-sm bg-transparent"
+                          >
+                            <option value="normal">Normal</option>
+                            <option value="abnormal" selected>Abnormal</option>
+                          </select>
+                        </td>
+                        <td
+                          class="px-4 py-3 whitespace-nowrap text-right text-sm"
+                        >
+                          <button class="text-gray-400 hover:text-gray-500">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value="HDL Cholesterol"
+                            class="border-0 p-0 w-full focus:ring-0 text-sm"
+                          />
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <input
+                              type="text"
+                              value="42"
+                              class="border-0 p-0 w-20 focus:ring-0 text-sm"
+                            />
+                            <span class="ml-1 text-sm text-gray-500"
+                              >mg/dL</span
+                            >
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center space-x-1">
+                            <span class="text-sm text-gray-500">&gt;</span>
+                            <input
+                              type="text"
+                              value="40"
+                              class="border-0 p-0 w-14 focus:ring-0 text-sm"
+                            />
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <select
+                            class="border-0 p-0 w-full focus:ring-0 text-sm bg-transparent"
+                          >
+                            <option value="normal" selected>Normal</option>
+                            <option value="abnormal">Abnormal</option>
+                          </select>
+                        </td>
+                        <td
+                          class="px-4 py-3 whitespace-nowrap text-right text-sm"
+                        >
+                          <button class="text-gray-400 hover:text-gray-500">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value="LDL Cholesterol"
+                            class="border-0 p-0 w-full focus:ring-0 text-sm"
+                          />
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <input
+                              type="text"
+                              value="135"
+                              class="border-0 p-0 w-20 focus:ring-0 text-sm"
+                            />
+                            <span class="ml-1 text-sm text-gray-500"
+                              >mg/dL</span
+                            >
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center space-x-1">
+                            <span class="text-sm text-gray-500">&lt;</span>
+                            <input
+                              type="text"
+                              value="100"
+                              class="border-0 p-0 w-14 focus:ring-0 text-sm"
+                            />
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <select
+                            class="border-0 p-0 w-full focus:ring-0 text-sm bg-transparent"
+                          >
+                            <option value="normal">Normal</option>
+                            <option value="abnormal" selected>Abnormal</option>
+                          </select>
+                        </td>
+                        <td
+                          class="px-4 py-3 whitespace-nowrap text-right text-sm"
+                        >
+                          <button class="text-gray-400 hover:text-gray-500">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value="Triglycerides"
+                            class="border-0 p-0 w-full focus:ring-0 text-sm"
+                          />
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <input
+                              type="text"
+                              value="165"
+                              class="border-0 p-0 w-20 focus:ring-0 text-sm"
+                            />
+                            <span class="ml-1 text-sm text-gray-500"
+                              >mg/dL</span
+                            >
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center space-x-1">
+                            <span class="text-sm text-gray-500">&lt;</span>
+                            <input
+                              type="text"
+                              value="150"
+                              class="border-0 p-0 w-14 focus:ring-0 text-sm"
+                            />
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <select
+                            class="border-0 p-0 w-full focus:ring-0 text-sm bg-transparent"
+                          >
+                            <option value="normal">Normal</option>
+                            <option value="abnormal" selected>Abnormal</option>
+                          </select>
+                        </td>
+                        <td
+                          class="px-4 py-3 whitespace-nowrap text-right text-sm"
+                        >
+                          <button class="text-gray-400 hover:text-gray-500">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value="Fasting Blood Glucose"
+                            class="border-0 p-0 w-full focus:ring-0 text-sm"
+                          />
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <input
+                              type="text"
+                              value="98"
+                              class="border-0 p-0 w-20 focus:ring-0 text-sm"
+                            />
+                            <span class="ml-1 text-sm text-gray-500"
+                              >mg/dL</span
+                            >
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <div class="flex items-center space-x-1">
+                            <input
+                              type="text"
+                              value="70"
+                              class="border-0 p-0 w-14 focus:ring-0 text-sm"
+                            />
+                            <span class="text-sm text-gray-500">-</span>
+                            <input
+                              type="text"
+                              value="100"
+                              class="border-0 p-0 w-14 focus:ring-0 text-sm"
+                            />
+                          </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <select
+                            class="border-0 p-0 w-full focus:ring-0 text-sm bg-transparent"
+                          >
+                            <option value="normal" selected>Normal</option>
+                            <option value="abnormal">Abnormal</option>
+                          </select>
+                        </td>
+                        <td
+                          class="px-4 py-3 whitespace-nowrap text-right text-sm"
+                        >
+                          <button class="text-gray-400 hover:text-gray-500">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Notes -->
+              <div class="mb-6">
+                <label
+                  for="notes"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Notes & Recommendations
+                </label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  rows="3"
+                  class="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Add any notes or recommendations based on the test results"
+                >
+Patient shows elevated cholesterol levels, particularly LDL. Recommend lifestyle modifications and dietary changes to reduce cholesterol levels.</textarea
+                >
+              </div>
+
+              <div class="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                >
+                  Upload Results
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      lucide.createIcons();
+
+      // Mobile menu toggle
+      document
+        .getElementById("open-mobile-menu")
+        .addEventListener("click", function () {
+          document.getElementById("mobile-menu").classList.remove("hidden");
+          document.getElementById("mobile-overlay").classList.remove("hidden");
+        });
+
+      document
+        .getElementById("close-mobile-menu")
+        .addEventListener("click", function () {
+          document.getElementById("mobile-menu").classList.add("hidden");
+          document.getElementById("mobile-overlay").classList.add("hidden");
+        });
+
+      document
+        .getElementById("mobile-overlay")
+        .addEventListener("click", function () {
+          document.getElementById("mobile-menu").classList.add("hidden");
+          document.getElementById("mobile-overlay").classList.add("hidden");
+        });
+    </script>
+  </body>
+</html>
