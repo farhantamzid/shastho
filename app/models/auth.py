@@ -1,21 +1,15 @@
 import bcrypt
 from uuid import uuid4
 from app.models.database import User, UserRole, UserStatus
-
-# Mock database for users - in a real implementation, this would be a database
-# Will be replaced by a database in future tasks
-users_db = {}
+from app.utils.db import db
 
 def find_user_by_username(username):
     """Find a user by username."""
-    for user_id, user in users_db.items():
-        if user.username == username:
-            return user
-    return None
+    return db.get_user_by_username(username)
 
 def find_user_by_id(user_id):
     """Find a user by ID."""
-    return users_db.get(str(user_id))
+    return db.get_by_id(User, user_id)
 
 def create_user(username, password, role, full_name=None):
     """Create a new user."""
@@ -37,11 +31,11 @@ def create_user(username, password, role, full_name=None):
         status=UserStatus.ACTIVE
     )
 
-    # Add full_name attribute to user object
-    user.full_name = full_name or username
+    # Save to database
+    user = db.create(user)
 
-    # Save to our mock database
-    users_db[str(user.id)] = user
+    # Store full_name attribute
+    user.full_name = full_name or username
 
     return user
 
@@ -82,8 +76,8 @@ def change_password(user_id, old_password, new_password):
     hashed = bcrypt.hashpw(new_password.encode('utf-8'), salt)
     user.password_hash = hashed.decode('utf-8')
 
-    # Update in mock database
-    users_db[str(user.id)] = user
+    # Update in database
+    db.update(user)
 
     return True
 
