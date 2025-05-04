@@ -1,9 +1,9 @@
 {% extends "base.html" %} {% block title %}Register - shastho{% endblock %} {%
 block content %}
 <div
-  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 to-blue-50 px-4 sm:px-6 lg:px-8"
+  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 to-blue-50 px-4 sm:px-6 lg:px-8 py-8"
 >
-  <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
+  <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8 my-8">
     <div class="text-center mb-8">
       <div class="flex justify-center mb-4">
         <img
@@ -121,13 +121,11 @@ block content %}
           >
             <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
           </div>
-          <input
-            id="confirm_password"
-            name="confirm_password"
-            type="password"
-            class="appearance-none block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
-            placeholder="Confirm your password"
-          />
+          {{ form.confirm_password(id="confirm_password", type="password",
+          class="appearance-none block w-full pl-10 pr-10 py-2.5 border
+          border-gray-300 rounded-lg shadow-sm placeholder-gray-400
+          focus:outline-none focus:ring-cyan-500 focus:border-cyan-500",
+          placeholder="Confirm your password") }}
           <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
             <button
               type="button"
@@ -164,6 +162,171 @@ block content %}
           {% for error in form.role.errors %} {{ error }} {% endfor %}
         </div>
         {% endif %}
+      </div>
+
+      <!-- Patient-specific fields - only shown when role is patient -->
+      <div id="patient-fields" class="hidden space-y-6">
+        <div>
+          <label
+            for="date_of_birth"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Date of Birth</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="calendar" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            {{ form.date_of_birth(id="date_of_birth", class="appearance-none
+            block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg
+            shadow-sm placeholder-gray-400 focus:outline-none
+            focus:ring-cyan-500 focus:border-cyan-500",
+            placeholder="YYYY-MM-DD") }}
+          </div>
+          {% if form.date_of_birth.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.date_of_birth.errors %} {{ error }} {% endfor
+            %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="gender"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Gender</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="user" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            {{ form.gender(id="gender", class="appearance-none block w-full
+            pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+            placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+            focus:border-cyan-500") }}
+          </div>
+          {% if form.gender.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.gender.errors %} {{ error }} {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="contact_number"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Contact Number</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="phone" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            <input
+              type="tel"
+              id="contact_number"
+              name="contact_number"
+              placeholder="Enter your contact number"
+              class="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+              value="{{ form.contact_number.data or '' }}"
+            />
+          </div>
+          {% if form.contact_number.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.contact_number.errors %} {{ error }} {% endfor
+            %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="address"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Address</label
+          >
+          <div class="relative">
+            <div
+              class="absolute top-3 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="map-pin" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            {{ form.address(id="address", class="appearance-none block w-full
+            pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+            placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+            focus:border-cyan-500", placeholder="Enter your address", rows="3")
+            }}
+          </div>
+          {% if form.address.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.address.errors %} {{ error }} {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="emergency_contact_name"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Emergency Contact Name</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="user-plus" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            <input
+              type="text"
+              id="emergency_contact_name"
+              name="emergency_contact_name"
+              placeholder="Enter emergency contact name"
+              class="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+              value="{{ form.emergency_contact_name.data or '' }}"
+            />
+          </div>
+          {% if form.emergency_contact_name.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.emergency_contact_name.errors %} {{ error }} {%
+            endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="emergency_contact_number"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Emergency Contact Number</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <i data-lucide="phone-call" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            <input
+              type="tel"
+              id="emergency_contact_number"
+              name="emergency_contact_number"
+              placeholder="Enter emergency contact number"
+              class="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+              value="{{ form.emergency_contact_number.data or '' }}"
+            />
+          </div>
+          {% if form.emergency_contact_number.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.emergency_contact_number.errors %} {{ error }}
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
       </div>
 
       <div class="mt-6">
@@ -215,6 +378,185 @@ block content %}
         lucide.createIcons();
       });
     });
+
+    // Show patient fields when role is 'patient'
+    const roleSelect = document.getElementById("role");
+    const patientFields = document.getElementById("patient-fields");
+
+    // Initial check on page load
+    if (roleSelect.value === "patient") {
+      patientFields.classList.remove("hidden");
+    }
+
+    // Check when role changes
+    roleSelect.addEventListener("change", function () {
+      if (this.value === "patient") {
+        patientFields.classList.remove("hidden");
+        // When patient role is selected, add required attribute to fields
+        document.getElementById("date_of_birth").setAttribute("required", "");
+        document.getElementById("gender").setAttribute("required", "");
+        document.getElementById("contact_number").setAttribute("required", "");
+        document.getElementById("address").setAttribute("required", "");
+        document
+          .getElementById("emergency_contact_name")
+          .setAttribute("required", "");
+        document
+          .getElementById("emergency_contact_number")
+          .setAttribute("required", "");
+      } else {
+        patientFields.classList.add("hidden");
+        // When patient role is not selected, remove required attribute
+        document.getElementById("date_of_birth").removeAttribute("required");
+        document.getElementById("gender").removeAttribute("required");
+        document.getElementById("contact_number").removeAttribute("required");
+        document.getElementById("address").removeAttribute("required");
+        document
+          .getElementById("emergency_contact_name")
+          .removeAttribute("required");
+        document
+          .getElementById("emergency_contact_number")
+          .removeAttribute("required");
+      }
+    });
+
+    // Client-side validation
+    const form = document.querySelector("form");
+
+    form.addEventListener("submit", function (event) {
+      let isValid = true;
+
+      // Basic email validation
+      const emailInput = document.getElementById("email");
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(emailInput.value)) {
+        showError(emailInput, "Please enter a valid email address");
+        isValid = false;
+      } else {
+        clearError(emailInput);
+      }
+
+      // Password validation
+      const passwordInput = document.getElementById("password");
+      if (passwordInput.value.length < 8) {
+        showError(passwordInput, "Password must be at least 8 characters");
+        isValid = false;
+      } else {
+        clearError(passwordInput);
+      }
+
+      // Password confirmation validation
+      const confirmPasswordInput = document.getElementById("confirm_password");
+      if (confirmPasswordInput.value !== passwordInput.value) {
+        showError(confirmPasswordInput, "Passwords do not match");
+        isValid = false;
+      } else {
+        clearError(confirmPasswordInput);
+      }
+
+      // If patient is selected, validate patient fields
+      if (roleSelect.value === "patient") {
+        // Date of birth validation
+        const dobInput = document.getElementById("date_of_birth");
+        if (!dobInput.value) {
+          showError(dobInput, "Please enter your date of birth");
+          isValid = false;
+        } else {
+          // Check if the date is in the past
+          const dob = new Date(dobInput.value);
+          const today = new Date();
+          if (dob > today) {
+            showError(dobInput, "Date of birth cannot be in the future");
+            isValid = false;
+          } else {
+            clearError(dobInput);
+          }
+        }
+
+        // Gender validation
+        const genderInput = document.getElementById("gender");
+        if (!genderInput.value) {
+          showError(genderInput, "Please select your gender");
+          isValid = false;
+        } else {
+          clearError(genderInput);
+        }
+
+        // Contact number validation
+        const contactInput = document.getElementById("contact_number");
+        const phonePattern = /^[\d\+\-\(\) ]{10,15}$/;
+        if (!phonePattern.test(contactInput.value)) {
+          showError(
+            contactInput,
+            "Please enter a valid phone number (10-15 digits)"
+          );
+          isValid = false;
+        } else {
+          clearError(contactInput);
+        }
+
+        // Address validation
+        const addressInput = document.getElementById("address");
+        if (!addressInput.value || addressInput.value.length < 5) {
+          showError(addressInput, "Please enter a valid address");
+          isValid = false;
+        } else {
+          clearError(addressInput);
+        }
+
+        // Emergency contact name validation
+        const ecNameInput = document.getElementById("emergency_contact_name");
+        if (!ecNameInput.value || ecNameInput.value.length < 2) {
+          showError(ecNameInput, "Please enter a valid emergency contact name");
+          isValid = false;
+        } else {
+          clearError(ecNameInput);
+        }
+
+        // Emergency contact number validation
+        const ecNumberInput = document.getElementById(
+          "emergency_contact_number"
+        );
+        if (!phonePattern.test(ecNumberInput.value)) {
+          showError(
+            ecNumberInput,
+            "Please enter a valid emergency contact number (10-15 digits)"
+          );
+          isValid = false;
+        } else {
+          clearError(ecNumberInput);
+        }
+      }
+
+      if (!isValid) {
+        event.preventDefault();
+      }
+    });
+
+    // Helper functions for validation
+    function showError(input, message) {
+      const parentDiv = input.closest("div.relative").parentElement;
+      let errorDiv = parentDiv.querySelector(".text-red-500");
+
+      if (!errorDiv) {
+        errorDiv = document.createElement("div");
+        errorDiv.className = "text-red-500 text-sm mt-1";
+        parentDiv.appendChild(errorDiv);
+      }
+
+      errorDiv.textContent = message;
+      input.classList.add("border-red-500");
+    }
+
+    function clearError(input) {
+      const parentDiv = input.closest("div.relative").parentElement;
+      const errorDiv = parentDiv.querySelector(".text-red-500");
+
+      if (errorDiv) {
+        errorDiv.textContent = "";
+      }
+
+      input.classList.remove("border-red-500");
+    }
   });
 </script>
 {% endblock %}
