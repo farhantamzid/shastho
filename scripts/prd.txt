@@ -1,0 +1,227 @@
+# Product Requirements Document: Shastho
+
+<context>
+# Overview
+
+Shastho is a web-based application designed to enhance public healthcare in Bangladesh by providing a centralized National Electronic Health Record (EHR) and a streamlined online Appointment Scheduling System for public hospitals[cite: 123, 124]. The system aims to solve the problems of fragmented patient medical histories and inefficient manual appointment booking processes. It serves multiple user groups, including patients, doctors, hospital administrators, system administrators, test/imaging administrators, and government regulatory bodies. The value lies in improving access to healthcare information, increasing the efficiency of hospital operations, enabling better public health monitoring, and ultimately improving the quality of healthcare services for citizens[cite: 124].
+
+# Core Features
+
+**1. Unified User Management & Authentication**
+    * **What it does:** Securely manages different user types (Patients, Doctors, Hospital Admins, System Admins, Tests/Imaging Admins, Government Regulatory Body) with role-based access control[cite: 138, 191]. Handles registration workflows (patient self-registration, admin-approved registration for others) and secure login/logout[cite: 181].
+    * **Why it's important:** Ensures data security and privacy by granting access only to authorized users based on their roles and responsibilities[cite: 191, 266]. Streamlines access to relevant system functionalities.
+    * **How it works:** Patients register directly. Doctors, Hospital Admins, Govt Body users get approved by System Admins. Test/Imaging Admin get approved by Hospital Admins. Login uses username/ID and password stored securely in the Supabase database. A simple database authentication approach will be used. When approving, password is generated automatically. Generated password is shown to the approver. The user who got generated can log in using the automatically generated credentials and then change their password if they wish once they log in.
+
+**2. Patient Portal & Dashboard**
+    * **What it does:** Allows registered patients to log in, view their dashboard, manage their profile information, and access their health records[cite: 146, 192].
+    * **Why it's important:** Empowers patients with access to their own health information and provides a central hub for managing their interactions with the healthcare system.
+    * **How it works:** After login, patients are presented with a dashboard summarizing appointments and providing navigation to view/edit profile details and access EHR sections[cite: 194, 195].
+
+**3. Electronic Health Record (EHR) Management**
+    * **What it does:** Provides a centralized, digital repository for storing and accessing patient health information[cite: 136, 198]. Allows authorized doctors to view and update EHRs, and patients to view their own records[cite: 82, 84, 86]. Test/Imaging Admins can upload results.
+    * **Why it's important:** Creates a comprehensive and longitudinal record of a patient's health, accessible to authorized providers, improving diagnostic accuracy and continuity of care[cite: 198].
+    * **How it works:** Doctors can search for patients (by ID) and view/edit structured EHR data including patient identifiers, visit details, clinical data (diagnoses, medications, allergies, procedures, labs, vitals, immunizations), intake/output, and provider notes[cite: 199, 200, 201, 202, 203]. Patients can view their records[cite: 82]. Test/Imaging Admins upload results linked to patient IDs. EHR data uses defined fields based on standards.
+
+**4. Appointment Scheduling System**
+    * **What it does:** Enables patients to search for available appointment slots, book, reschedule, and cancel appointments online[cite: 137, 207]. Allows doctors to set their availability and view their schedules[cite: 54]. Hospital Admins can manage doctor schedules and view overall hospital appointment data[cite: 213].
+    * **Why it's important:** Improves patient convenience, reduces administrative overhead for hospitals, and optimizes doctor scheduling[cite: 207].
+    * **How it works:** Patients select Hospital -> Department -> Doctor -> Available Slot to book[cite: 208, 210]. Doctors define their available time slots in their profile[cite: 78]. The system checks for slot availability before confirming bookings[cite: 3, 50, 98]. Patients can view and manage their booked appointments[cite: 52]. Doctors and Admins can view relevant schedules[cite: 54].
+
+**5. Doctor Portal & Tools**
+    * **What it does:** Provides a dedicated interface for doctors to manage their schedules, view appointments, access and update patient EHRs, add prescriptions, and request tests/imaging[cite: 148, 214].
+    * **Why it's important:** Equips doctors with the necessary tools to efficiently manage their patient interactions and document care within the system[cite: 153].
+    * **How it works:** Doctors log in to access their dashboard, view upcoming appointments[cite: 54, 101], search for patients to view/edit EHRs[cite: 84, 86, 116, 117], use forms to add prescriptions/diagnoses/notes[cite: 56, 102], and manage their availability slots[cite: 78, 113].
+
+**6. Administration Portals (System & Hospital)**
+    * **What it does:** Provides interfaces for System Administrators (manage hospitals, approve certain user accounts) and Hospital Administrators (approve Test/Imaging Admins, view hospital-wide appointments, view doctor schedules/appointments, view hospital feedback)[cite: 156, 157].
+    * **Why it's important:** Enables decentralized management of users and resources while maintaining overall system control.
+    * **How it works:** Admins log in to access specific dashboards with tools for user approval workflows, hospital/department management (System Admin), viewing aggregated appointment data, and feedback relevant to their scope (Hospital Admin)[cite: 72, 80, 66].
+
+**7. Feedback & Review System**
+    * **What it does:** Allows patients to submit feedback/reviews regarding specific doctors, hospitals, or appointments[cite: 66]. Enables Hospital Administrators and Government bodies to view and analyze this feedback[cite: 70, 64].
+    * **Why it's important:** Provides a channel for patient experience input, allowing for quality monitoring and service improvement.
+    * **How it works:** Patients use a form to submit feedback linked to a doctor, hospital, or appointment. Hospital Admins view feedback filtered for their hospital[cite: 66, 107]. Government users can view all feedback and generate aggregated reports/statistics[cite: 70, 64, 109].
+
+**8. Government Health Analytics & Reporting**
+    * **What it does:** Provides authorized Government Regulatory Body users with access to anonymized, aggregated health data, analytics dashboards, reports, visualizations, and outbreak notifications[cite: 139, 221].
+    * **Why it's important:** Supports public health monitoring, policy-making, resource allocation, and timely response to health trends or outbreaks[cite: 158].
+    * **How it works:** Government users log in to a dedicated portal. The system aggregates anonymized EHR and potentially appointment data[cite: 19, 64]. Users can filter data (e.g., by region, disease) to generate reports, view charts/graphs[cite: 222, 224], and receive system-generated alerts based on predefined criteria (e.g., disease spikes)[cite: 23, 68, 108].
+
+# User Experience
+
+* **User Personas:**
+    * **Patient:** Citizens of Bangladesh of varying ages and tech-savviness, needing easy access to their health records and convenient appointment booking[cite: 152]. Prefers clear navigation and simple language (Bangla/English support required)[cite: 164].
+    * **Doctor (Public Hospital):** Busy healthcare professionals needing efficient access to patient information, scheduling tools, and EHR updating capabilities[cite: 153]. Requires a clear, organized interface to quickly find information.
+    * **Hospital Administrator:** Staff managing hospital-specific operations within the system (user approvals, schedule overviews, feedback monitoring)[cite: 156]. Needs clear dashboards and reporting tools.
+    * **System Administrator:** Technical personnel responsible for overall system health, user account management (higher level), and core data setup (hospitals)[cite: 157]. Needs robust administrative tools.
+    * **Tests/Imaging Admin:** Staff responsible for accurately uploading test/imaging results associated with patient records. Requires a simple, focused interface for data entry/upload.
+    * **Government Regulatory Body User:** Officials focused on public health trends and oversight[cite: 158]. Needs access to aggregated data, reports, and visualizations for analysis and decision-making.
+
+* **Key User Flows:**
+    * **Patient Registration & Login:** Navigate to Register -> Enter Details -> Submit -> Login.
+    * **Appointment Booking:** Login -> Search/Select Hospital -> Select Department -> Select Doctor -> View Available Slots -> Select Slot -> Confirm Booking[cite: 1, 3, 48, 50, 97, 98].
+    * **Appointment Reschedule/Cancel:** Login -> View Appointments -> Select Appointment -> Choose Reschedule/Cancel -> (If Reschedule: Select New Slot) -> Confirm[cite: 5, 52, 99].
+    * **Doctor EHR Access/Update:** Login -> Search Patient ID -> View EHR -> Select Section -> Add/Edit Info (Diagnosis, Prescription, Notes, Request Test) -> Save[cite: 38, 40, 56, 84, 86, 102, 116, 117].
+    * **Doctor Availability Setup:** Login -> Go to Profile/Schedule -> Define Working Hours/Available Slots -> Save[cite: 78, 113].
+    * **Admin User Approval:** Login -> View Pending Requests -> Select Request -> Review Info -> Approve/Reject[cite: 72].
+    * **Test Result Upload:** Login -> Search Patient ID -> Select Test Type -> Upload File/Enter Results -> Save.
+    * **Feedback Submission:** Login -> Navigate to Feedback Section -> Select Target (Doctor/Hospital/Appointment) -> Enter Feedback -> Submit.
+    * **Analytics Viewing (Govt):** Login -> Go to Analytics Dashboard -> Select Filters (Region, Date, etc.) -> View Report/Visualization[cite: 19, 64, 106].
+
+* **UI/UX Considerations:**
+    * **Simplicity:** The interface must be intuitive and easy to navigate for all user types, especially patients with varying technical skills[cite: 268]. Follow design conventions from `frontendExamples/`.
+    * **Technology:** Use plain HTML, CSS, and Tailwind CSS for the frontend. No complex frontend frameworks.
+    * **Responsiveness:** The web application must adapt to different screen sizes (desktop, tablet, mobile)[cite: 245].
+    * **Language:** Support both Bangla and English languages throughout the interface[cite: 164, 247].
+    * **Accessibility:** Adhere to accessibility guidelines (e.g., WCAG) to ensure usability for people with disabilities[cite: 163, 246].
+    * **Clarity:** Use clear labels, instructions, and feedback messages[cite: 269]. Error messages should be informative.
+
+</context>
+
+<PRD>
+# Technical Architecture
+
+* **System Components:**
+    * **Frontend:** Web interface built with HTML, CSS, and Tailwind CSS. Responsible for rendering views and interacting with the backend API.
+    * **Backend:** API server built with Python Flask framework. Handles business logic, data processing, authentication, and communication with the database. Will follow an Object-Oriented approach where feasible.
+    * **Database:** PostgreSQL managed via Supabase. Stores all application data including user information, EHRs, appointments, schedules, hospitals, feedback, etc.
+    * **Hosting:** Implicitly requires web hosting for Flask application and utilizes Supabase for database hosting/backend services.
+
+* **Data Models (High-Level):**
+    * `Users`: Stores login credentials (username/ID, hashed password), role (Patient, Doctor, SysAdmin, HospAdmin, TestAdmin, Govt), status (active, pending approval), basic profile link.
+    * `Patients`: Links to `Users`, stores demographic info, potentially insurance info, emergency contact.
+    * `Doctors`: Links to `Users`, stores professional details (specialization, credentials), associated Hospital/Department, availability schedule (e.g., `DoctorAvailabilitySlots` table).
+    * `Hospitals`: Stores hospital details (name, location, etc.). Managed by System Admins.
+    * `Departments`: Stores department details (name), linked to `Hospitals`.
+    * `Appointments`: Links `Patients`, `Doctors`, `Hospitals`, `Departments`. Stores date, time slot, status (booked, completed, cancelled, rescheduled).
+    * `EHR`: Central table linking to `Patients`. Contains core identifiers and visit details.
+    * `EHR_ClinicalData`: Linked to `EHR`/`Visit`, storing diagnoses, medications, allergies, procedures, vitals, immunizations etc. Potentially separate tables for structure (e.g., `Medications`, `Diagnoses`).
+    * `EHR_ProviderNotes`: Linked to `EHR`/`Visit`, storing notes.
+    * `EHR_TestResults`: Linked to `EHR`/`Patient`, storing uploaded test/imaging results (file paths or data), managed by Test/Imaging Admins.
+    * `Prescriptions`: Linked to `EHR`/`Visit`/`Doctor`/`Patient`, storing medication, dosage, instructions.
+    * `Feedback`: Links `Patients` (submitter), potentially `Doctors`/`Hospitals`/`Appointments` (subject). Stores rating, comments, submission date.
+
+* **APIs and Integrations:**
+    * **Internal REST API:** Flask backend will expose RESTful endpoints for the frontend to consume (e.g., `/api/login`, `/api/appointments`, `/api/ehr/{patient_id}`, `/api/doctors/{doctor_id}/schedule`).
+    * **Supabase Integration:** Flask backend will use Supabase Python library (`supabase-py` or direct PostgreSQL connection if preferred) to interact with the Supabase database for all CRUD operations.
+    * **External APIs:** None required as per user specification (No NID, SMS, Email, AI/LLM APIs needed for MVP/initial phases).
+
+* **Infrastructure Requirements:**
+    * Web server capable of running Python Flask application.
+    * Supabase account for Database and potentially other BaaS features (excluding Auth).
+    * Standard web hosting environment.
+
+# Development Roadmap
+
+*(Focus on scope per phase, not timelines)*
+
+**Phase 1: Foundation & Core Patient/Doctor MVP**
+    * **Scope:**
+        * Basic User Models & DB Schema (Users, Patients, Doctors, Hospitals, Departments).
+        * Simple DB-based Authentication (Login/Logout).
+        * Patient Registration UI & Backend.
+        * Doctor Application UI & Backend.
+        * System Admin Portal: Hospital CRUD (Create/Read/Update/Delete).
+        * System Admin Portal: Doctor Account Approval Workflow (View applications, Approve/Reject -> Create basic Doctor account with random password).
+        * Doctor Portal: Initial Login & Mandatory Password Change.
+        * Doctor Portal: Profile Setup (Select Hospital/Department/Specialization).
+        * Doctor Portal: Basic Schedule/Availability Setup (Define available time slots).
+        * Patient Portal: View Available Slots (based on Hospital->Dept->Doctor selection).
+        * Patient Portal: Book Appointment (Select slot -> Save basic appointment record).
+        * Patient Portal: View Upcoming Appointments.
+        * Doctor Portal: View Appointment Schedule for a selected date.
+    * **Goal:** Establish core user roles, registration/login, basic data setup (hospitals), and the fundamental appointment booking/viewing flow. A visible, minimally functional frontend.
+
+**Phase 2: EHR Core & Basic Interactions**
+    * **Scope:**
+        * EHR Data Models & DB Schema (Implement structure for key EHR fields: identifiers, visit details, basic clinical data - diagnosis, medication, allergy, notes).
+        * Patient Portal: View own EHR (Read-only view of data entered).
+        * Doctor Portal: Search Patient by ID.
+        * Doctor Portal: View Patient EHR (Read-only initially).
+        * Doctor Portal: Update/Add EHR Information (Diagnosis, Allergies, Notes).
+        * Doctor Portal: Add Prescriptions (Medication, Dosage, Instructions).
+        * Doctor Portal: Functionality to 'Request' Test/Imaging (flags patient record or creates a basic request entry).
+        * Tests/Imaging Admin Role & Basic User Model.
+        * Hospital Admin Role & Basic User Model.
+        * Hospital Admin Portal: Approve Test/Imaging Admin accounts.
+        * Test/Imaging Admin Portal: Login.
+        * Test/Imaging Admin Portal: Search Patient by ID.
+        * Test/Imaging Admin Portal: Upload Test/Lab/Imaging Results (Basic file upload or data entry linked to patient).
+    * **Goal:** Implement the core EHR structure, allow doctors to view/update basic records and prescriptions, and enable test result uploading.
+
+**Phase 3: Enhanced Features & Feedback Loop**
+    * **Scope:**
+        * Patient Portal: Reschedule/Cancel Appointments (Check slot availability for reschedule).
+        * Patient Portal: Submit Feedback (for Doctor/Hospital/Appointment).
+        * Hospital Admin Portal: View Hospital-specific Feedback entries.
+        * Government Regulatory Body Role & Basic User Model.
+        * System Admin Portal: Approve Government Regulatory Body accounts.
+        * Government Portal: Login.
+        * Government Portal: View All Feedback entries.
+        * Government Portal: Generate Basic Aggregated Feedback Reports/Stats.
+        * Implement remaining EHR fields (Vitals, Immunizations, Procedures, Intake/Output etc.).
+        * Patient Portal: View detailed Prescriptions, Test Results, Vaccinations.
+        * Password Reset Functionality for all users.
+    * **Goal:** Add appointment management flexibility, introduce the feedback mechanism, and start building out the government oversight functionality.
+
+**Phase 4: Analytics & Advanced Administration**
+    * **Scope:**
+        * Government Portal: Anonymized Health Data Analytics Dashboard (Basic stats by region, hospital, disease).
+        * Government Portal: Basic Data Visualizations (Charts/Graphs for analytics).
+        * Government Portal: Simple Outbreak Notification trigger/alert based on configurable rules (e.g., spike in specific diagnosis codes in a region).
+        * Hospital Admin Portal: View all Appointments for the hospital for a given date.
+        * Hospital Admin Portal: View individual Doctor's schedule details (slots, past/upcoming appointments within the hospital).
+        * Enhanced Admin User Management features (Search, Filter, Edit user profiles).
+        * Expand EHR viewing/editing capabilities as needed based on feedback.
+    * **Goal:** Deliver core analytics for government users and provide more comprehensive administrative views for hospital management.
+
+# Logical Dependency Chain
+
+1.  **User & Auth Foundation:** Define User models (all types), Role structure, Database tables. Implement basic registration (Patient) and login/logout logic (all types) with simple DB authentication. Set up Flask backend structure. Create basic frontend layout (HTML/CSS/Tailwind).
+2.  **Core Data Setup:** Implement Hospital and Department models. Create System Admin UI to manage Hospitals/Departments.
+3.  **Doctor Onboarding:** Implement Doctor application UI/backend. Implement System Admin approval UI/backend (creates Doctor user). Implement Doctor first-login/password change and profile setup (Hospital, Dept, Spec).
+4.  **Scheduling Core:** Implement Doctor schedule/availability setup UI/backend. Implement Patient Appointment Booking flow UI/backend (Select H->D->Dr->Slot).
+5.  **Basic Viewing:** Implement Patient UI to view booked appointments. Implement Doctor UI to view schedule/appointments.
+6.  **EHR Structure & Patient View:** Define EHR models/tables. Implement Patient UI to view their (initially empty) EHR sections (Prescriptions, History, Tests etc.).
+7.  **Doctor EHR Interaction:** Implement Doctor UI to search patient, view EHR structure. Implement Doctor UI/backend to Add/Edit key EHR data (Diagnosis, Allergies, Notes, Prescriptions).
+8.  **Test Results Flow:** Implement Test/Imaging Admin models & Hospital Admin approval. Implement Test Admin UI/backend to search patient & upload results. Modify Patient/Doctor EHR view to display uploaded results.
+9.  **Feedback Implementation:** Implement Feedback model. Implement Patient UI to submit feedback. Implement Hospital Admin UI and Govt UI to view feedback.
+10. **Appointment Management:** Implement Patient UI/backend for Reschedule/Cancel.
+11. **Analytics & Reporting:** Implement anonymization logic. Implement Govt UI/backend for basic aggregated feedback reports and health analytics dashboard/visualizations. Implement simple Outbreak trigger logic.
+12. **Advanced Admin Views:** Implement Hospital Admin UI to view hospital-wide appointments and detailed doctor schedules.
+
+* **Guiding Principles:** Build foundational models first. Get user registration/login working early. Prioritize the core Patient -> Doctor appointment booking flow to have a visible, usable path quickly. Layer EHR functionality onto this. Build admin/analytics features progressively after core user flows are stable.
+
+# Risks and Mitigations
+
+* **Technical Complexity Creep:**
+    * **Risk:** Despite the goal of simplicity, features might become overly complex during implementation using Flask and direct Supabase interaction.
+    * **Mitigation:** Strictly adhere to the "simple and straightforward" coding paradigm. Use basic OOP patterns. Regularly review code for unnecessary complexity. Prioritize functional requirements over elaborate technical solutions.
+* **MVP Scope Definition:**
+    * **Risk:** Difficulty in strictly defining and adhering to the Minimum Viable Product (MVP) scope for Phase 1, leading to delays.
+    * **Mitigation:** Clearly document and agree upon the exact features listed for Phase 1. Resist adding features outside this scope until Phase 1 is delivered. Focus on the core booking/viewing loop as the primary MVP goal.
+* **Supabase Integration:**
+    * **Risk:** Unexpected challenges or limitations when integrating Flask with Supabase for all database operations, including custom authentication logic.
+    * **Mitigation:** Prototype key database interactions (user creation, EHR updates, appointment booking logic) early. Consult Supabase documentation and community resources for best practices with Flask. Ensure the chosen authentication approach is robust enough.
+* **Frontend Consistency:**
+    * **Risk:** Maintaining UI consistency across the application using only HTML/CSS/Tailwind without a component library. Ensuring responsiveness works well across devices.
+    * **Mitigation:** Strictly follow the design conventions provided in `frontendExamples/`. Develop reusable Tailwind CSS patterns/classes. Conduct thorough testing on various screen sizes throughout development.
+* **Resource Constraints (Implicit):**
+    * **Risk:** Limited time or developers impacting the ability to deliver the planned scope.
+    * **Mitigation:** Focus on the phased approach. Ensure each phase delivers tangible value. Keep the scope tightly controlled and prioritize ruthlessly based on the logical dependency chain and core value proposition.
+
+# Appendix
+
+* **Supporting Documents:**
+    * `frontendExamples/` folder (Contains UI design conventions)
+* **EHR Data Fields (Based on User Input):**
+    * **Patient Identifiers:** Full name, date of birth, contact information, unique patient ID/medical record number, emergency contact, insurance/employer info.
+    * **Visit Details:** Date and time of arrival, date and time of admission, provider (attending physician, resident, or mid-level), visit type (e.g., urgent, follow-up).
+    * **Clinical Data:** Chief complaint/reason for visit, Diagnoses (ICD codes), Medications (current and prescribed), Allergies, Procedures performed, Laboratory results, Vital signs (temperature, pulse, blood pressure, respiratory rate, etc.), Immunizations.
+    * **Intake & Output (for inpatients):** Date/time of entry, Type (Intake, IV Intake, Output), Subtype (e.g., oral fluids, urine, drains), Value (in milliliters).
+    * **Provider Notes:** Free-text or structured clinical notes.
+* **Glossary:** Refer to SRS Appendix A.
+* **Open Issues:**
+    * Finalize specific database schema details for EHR sections based on the required fields.
+
+    * Establish detailed validation rules for data entry fields (EHR, Profile, etc.).
