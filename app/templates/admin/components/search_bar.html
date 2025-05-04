@@ -1,0 +1,57 @@
+{% macro search_bar(url, placeholder="Search...", search_query="", filter_options=None, filter_name=None, filter_value=None) %}
+<div class="mb-6">
+  <form
+    action="{{ url }}"
+    method="GET"
+    class="md:flex space-y-4 md:space-y-0 md:space-x-4"
+  >
+    <!-- Search input -->
+    <div class="flex w-full md:w-1/2">
+      <input
+        type="text"
+        name="search"
+        placeholder="{{ placeholder }}"
+        value="{{ search_query }}"
+        class="flex-grow shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md rounded-r-none"
+      />
+      <button
+        type="submit"
+        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        <svg
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Filter dropdown (if provided) -->
+    {% if filter_options and filter_name %}
+    <div class="flex w-full md:w-1/3">
+      <select
+        name="{{ filter_name }}"
+        id="{{ filter_name }}"
+        class="flex-grow shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+        onchange="this.form.submit()"
+      >
+        <option value="">All</option>
+        {% for option_value, option_label in filter_options %}
+        <option value="{{ option_value }}" {% if filter_value == option_value %}selected{% endif %}>
+          {{ option_label }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+  </form>
+</div>
+{% endmacro %}

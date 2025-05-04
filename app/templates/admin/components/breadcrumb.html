@@ -1,0 +1,10 @@
+{% macro breadcrumb(items) %}
+<div class="flex text-sm text-gray-500 overflow-hidden">
+  {% for item in items %} {% if not loop.last %}
+  <a href="{{ item.url }}" class="hover:text-indigo-600">{{ item.label }}</a>
+  <span class="mx-2">›</span>
+  {% else %}
+  <span class="text-gray-700 truncate">{{ item.label }}</span>
+  {% endif %} {% endfor %}
+</div>
+{% endmacro %}

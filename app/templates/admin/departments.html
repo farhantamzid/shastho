@@ -1,0 +1,179 @@
+{% extends "admin/layout.html" %} {% from "admin/components/flash_messages.html"
+import flash_messages %} {% from "admin/components/search_bar.html" import
+search_bar %} {% from "admin/components/confirm_modal.html" import confirm_modal
+%} {% block title %}Departments - Admin Portal - Shastho{% endblock %} {% block
+page_title %}Departments{% endblock %} {% block breadcrumb %}
+<span class="text-gray-700">Departments</span>
+{% endblock %} {% block admin_content %}
+<div class="mt-4">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-lg font-medium text-gray-900">Department Management</h2>
+    <a
+      href="{{ url_for('admin.create_department') }}"
+      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    >
+      <svg
+        class="-ml-1 mr-2 h-5 w-5"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+        />
+      </svg>
+      Add Department
+    </a>
+  </div>
+
+  <!-- Search and Filter Bar -->
+  {% set filter_options = [] %} {% for hospital in hospitals %} {% set
+  filter_options = filter_options + [(hospital.id|string, hospital.name)] %} {%
+  endset %} {{ search_bar( url=url_for('admin.departments'), placeholder="Search
+  by department name...", search_query=search_query,
+  filter_options=filter_options, filter_name="hospital_id",
+  filter_value=hospital_id ) }}
+
+  <!-- Flash Messages -->
+  {{ flash_messages() }}
+
+  <!-- Department List -->
+  <div class="bg-white shadow overflow-hidden sm:rounded-md">
+    {% if departments %}
+    <ul class="divide-y divide-gray-200">
+      {% for department in departments %}
+      <li>
+        <div class="px-4 py-4 sm:px-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="bg-indigo-100 rounded-md p-2 mr-4">
+                <svg
+                  class="h-6 w-6 text-indigo-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-indigo-600 truncate">
+                  {{ department.name }}
+                </p>
+                <p class="flex items-center text-sm text-gray-500">
+                  <svg
+                    class="flex-shrink-0 mr-1 h-4 w-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  Hospital: {{ hospital_names.get(department.hospital_id|string,
+                  'Unknown') }}
+                </p>
+              </div>
+            </div>
+            <div class="flex space-x-2">
+              <a
+                href="{{ url_for('admin.edit_department', department_id=department.id) }}"
+                class="inline-flex items-center p-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <svg
+                  class="h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
+                </svg>
+              </a>
+              <button
+                onclick="handleDeleteDepartment('{{ department.id }}', '{{ department.name }}')"
+                class="inline-flex items-center p-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                <svg
+                  class="h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="px-4 py-5 sm:p-6 text-center">
+      {% if search_query or hospital_id %}
+      <p class="text-gray-500">
+        No departments found matching your filters. {% if search_query %}<br />Search:
+        "{{ search_query }}"{% endif %} {% if hospital_id %}<br />Hospital: "{{
+        hospital_names.get(hospital_id, 'Unknown') }}"{% endif %}
+      </p>
+      {% else %}
+      <p class="text-gray-500">No departments have been added yet.</p>
+      {% endif %}
+      <a
+        href="{{ url_for('admin.create_department') }}"
+        class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        Add Your First Department
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal using Component -->
+{{ confirm_modal( modal_id="deleteModal", form_id="deleteForm", title="Delete
+Department", js_function_name="Delete" ) }}
+
+<script>
+  function handleDeleteDepartment(departmentId, departmentName) {
+    confirmDelete(
+      departmentId,
+      departmentName,
+      `/admin/departments/${departmentId}/delete`
+    );
+  }
+</script>
+{% endblock %}

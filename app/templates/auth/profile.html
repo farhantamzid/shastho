@@ -59,8 +59,9 @@ block content %}
             <div>
               <h3 class="text-sm font-medium text-gray-500">Account Created</h3>
               <p class="mt-1 text-gray-900">
-                {{ user.created_at.strftime('%B %d, %Y') if user.created_at else
-                'Unknown' }}
+                {% if user.created_at %} {% if user.created_at is string %} {{
+                user.created_at }} {% else %} {{ user.created_at.strftime('%B
+                %d, %Y') }} {% endif %} {% else %} Unknown {% endif %}
               </p>
             </div>
           </div>

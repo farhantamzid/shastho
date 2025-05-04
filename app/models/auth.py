@@ -84,6 +84,19 @@ def change_password(user_id, old_password, new_password):
 # Create some initial users for testing
 def create_demo_users():
     """Create demo users for testing."""
+    if not find_user_by_username('patient@shastho.com'):
+        create_user('patient@shastho.com', 'patient123', 'patient', 'Demo Patient')
+
+    if not find_user_by_username('doctor@shastho.com'):
+        create_user('doctor@shastho.com', 'doctor123', 'doctor', 'Dr. Demo Doctor')
+
+    if not find_user_by_username('admin@shastho.com'):
+        create_user('admin@shastho.com', 'admin123', 'admin', 'Admin User')
+
+    if not find_user_by_username('staff@shastho.com'):
+        create_user('staff@shastho.com', 'staff123', 'staff', 'Staff Member')
+
+    # Also keep the example.com accounts for backward compatibility
     if not find_user_by_username('patient@example.com'):
         create_user('patient@example.com', 'password123', 'patient', 'Demo Patient')
 

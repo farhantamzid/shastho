@@ -1,0 +1,135 @@
+{% extends "base.html" %} {% block title %}Dashboard - Shastho{% endblock %} {%
+block content %}
+<div class="bg-gradient-to-br from-cyan-50 to-blue-50 min-h-screen py-12">
+  <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto">
+      <!-- Dashboard Header -->
+      <div class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+          Welcome, {{ session.get('user_name', 'User') }}
+        </h1>
+        <p class="text-gray-600">
+          Your role:
+          <span class="font-medium capitalize"
+            >{{ session.get('user_role', 'User') }}</span
+          >
+        </p>
+      </div>
+
+      <!-- Dashboard Cards -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Profile Card -->
+        <div
+          class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+        >
+          <div class="bg-cyan-600 p-4">
+            <h2 class="text-xl font-semibold text-white">Your Profile</h2>
+          </div>
+          <div class="p-5">
+            <p class="text-gray-600 mb-4">
+              View and manage your personal information
+            </p>
+            <a
+              href="{{ url_for('auth.profile') }}"
+              class="inline-block bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded transition"
+            >
+              View Profile
+            </a>
+          </div>
+        </div>
+
+        <!-- Admin Portal Card (Shown only for admins) -->
+        {% if session.get('user_role') == 'admin' %}
+        <div
+          class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+        >
+          <div class="bg-purple-600 p-4">
+            <h2 class="text-xl font-semibold text-white">Admin Portal</h2>
+          </div>
+          <div class="p-5">
+            <p class="text-gray-600 mb-4">
+              Manage hospitals, departments, and system settings
+            </p>
+            <a
+              href="{{ url_for('admin.dashboard') }}"
+              class="inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded transition"
+            >
+              Go to Admin Portal
+            </a>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Patient Records Card (Shown for doctors or staff) -->
+        {% if session.get('user_role') in ['doctor', 'staff'] %}
+        <div
+          class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+        >
+          <div class="bg-green-600 p-4">
+            <h2 class="text-xl font-semibold text-white">Patient Records</h2>
+          </div>
+          <div class="p-5">
+            <p class="text-gray-600 mb-4">Access and manage patient records</p>
+            <a
+              href="#"
+              class="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+            >
+              View Patients
+            </a>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Appointments Card (Shown for patients or doctors) -->
+        {% if session.get('user_role') in ['patient', 'doctor'] %}
+        <div
+          class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+        >
+          <div class="bg-blue-600 p-4">
+            <h2 class="text-xl font-semibold text-white">Appointments</h2>
+          </div>
+          <div class="p-5">
+            <p class="text-gray-600 mb-4">
+              {% if session.get('user_role') == 'patient' %} Schedule and manage
+              your appointments {% else %} View and manage your patient
+              appointments {% endif %}
+            </p>
+            <a
+              href="#"
+              class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
+            >
+              {% if session.get('user_role') == 'patient' %} Schedule
+              Appointment {% else %} View Schedule {% endif %}
+            </a>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Health Records Card (Shown only for patients) -->
+        {% if session.get('user_role') == 'patient' %}
+        <div
+          class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+        >
+          <div class="bg-teal-600 p-4">
+            <h2 class="text-xl font-semibold text-white">Health Records</h2>
+          </div>
+          <div class="p-5">
+            <p class="text-gray-600 mb-4">
+              Access your medical history and test results
+            </p>
+            <a
+              href="#"
+              class="inline-block bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded transition"
+            >
+              View Records
+            </a>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- More cards can be added conditionally based on role -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

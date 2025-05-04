@@ -1,0 +1,496 @@
+{% extends "admin/layout.html" %} {% block title %}Hospitals - Admin Portal -
+Shastho{% endblock %} {% block page_title %}Hospitals{% endblock %} {% block
+breadcrumb %}
+<span class="text-gray-700">Hospitals</span>
+{% endblock %} {% block admin_content %}
+<div class="mt-4">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-lg font-medium text-gray-900">Hospital Management</h2>
+    <a
+      href="{{ url_for('admin.create_hospital') }}"
+      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    >
+      <svg
+        class="-ml-1 mr-2 h-5 w-5"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+        />
+      </svg>
+      Add Hospital
+    </a>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="mb-6">
+    <form
+      action="{{ url_for('admin.hospitals') }}"
+      method="GET"
+      class="flex w-full md:w-1/2"
+    >
+      <input
+        type="text"
+        name="search"
+        placeholder="Search by name or location..."
+        value="{{ search_query }}"
+        class="flex-grow shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md rounded-r-none"
+      />
+      <button
+        type="submit"
+        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        <svg
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %}
+  <div
+    class="mb-4 p-4 rounded-md {% if category == 'success' %}bg-green-50 text-green-800{% elif category == 'error' %}bg-red-50 text-red-800{% else %}bg-blue-50 text-blue-800{% endif %}"
+  >
+    <div class="flex">
+      <div class="flex-shrink-0">
+        {% if category == 'success' %}
+        <svg
+          class="h-5 w-5 text-green-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          />
+        </svg>
+        {% elif category == 'error' %}
+        <svg
+          class="h-5 w-5 text-red-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+        {% else %}
+        <svg
+          class="h-5 w-5 text-blue-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        {% endif %}
+      </div>
+      <div class="ml-3">
+        <p class="text-sm">{{ message }}</p>
+      </div>
+    </div>
+  </div>
+  {% endfor %} {% endif %} {% endwith %}
+
+  <!-- Hospital List -->
+  <div class="bg-white shadow overflow-hidden sm:rounded-md">
+    {% if hospitals %}
+    <ul class="divide-y divide-gray-200">
+      {% for hospital in hospitals %}
+      <li>
+        <div class="px-4 py-4 sm:px-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="bg-indigo-100 rounded-md p-2 mr-4">
+                <svg
+                  class="h-6 w-6 text-indigo-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-indigo-600 truncate">
+                  {{ hospital.name }}
+                </p>
+                <p class="flex items-center text-sm text-gray-500">
+                  <svg
+                    class="flex-shrink-0 mr-1 h-4 w-4 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  {{ hospital.location }}
+                </p>
+              </div>
+            </div>
+            <div class="flex space-x-2">
+              <a
+                href="{{ url_for('admin.edit_hospital', hospital_id=hospital.id) }}"
+                class="inline-flex items-center p-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <svg
+                  class="h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
+                </svg>
+              </a>
+              <button
+                onclick="confirmDelete('{{ hospital.id }}', '{{ hospital.name }}')"
+                class="inline-flex items-center p-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                <svg
+                  class="h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="mt-2 sm:flex sm:justify-between">
+            <div class="sm:flex-1">
+              <p class="text-sm text-gray-500">{{ hospital.address }}</p>
+              <p class="mt-1 flex items-center text-sm text-gray-500">
+                <svg
+                  class="flex-shrink-0 mr-1 h-4 w-4 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  />
+                </svg>
+                {{ hospital.contact_number }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="px-4 py-5 sm:p-6 text-center">
+      {% if search_query %}
+      <p class="text-gray-500">
+        No hospitals found matching "{{ search_query }}".
+        <a
+          href="{{ url_for('admin.hospitals') }}"
+          class="text-indigo-600 hover:text-indigo-500"
+          >Clear search</a
+        >
+      </p>
+      {% else %}
+      <p class="text-gray-500">No hospitals have been added yet.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+  <div
+    class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+  >
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+    <span
+      class="hidden sm:inline-block sm:align-middle sm:h-screen"
+      aria-hidden="true"
+      >&#8203;</span
+    >
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+    >
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div
+            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+          >
+            <svg
+              class="h-6 w-6 text-red-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3
+              class="text-lg leading-6 font-medium text-gray-900"
+              id="modal-title"
+            >
+              Delete Hospital
+            </h3>
+            <div class="mt-2">
+              <p class="text-sm text-gray-500" id="delete-message">
+                Are you sure you want to delete this hospital? This action
+                cannot be undone.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <form id="deleteForm" method="POST">
+          <button
+            type="submit"
+            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Delete
+          </button>
+        </form>
+        <button
+          type="button"
+          onclick="closeModal()"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function confirmDelete(hospitalId, hospitalName) {
+    document.getElementById("deleteForm").action =
+      "{{ url_for('admin.delete_hospital', hospital_id='PLACEHOLDER') }}".replace(
+        "PLACEHOLDER",
+        hospitalId
+      );
+    document.getElementById(
+      "delete-message"
+    ).textContent = `Are you sure you want to delete the hospital "${hospitalName}"? This action cannot be undone.`;
+    document.getElementById("deleteModal").classList.remove("hidden");
+  }
+
+  function closeModal() {
+    document.getElementById("deleteModal").classList.add("hidden");
+  }
+
+  // Close modal when clicking outside
+  document.addEventListener("click", function (event) {
+    const modal = document.getElementById("deleteModal");
+    const modalContent = document.querySelector(
+      "#deleteModal > div > div:last-child"
+    );
+
+    if (
+      modal &&
+      !modal.classList.contains("hidden") &&
+      !modalContent.contains(event.target)
+    ) {
+      closeModal();
+    }
+  });
+
+  // Ajax delete handler
+  document
+    .getElementById("deleteForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      fetch(this.action, {
+        method: "POST",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          closeModal();
+          if (data.success) {
+            // Show success message
+            const flashContainer = document.createElement("div");
+            flashContainer.className =
+              "mb-4 p-4 rounded-md bg-green-50 text-green-800";
+            flashContainer.innerHTML = `
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm">${data.message}</p>
+            </div>
+          </div>
+        `;
+
+            // Insert at the top of the content area
+            const contentArea = document.querySelector(".bg-white.shadow");
+            contentArea.parentNode.insertBefore(flashContainer, contentArea);
+
+            // Remove the deleted hospital from the list
+            const hospitalId = this.action.split("/").pop();
+            const listItem = document
+              .querySelector(`button[onclick*="${hospitalId}"]`)
+              .closest("li");
+            listItem.remove();
+
+            // Check if we need to show the "no hospitals" message
+            const hospitalItems = document.querySelectorAll(".divide-y > li");
+            if (hospitalItems.length === 0) {
+              const noHospitalsMessage = document.createElement("div");
+              noHospitalsMessage.className = "px-4 py-5 sm:p-6 text-center";
+              noHospitalsMessage.innerHTML =
+                '<p class="text-gray-500">No hospitals have been added yet.</p>';
+
+              const listContainer = document.querySelector(".divide-y");
+              if (listContainer) {
+                listContainer.parentNode.replaceChild(
+                  noHospitalsMessage,
+                  listContainer
+                );
+              }
+            }
+
+            // Auto-remove the flash message after 5 seconds
+            setTimeout(() => {
+              flashContainer.remove();
+            }, 5000);
+          } else {
+            // Show error message
+            const flashContainer = document.createElement("div");
+            flashContainer.className =
+              "mb-4 p-4 rounded-md bg-red-50 text-red-800";
+            flashContainer.innerHTML = `
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm">${data.message}</p>
+            </div>
+          </div>
+        `;
+
+            // Insert at the top of the content area
+            const contentArea = document.querySelector(".bg-white.shadow");
+            contentArea.parentNode.insertBefore(flashContainer, contentArea);
+
+            // Auto-remove the flash message after 5 seconds
+            setTimeout(() => {
+              flashContainer.remove();
+            }, 5000);
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          closeModal();
+
+          // Show error message
+          const flashContainer = document.createElement("div");
+          flashContainer.className =
+            "mb-4 p-4 rounded-md bg-red-50 text-red-800";
+          flashContainer.innerHTML = `
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm">An error occurred while deleting the hospital.</p>
+          </div>
+        </div>
+      `;
+
+          // Insert at the top of the content area
+          const contentArea = document.querySelector(".bg-white.shadow");
+          contentArea.parentNode.insertBefore(flashContainer, contentArea);
+
+          // Auto-remove the flash message after 5 seconds
+          setTimeout(() => {
+            flashContainer.remove();
+          }, 5000);
+        });
+    });
+</script>
+{% endblock %}

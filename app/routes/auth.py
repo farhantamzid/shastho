@@ -198,59 +198,51 @@ def register():
                 flash('Registration successful! Please log in.', 'success')
                 return redirect(url_for('auth.login'))
         else:
-            # This should not happen due to earlier validation, but just in case
-            flash('A user with that email already exists or there was an error during registration.', 'error')
+            # Handle user creation failure
+            flash('There was an error creating your account. Please try again.', 'error')
             return render_template('auth/register.html', form=form)
-
-    # Form didn't validate
-    for field, errors in form.errors.items():
-        for error in errors:
-            flash(f"{field}: {error}", 'error')
 
     return render_template('auth/register.html', form=form)
 
 @auth_bp.route('/registration-success', methods=['GET'])
 def registration_success():
     # Check if we have temporary user info in session
-    if 'temp_user_id' not in session or 'temp_user_role' not in session:
-        flash('Invalid access to registration success page.', 'error')
-        return redirect(url_for('auth.login'))
-
-    # Get user info
     user_id = session.pop('temp_user_id', None)
     user_role = session.pop('temp_user_role', None)
 
-    return render_template('auth/registration_success.html',
-                          user_id=user_id,
-                          user_role=user_role)
+    if not user_id:
+        # If no temp user ID, redirect to home
+        return redirect(url_for('main.index'))
+
+    return render_template('auth/registration_success.html', user_role=user_role)
 
 @auth_bp.route('/logout')
 def logout():
     # Clear the session
     session.clear()
-    flash('You have been logged out', 'success')
+    flash('You have been logged out.', 'success')
     return redirect(url_for('main.index'))
 
-# Example of a protected route that requires authentication
 @auth_bp.route('/profile')
 @login_required
 def profile():
-    user = find_user_by_id(session['user_id'])
+    user_id = session.get('user_id')
+    user = find_user_by_id(user_id)
+
     if not user:
-        session.clear()
-        flash('User not found', 'error')
+        session.clear()  # Clear invalid session
+        flash('User not found. Please log in again.', 'error')
         return redirect(url_for('auth.login'))
 
     return render_template('auth/profile.html', user=user)
 
-# Example of a route that requires specific role(s)
 @auth_bp.route('/admin')
 @role_required(['admin'])
 def admin():
-    return "Admin area - only admins can see this page"
+    # Redirect to the new admin dashboard
+    return redirect(url_for('admin.dashboard'))
 
-# Example of a route that allows multiple roles
 @auth_bp.route('/restricted')
 @role_required(['admin', 'staff'])
 def restricted_area():
-    return "Restricted area - only admins and staff can see this page"
+    return render_template('restricted.html')

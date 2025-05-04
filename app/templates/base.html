@@ -55,6 +55,13 @@
             class="font-medium text-gray-700 hover:text-cyan-600"
             >Home</a
           >
+          {% if session.get('user_id') %}
+          <a
+            href="{{ url_for('main.dashboard') }}"
+            class="font-medium text-gray-700 hover:text-cyan-600"
+            >Dashboard</a
+          >
+          {% endif %}
           <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
             >Services</a
           >
@@ -103,11 +110,11 @@
                 </a>
                 {% if session.get('user_role') == 'admin' %}
                 <a
-                  href="{{ url_for('auth.admin') }}"
+                  href="{{ url_for('admin.dashboard') }}"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   <i data-lucide="settings" class="h-4 w-4 inline mr-1"></i>
-                  Admin
+                  Admin Portal
                 </a>
                 {% endif %}
                 <div class="border-t border-gray-100"></div>
@@ -144,6 +151,13 @@
             class="font-medium text-gray-700 hover:text-cyan-600 py-2"
             >Home</a
           >
+          {% if session.get('user_id') %}
+          <a
+            href="{{ url_for('main.dashboard') }}"
+            class="font-medium text-gray-700 hover:text-cyan-600 py-2"
+            >Dashboard</a
+          >
+          {% endif %}
           <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
             >Services</a
           >
@@ -172,10 +186,11 @@
           </a>
           {% if session.get('user_role') == 'admin' %}
           <a
-            href="{{ url_for('auth.admin') }}"
+            href="{{ url_for('admin.dashboard') }}"
             class="font-medium text-gray-700 hover:text-cyan-600 py-1 ml-6"
           >
             <i data-lucide="settings" class="h-4 w-4 inline mr-1"></i> Admin
+            Portal
           </a>
           {% endif %}
           <a
@@ -202,67 +217,127 @@
       </div>
     </header>
 
+    <!-- Flash Messages -->
+    <div class="container mx-auto px-4 mt-4">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div
+        class="mb-4 {% if category == 'error' %}bg-red-100 text-red-700 border-red-400{% elif category == 'success' %}bg-green-100 text-green-700 border-green-400{% else %}bg-blue-100 text-blue-700 border-blue-400{% endif %} border-l-4 p-4 rounded"
+      >
+        <div class="flex">
+          <div class="flex-shrink-0">
+            {% if category == 'error' %}
+            <i data-lucide="alert-circle" class="h-5 w-5 text-red-400"></i>
+            {% elif category == 'success' %}
+            <i data-lucide="check-circle" class="h-5 w-5 text-green-400"></i>
+            {% else %}
+            <i data-lucide="info" class="h-5 w-5 text-blue-400"></i>
+            {% endif %}
+          </div>
+          <div class="ml-3">
+            <p class="text-sm">{{ message }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+    </div>
+
     <!-- Main Content -->
-    <main class="flex-grow">{% block content %}{% endblock %}</main>
+    <div class="flex-grow">{% block content %}{% endblock %}</div>
 
     <!-- Footer -->
-    <footer class="bg-gray-100 border-t py-6">
-      <div class="container mx-auto px-4 text-center text-gray-600">
-        <p>&copy; 2023 shastho. All rights reserved.</p>
+    <footer class="bg-gray-800 text-white py-8 mt-auto">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <h3 class="text-lg font-semibold mb-4">shastho</h3>
+            <p class="text-gray-300 text-sm">
+              Making healthcare accessible for everyone.
+            </p>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+            <ul class="space-y-2 text-gray-300 text-sm">
+              <li><a href="#" class="hover:text-white">About Us</a></li>
+              <li><a href="#" class="hover:text-white">Services</a></li>
+              <li><a href="#" class="hover:text-white">Doctors</a></li>
+              <li><a href="#" class="hover:text-white">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Legal</h3>
+            <ul class="space-y-2 text-gray-300 text-sm">
+              <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+              <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+              <li>
+                <a href="#" class="hover:text-white">Cookie Policy</a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Connect</h3>
+            <div class="flex space-x-4">
+              <a href="#" class="text-gray-300 hover:text-white">
+                <i data-lucide="facebook" class="h-5 w-5"></i>
+              </a>
+              <a href="#" class="text-gray-300 hover:text-white">
+                <i data-lucide="twitter" class="h-5 w-5"></i>
+              </a>
+              <a href="#" class="text-gray-300 hover:text-white">
+                <i data-lucide="instagram" class="h-5 w-5"></i>
+              </a>
+              <a href="#" class="text-gray-300 hover:text-white">
+                <i data-lucide="linkedin" class="h-5 w-5"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-gray-700 mt-8 pt-8 text-sm text-gray-300">
+          <p>&copy; 2023 shastho. All rights reserved.</p>
+        </div>
       </div>
     </footer>
 
-    <!-- JavaScript -->
+    <!-- Lucide Icons (Just the ones we need) -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
+      lucide.createIcons();
+    </script>
+
+    <!-- User Menu Toggle -->
+    <script>
+      // For desktop dropdown
       document.addEventListener("DOMContentLoaded", function () {
-        // Initialize Lucide icons
-        lucide.createIcons();
-
-        // Mobile menu toggle functionality
-        const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
-        const mobileMenu = document.getElementById("mobile-menu");
-
-        if (mobileMenuToggle && mobileMenu) {
-          mobileMenuToggle.addEventListener("click", function () {
-            mobileMenu.classList.toggle("hidden");
-
-            // Change icon based on menu state
-            const icon = mobileMenuToggle.querySelector("i");
-            if (mobileMenu.classList.contains("hidden")) {
-              icon.setAttribute("data-lucide", "menu");
-            } else {
-              icon.setAttribute("data-lucide", "x");
-            }
-            lucide.createIcons();
-          });
-        }
-
-        // User dropdown menu functionality
         const userMenuButton = document.getElementById("userMenuButton");
         const userMenu = document.getElementById("userMenu");
+        const userMenuDropdown = document.getElementById("userMenuDropdown");
 
         if (userMenuButton && userMenu) {
           userMenuButton.addEventListener("click", function () {
             userMenu.classList.toggle("hidden");
           });
 
-          // Close dropdown when clicking outside
+          // Close the dropdown when clicking outside
           document.addEventListener("click", function (event) {
-            const isClickInside = document
-              .getElementById("userMenuDropdown")
-              ?.contains(event.target);
-            if (
-              isClickInside === false &&
-              !userMenu.classList.contains("hidden")
-            ) {
+            if (userMenuDropdown && !userMenuDropdown.contains(event.target)) {
               userMenu.classList.add("hidden");
             }
+          });
+        }
+
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+        const mobileMenu = document.getElementById("mobile-menu");
+
+        if (mobileMenuToggle && mobileMenu) {
+          mobileMenuToggle.addEventListener("click", function () {
+            mobileMenu.classList.toggle("hidden");
           });
         }
       });
     </script>
 
-    {% block scripts %}{% endblock %}
+    <!-- Additional JavaScript -->
+    {% block extra_js %}{% endblock %}
   </body>
 </html>

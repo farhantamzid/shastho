@@ -1,0 +1,58 @@
+{% macro flash_messages() %} {% with messages =
+get_flashed_messages(with_categories=true) %} {% if messages %} {% for category,
+message in messages %}
+<div
+  class="mb-4 p-4 rounded-md {% if category == 'success' %}bg-green-50 text-green-800{% elif category == 'error' %}bg-red-50 text-red-800{% else %}bg-blue-50 text-blue-800{% endif %}"
+>
+  <div class="flex">
+    <div class="flex-shrink-0">
+      {% if category == 'success' %}
+      <svg
+        class="h-5 w-5 text-green-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+      {% elif category == 'error' %}
+      <svg
+        class="h-5 w-5 text-red-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+      {% else %}
+      <svg
+        class="h-5 w-5 text-blue-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      {% endif %}
+    </div>
+    <div class="ml-3">
+      <p class="text-sm">{{ message }}</p>
+    </div>
+  </div>
+</div>
+{% endfor %} {% endif %} {% endwith %} {% endmacro %}
