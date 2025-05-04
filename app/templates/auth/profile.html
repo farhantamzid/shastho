@@ -1,0 +1,97 @@
+{% extends "base.html" %} {% block title %}Profile - HealthBD{% endblock %} {%
+block content %}
+<div
+  class="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <!-- Header with user info -->
+      <div class="bg-cyan-600 p-6 text-white">
+        <div class="flex items-center space-x-4">
+          <div class="rounded-full bg-white p-2">
+            <i data-lucide="user" class="h-10 w-10 text-cyan-600"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold">Welcome, {{ user.username }}</h1>
+            <p class="text-cyan-100">
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800 capitalize"
+              >
+                {{ user.role.value if user.role else 'User' }}
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="p-6">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div
+          class="rounded-md p-4 mb-4 {% if category == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}"
+        >
+          {{ message }}
+        </div>
+        {% endfor %} {% endif %} {% endwith %}
+
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+          <h2 class="text-lg font-medium text-gray-900 mb-4">
+            Account Information
+          </h2>
+          <div class="space-y-3">
+            <div>
+              <h3 class="text-sm font-medium text-gray-500">Email</h3>
+              <p class="mt-1 text-gray-900">{{ user.username }}</p>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-500">Role</h3>
+              <p class="mt-1 text-gray-900 capitalize">
+                {{ user.role.value if user.role else 'User' }}
+              </p>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-500">Status</h3>
+              <p class="mt-1 text-gray-900 capitalize">
+                {{ user.status.value if user.status else 'Unknown' }}
+              </p>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-500">Account Created</h3>
+              <p class="mt-1 text-gray-900">
+                {{ user.created_at.strftime('%B %d, %Y') if user.created_at else
+                'Unknown' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a
+            href="{{ url_for('main.index') }}"
+            class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+          >
+            <i data-lucide="home" class="h-5 w-5 mr-2"></i>
+            Back to Home
+          </a>
+          <a
+            href="{{ url_for('auth.logout') }}"
+            class="inline-flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+          >
+            <i data-lucide="log-out" class="h-5 w-5 mr-2"></i>
+            Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize Lucide icons
+    lucide.createIcons();
+  });
+</script>
+{% endblock %}

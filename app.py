@@ -1,6 +1,8 @@
 import os
 from flask import Flask, render_template
 from dotenv import load_dotenv
+from datetime import timedelta
+from flask_session import Session
 
 # Load environment variables
 load_dotenv()
@@ -13,9 +15,23 @@ def create_app():
     # Configure the app
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-for-development')
 
+    # Session configuration
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_PERMANENT'] = True
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+    app.config['SESSION_USE_SIGNER'] = True
+    app.config['SESSION_KEY_PREFIX'] = 'shastho_'
+    app.config['SESSION_FILE_DIR'] = os.path.join(os.getcwd(), 'flask_session')
+
+    # Initialize Flask-Session
+    Session(app)
+
     # Register blueprints
     from app.routes.main import main_bp
+    from app.routes.auth import auth_bp
+
     app.register_blueprint(main_bp)
+    app.register_blueprint(auth_bp)
 
     return app
 

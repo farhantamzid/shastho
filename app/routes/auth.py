@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SelectField
-from wtforms.validators import DataRequired, Email, EqualTo, Length
-from app.models.database import UserRole, UserStatus
-from app.models.auth import create_user, validate_credentials, find_user_by_id
+from wtforms import StringField, PasswordField, BooleanField, SelectField, DateField, TextAreaField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
+from app.models.database import UserRole, UserStatus, Gender
+from app.models.auth import create_user, validate_credentials, find_user_by_id, find_user_by_username
 from functools import wraps
 from uuid import uuid4
+from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -32,6 +33,18 @@ class RegistrationForm(FlaskForm):
         ('admin', 'Administrator'),
         ('staff', 'Staff')
     ], validators=[DataRequired()])
+
+    # Patient-specific fields (shown conditionally when role='patient')
+    date_of_birth = DateField('Date of Birth', format='%Y-%m-%d', validators=[Optional()])
+    gender = SelectField('Gender', choices=[
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other')
+    ], validators=[Optional()])
+    contact_number = StringField('Contact Number', validators=[Optional(), Length(min=10, max=15)])
+    address = TextAreaField('Address', validators=[Optional(), Length(max=200)])
+    emergency_contact_name = StringField('Emergency Contact Name', validators=[Optional(), Length(min=2, max=100)])
+    emergency_contact_number = StringField('Emergency Contact Number', validators=[Optional(), Length(min=10, max=15)])
 
 # Helper functions for role-based access control
 def login_required(f):
@@ -87,6 +100,54 @@ def login():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        # Additional server-side validation for patient fields if the role is 'patient'
+        validation_errors = []
+
+        if form.role.data == 'patient':
+            # Date of birth validation
+            if not form.date_of_birth.data:
+                validation_errors.append('Date of birth is required for patients.')
+            elif form.date_of_birth.data > datetime.now().date():
+                validation_errors.append('Date of birth cannot be in the future.')
+
+            # Gender validation
+            if not form.gender.data:
+                validation_errors.append('Gender is required for patients.')
+
+            # Contact number validation
+            if not form.contact_number.data:
+                validation_errors.append('Contact number is required for patients.')
+            elif len(form.contact_number.data) < 10 or len(form.contact_number.data) > 15:
+                validation_errors.append('Contact number must be between 10 and 15 characters.')
+
+            # Address validation
+            if not form.address.data:
+                validation_errors.append('Address is required for patients.')
+            elif len(form.address.data) < 5:
+                validation_errors.append('Address must be at least 5 characters.')
+
+            # Emergency contact name validation
+            if not form.emergency_contact_name.data:
+                validation_errors.append('Emergency contact name is required for patients.')
+
+            # Emergency contact number validation
+            if not form.emergency_contact_number.data:
+                validation_errors.append('Emergency contact number is required for patients.')
+            elif len(form.emergency_contact_number.data) < 10 or len(form.emergency_contact_number.data) > 15:
+                validation_errors.append('Emergency contact number must be between 10 and 15 characters.')
+
+        # Check for uniqueness of username/email
+        existing_user = find_user_by_username(form.email.data)
+        if existing_user:
+            validation_errors.append('A user with that email already exists.')
+
+        # If there are validation errors, show them
+        if validation_errors:
+            for error in validation_errors:
+                flash(error, 'error')
+            return render_template('auth/register.html', form=form)
+
+        # All validations passed, create the user
         user = create_user(
             username=form.email.data,
             password=form.password.data,
@@ -95,12 +156,73 @@ def register():
         )
 
         if user:
-            flash('Registration successful! Please log in.', 'success')
-            return redirect(url_for('auth.login'))
+            # If registering as a patient, create a patient record
+            if form.role.data == 'patient':
+                try:
+                    from app.models.database import Patient, Gender
+
+                    # Create patient record linked to user
+                    patient = Patient(
+                        user_id=user.id,
+                        full_name=form.full_name.data,
+                        date_of_birth=form.date_of_birth.data if form.date_of_birth.data else None,
+                        gender=Gender(form.gender.data) if form.gender.data else None,
+                        contact_number=form.contact_number.data,
+                        address=form.address.data,
+                        emergency_contact_name=form.emergency_contact_name.data,
+                        emergency_contact_number=form.emergency_contact_number.data
+                    )
+
+                    # Save patient to database (using a mock database for now)
+                    from app.models.patient import save_patient
+                    saved_patient = save_patient(patient)
+
+                    if saved_patient:
+                        # Save user ID and role in session for redirection to success page
+                        session['temp_user_id'] = str(user.id)
+                        session['temp_user_role'] = user.role.value if user.role else 'patient'
+
+                        # Redirect to registration success page
+                        flash('Registration successful! Your patient account has been created.', 'success')
+                        return redirect(url_for('auth.registration_success'))
+                    else:
+                        # Handle patient save failure
+                        flash('There was an error creating your patient profile. Please try again.', 'error')
+                        return render_template('auth/register.html', form=form)
+                except Exception as e:
+                    # Handle any exceptions during patient creation
+                    flash(f'An error occurred: {str(e)}. Please try again.', 'error')
+                    return render_template('auth/register.html', form=form)
+            else:
+                # For non-patient users, redirect to login
+                flash('Registration successful! Please log in.', 'success')
+                return redirect(url_for('auth.login'))
         else:
-            flash('A user with that email already exists', 'error')
+            # This should not happen due to earlier validation, but just in case
+            flash('A user with that email already exists or there was an error during registration.', 'error')
+            return render_template('auth/register.html', form=form)
+
+    # Form didn't validate
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(f"{field}: {error}", 'error')
 
     return render_template('auth/register.html', form=form)
+
+@auth_bp.route('/registration-success', methods=['GET'])
+def registration_success():
+    # Check if we have temporary user info in session
+    if 'temp_user_id' not in session or 'temp_user_role' not in session:
+        flash('Invalid access to registration success page.', 'error')
+        return redirect(url_for('auth.login'))
+
+    # Get user info
+    user_id = session.pop('temp_user_id', None)
+    user_role = session.pop('temp_user_role', None)
+
+    return render_template('auth/registration_success.html',
+                          user_id=user_id,
+                          user_role=user_role)
 
 @auth_bp.route('/logout')
 def logout():
