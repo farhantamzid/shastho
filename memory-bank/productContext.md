@@ -1,65 +1,132 @@
 # Product Context
 
-## Problem Statement
+## What is shastho?
 
-Healthcare in Bangladesh currently faces several critical challenges:
+shastho is a web-based application designed to enhance public healthcare in Bangladesh by providing a centralized National Electronic Health Record (EHR) system and a streamlined online Appointment Scheduling System for public hospitals. The platform addresses critical gaps in the country's healthcare infrastructure by digitizing health records and simplifying access to medical services.
 
-1. **Fragmented Medical Records**: Patient medical histories are scattered across different facilities, leading to incomplete information during treatment.
-2. **Inefficient Appointment Systems**: Manual appointment booking processes are time-consuming and error-prone.
-3. **Limited Health Monitoring**: Government lacks centralized data for public health monitoring and resource allocation.
-4. **Accessibility Barriers**: Citizens face difficulties accessing their own health information and navigating healthcare systems.
+## Key Problems shastho Solves
 
-## Solution Overview
+### Problem 1: Fragmented Medical Records
 
-Shastho addresses these challenges by providing:
+Currently, patient medical histories in Bangladesh are fragmented across different hospitals and healthcare providers, with most records maintained on paper. This leads to:
 
-- A **centralized EHR system** accessible to authorized healthcare providers and patients
-- An **online appointment scheduling system** for public hospitals
-- **Role-based access** for different stakeholders (patients, doctors, administrators)
-- **Government analytics** for public health monitoring and decision-making
+- **Incomplete medical history** when patients visit different facilities
+- **Repeated tests and examinations** due to lack of previous results
+- **Medication errors** without comprehensive prescription history
+- **Inefficient healthcare delivery** due to time spent reconstructing patient history
 
-## User Groups and Value Proposition
+shastho solves this by creating a centralized EHR system that:
 
-### Patients
+- Maintains complete medical histories in one secure location
+- Allows authorized healthcare providers to access relevant patient information
+- Reduces redundant tests and improves care continuity
+- Empowers patients to view and share their own medical records
 
-- **Value**: Easy access to personal health records and simplified appointment booking
-- **Pain Points Addressed**: Reduced wait times, elimination of lost medical records, convenient scheduling
-- **Key Features**: Self-registration, EHR access, appointment booking/management, feedback submission
+### Problem 2: Inefficient Appointment Booking
 
-### Doctors
+The current appointment booking process in Bangladesh's public hospitals is largely manual, requiring:
 
-- **Value**: Comprehensive patient history and efficient schedule management
-- **Pain Points Addressed**: Incomplete patient information, scheduling conflicts, inefficient record-keeping
-- **Key Features**: Patient search, EHR viewing/updating, prescription management, availability setting
+- **Physical presence** at hospitals for booking
+- **Long waiting lines** and administrative delays
+- **Limited visibility** into doctor availability
+- **No streamlined system** for rescheduling or cancellations
 
-### Hospital Administrators
+shastho addresses this with an online appointment scheduling system that:
 
-- **Value**: Better operational oversight and resource management
-- **Pain Points Addressed**: Scheduling inefficiencies, resource allocation, staffing challenges
-- **Key Features**: Test admin approval, hospital-wide appointment views, feedback monitoring
+- Allows patients to book appointments remotely
+- Provides real-time visibility into doctor availability
+- Enables easy rescheduling and cancellation
+- Reduces congestion and waiting times at hospitals
 
-### System Administrators
+## User Types and Their Needs
 
-- **Value**: Centralized system management
-- **Key Features**: Hospital management, user account approval
+shastho serves multiple user types, each with specific needs:
 
-### Test/Imaging Administrators
+1. **Patients**
 
-- **Value**: Streamlined result management
-- **Key Features**: Result upload, patient search
+   - Access to personal medical records
+   - Ability to book and manage appointments
+   - Secure communication with healthcare providers
+   - View prescription history and test results
 
-### Government Bodies
+2. **Doctors**
 
-- **Value**: Data-driven public health monitoring and policy development
-- **Pain Points Addressed**: Delayed outbreak detection, inefficient resource allocation, limited health trend visibility
-- **Key Features**: Anonymized health analytics, feedback reporting, outbreak notifications
+   - Access to patient medical histories
+   - Management of appointments and schedules
+   - Ability to issue prescriptions and test requests
+   - Communication with patients and other healthcare providers
+
+3. **Hospital Administrators**
+
+   - Management of hospital resources and departments
+   - Oversight of doctor scheduling
+   - Access to aggregate hospital data
+   - Ability to generate operational reports
+
+4. **System Administrators**
+
+   - User management and access control
+   - System configuration and maintenance
+   - Security monitoring and implementation
+
+5. **Test & Imaging Administrators**
+
+   - Management of test results and medical imaging
+   - Uploading reports to patient records
+   - Scheduling diagnostic appointments
+
+6. **Government Health Officials**
+   - Access to anonymized population health data
+   - Ability to monitor healthcare delivery trends
+   - Tools for healthcare resource planning
+
+## User Experience Goals
+
+shastho aims to provide a seamless, intuitive experience for all users:
+
+- **Accessible to All**: Simple interface usable by people with varying levels of technical literacy
+- **Multilingual Support**: Available in both Bangla and English
+- **Mobile-Friendly**: Responsive design that works on smartphones, tablets, and computers
+- **Low-Bandwidth Optimized**: Functions efficiently in areas with limited internet connectivity
+- **Privacy-Focused**: Clear controls for users to manage their data privacy
+
+## Development Phases
+
+The system will be built in four phases, each adding key functionality:
+
+1. **Foundation & Core Patient/Doctor MVP**
+
+   - User registration and authentication
+   - Basic hospital and doctor directories
+   - Simple appointment booking
+   - Core patient profile
+
+2. **EHR Core & Basic Interactions**
+
+   - Electronic health record foundation
+   - Prescription management
+   - Test request and results viewing
+   - Basic doctor-patient communication
+
+3. **Enhanced Features & Feedback**
+
+   - Advanced appointment management
+   - Patient feedback system
+   - Government portal for basic reporting
+   - Enhanced notification system
+
+4. **Analytics & Advanced Administration**
+   - Population health analytics
+   - Advanced administrative features
+   - Outbreak detection capabilities
+   - Integration capabilities with other systems
 
 ## Success Metrics
 
-The success of Shastho will be measured by:
+shastho's success will be measured through:
 
-1. **Adoption rate** among patients and healthcare providers
-2. **Reduction in wait times** for appointments
-3. **Improvements in healthcare continuity** (measured through patient/doctor feedback)
-4. **Enhanced public health monitoring** capabilities
-5. **Accessibility** to healthcare information for citizens
+- **User Adoption**: Number of registered patients, doctors, and hospitals
+- **System Usage**: Appointments booked, records accessed, prescriptions issued
+- **Efficiency Gains**: Reduction in hospital wait times and administrative overhead
+- **Patient Outcomes**: Improvements in care continuity and reduction of medical errors
+- **User Satisfaction**: Feedback from patients, doctors, and administrators

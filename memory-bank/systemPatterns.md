@@ -1,225 +1,250 @@
 # System Patterns
 
-## Architecture Overview
+## Application Architecture
 
-Shastho follows a classic MVC (Model-View-Controller) architecture with Flask:
+### Overall Structure
+
+The shastho application follows a classic Flask application structure with modifications for component-based frontend development:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Client (Web Browser)                      │
-└───────────────────────────┬─────────────────────────────────┘
-                            │
-┌───────────────────────────▼─────────────────────────────────┐
-│                     Flask Application                        │
-│                                                             │
-│  ┌───────────────┐     ┌───────────────┐    ┌────────────┐  │
-│  │   Routes &    │     │   Services &  │    │   Models   │  │
-│  │  Controllers  │◄───►│   Business    │◄──►│            │  │
-│  │               │     │     Logic     │    │            │  │
-│  └───────────────┘     └───────────────┘    └────────────┘  │
-│         │                                      │           │
-│         ▼                                      │           │
-│  ┌───────────────┐                             │           │
-│  │  Design System│                             │           │
-│  │   Components  │                             │           │
-│  └───────────────┘                             │           │
-│                                                │           │
-└────────────────────────────────────────────────┼───────────┘
-                                                 │
-┌────────────────────────────────────────────────▼───────────┐
-│                       Supabase                              │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │                PostgreSQL Database                   │    │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
+shastho/
+  ├── app/                    # Main application package
+  │   ├── components/         # Reusable UI components
+  │   ├── models/             # Database models
+  │   ├── routes/             # API and view routes
+  │   ├── services/           # Business logic services
+  │   ├── static/             # Static assets (CSS, JS, images)
+  │   ├── templates/          # Jinja2 HTML templates
+  │   └── utils/              # Utility functions and helpers
+  ├── design-system/          # Design system documentation and examples
+  ├── frontendExamples/       # Example UI implementations (reference only)
+  ├── tasks/                  # Task management files
+  ├── app.py                  # Application entry point
+  └── requirements.txt        # Python dependencies
 ```
 
-## Key Design Patterns
+### Component Based Development
 
-### 1. Repository Pattern
+The application uses a component-based approach for frontend development:
 
-Database interactions are abstracted through repository classes to separate data access from business logic:
+1. **Python Components**: Located in `app/components/`, these are Python modules that generate HTML for reusable UI elements (buttons, forms, cards, etc.)
+2. **Jinja2 Templates**: Located in `app/templates/`, these extend a base template and use the Python components
+3. **Design System**: Documents and demonstrates the components and their usage
+
+This approach allows for consistent UI elements throughout the application while working within the constraints of server-side rendering.
+
+## Design System
+
+The design system is implemented with Tailwind CSS and follows the patterns established in the `frontendExamples/` directory:
+
+1. **Color System**:
+
+   - Primary: Cyan-600 (#0891b2)
+   - Primary Hover: Cyan-700 (#0e7490)
+   - Primary Light: Cyan-50 (#ecfeff)
+   - Success: Green-500 (#10b981)
+   - Warning: Amber-500 (#f59e0b)
+   - Error: Red-500 (#ef4444)
+   - Info: Blue-500 (#3b82f6)
+
+2. **Component Types**:
+
+   - Base components (Button, Input, Card)
+   - Composite components (Form, Navbar, Table)
+   - Layout components (Container, Grid)
+
+3. **Documentation**:
+   - Each component has clear usage examples
+   - Design tokens are documented
+   - Layout patterns are provided
+
+## Component Implementation
+
+### Python Component Pattern
+
+UI components are implemented as Python functions that generate HTML:
 
 ```python
-class UserRepository:
-    def get_by_id(self, user_id):
-        # Database query logic
+# Example component pattern (Button)
+def primary(text, type="button", size="md", full_width=False, icon=None, additional_classes=""):
+    """
+    Generate HTML for a primary button.
+    """
+    # Base classes
+    classes = "bg-primary hover:bg-primary-hover text-white rounded-lg font-medium transition-colors"
 
-    def create(self, user_data):
-        # Insert logic
+    # Size classes
+    size_classes = {
+        "sm": "px-3 py-1.5 text-sm",
+        "md": "px-4 py-2.5",
+        "lg": "px-6 py-3 text-lg"
+    }
+
+    # Logic to build HTML
+    # ...
+
+    return f'<button type="{type}" class="{classes}">{icon_html}{text}</button>'
 ```
 
-### 2. Service Layer Pattern
+This allows for consistent components with configurable options, while keeping the HTML generation on the server side.
 
-Business logic is encapsulated in service classes:
+### Template Pattern
+
+Templates follow this structure:
+
+1. **Base Template**: Defines the overall page structure
+
+   ```html
+   <!DOCTYPE html>
+   <html>
+     <head>
+       <!-- Meta, CSS, etc. -->
+     </head>
+     <body>
+       <header><!-- Navigation --></header>
+       <main>{% block content %}{% endblock %}</main>
+       <footer><!-- Footer content --></footer>
+     </body>
+   </html>
+   ```
+
+2. **Page Templates**: Extend the base template
+
+   ```html
+   {% extends "base.html" %} {% block content %}
+   <!-- Page-specific content -->
+   {% endblock %}
+   ```
+
+3. **Component Usage**: Components are used within routes
+
+   ```python
+   from app.components import button
+
+   @app.route('/example')
+   def example():
+       primary_btn = button.primary("Click Me")
+       return render_template('example.html', primary_btn=primary_btn)
+   ```
+
+## Database Schema (Planned)
+
+The database schema will be implemented in Supabase (PostgreSQL) with the following key tables:
+
+1. **Users**: Core user information and authentication
+2. **Roles**: User roles (Patient, Doctor, Hospital Admin, etc.)
+3. **Hospitals**: Hospital information
+4. **Departments**: Hospital departments
+5. **Doctors**: Doctor profiles and specialties
+6. **Appointments**: Appointment scheduling
+7. **EHR**: Electronic health records
+8. **Prescriptions**: Medication prescriptions
+9. **Tests**: Medical test requests and results
+10. **Feedback**: User feedback and ratings
+
+## Authentication Flow (Planned)
+
+The authentication system will be a simple database-based approach:
+
+1. **Registration**:
+
+   - Role-specific registration forms
+   - Email verification
+   - Initial password setup
+
+2. **Login**:
+
+   - Email/password authentication
+   - Role-based redirection after login
+   - Session management
+
+3. **Authorization**:
+   - Role-based access control
+   - Permission checks in routes and templates
+
+## Routing Structure (Implemented)
+
+Routes are organized by feature and implemented using Flask Blueprints:
 
 ```python
-class AppointmentService:
-    def __init__(self, appointment_repo, doctor_repo):
-        self.appointment_repo = appointment_repo
-        self.doctor_repo = doctor_repo
+# Main blueprint example
+from flask import Blueprint, render_template
 
-    def book_appointment(self, patient_id, doctor_id, time_slot):
-        # Check availability, validate, and book
+main_bp = Blueprint('main', __name__)
+
+@main_bp.route('/')
+def index():
+    """Landing page route"""
+    return render_template('index.html', title='Home')
 ```
 
-### 3. Blueprint Pattern (Flask)
-
-The application is organized into logical modules using Flask Blueprints:
+Blueprints are registered in the main app:
 
 ```python
-# auth_blueprint.py
-auth_bp = Blueprint('auth', __name__)
-
-@auth_bp.route('/login', methods=['GET', 'POST'])
-def login():
-    # Login logic
-
 # In app.py
-app.register_blueprint(auth_bp, url_prefix='/auth')
+def create_app():
+    app = Flask(__name__,
+               template_folder='app/templates',
+               static_folder='app/static')
+
+    # Register blueprints
+    from app.routes.main import main_bp
+    app.register_blueprint(main_bp)
+
+    return app
 ```
 
-### 4. Design System Component Pattern
+## Database Connection (Implemented)
 
-For frontend components, we've established a comprehensive design system with a consistent component architecture pattern:
+Supabase client is implemented as a utility function:
 
-```javascript
-/**
- * ComponentName Component
- *
- * Brief description of what it does.
- *
- * Usage examples in JSDoc comments.
- */
-class ComponentName {
-  constructor() {
-    // Base classes and default configuration
-    this.baseClasses = "...";
-  }
+```python
+# In app/utils/db.py
+import os
+from supabase import create_client
+from dotenv import load_dotenv
 
-  /**
-   * Renders the component with options
-   * @param {Object} options - Component options
-   * @returns {string} HTML markup
-   */
-  render(options = {}) {
-    // Combine classes, process options
-    return `<!-- Generated HTML -->`;
-  }
+# Load environment variables if not already loaded
+load_dotenv()
 
-  // Helper methods for common variants
-  variantName(options = {}) {
-    return this.render({ variant: "name", ...options });
-  }
-}
+def get_supabase_client():
+    """
+    Create and return a Supabase client instance.
+    """
+    supabase_url = os.getenv("SUPABASE_URL")
+    supabase_key = os.getenv("SUPABASE_KEY")
 
-export default new ComponentName();
+    if not supabase_url or not supabase_key:
+        raise ValueError("Supabase URL and key must be provided in environment variables")
+
+    return create_client(supabase_url, supabase_key)
 ```
 
-This pattern allows for consistent rendering, composition, and styling across the UI.
+## Environment Configuration (Implemented)
 
-## Design System Architecture
-
-Our UI Design System follows a modular architecture with clear hierarchy and composition patterns:
-
-### 1. Design Tokens
-
-Foundational visual attributes with standardized values:
-
-- **Colors**: Primary (cyan), neutrals, semantic (success, warning, error)
-- **Typography**: Font families, sizes, weights, line heights
-- **Spacing**: Consistent spacing scale (aligned with Tailwind defaults)
-- **Borders & Radii**: Border widths, styles, and border radius values
-- **Shadows**: Elevation levels and shadow definitions
-- **Breakpoints**: Responsive design breakpoints (sm, md, lg, xl)
-- **Z-Index**: Stacking order scale
-
-### 2. Base UI Components
-
-Atomic, single-purpose UI elements:
-
-- **Button**: Multiple variants (primary, secondary, outline, link) with consistent states
-- **Input**: Text, email, password inputs with validation states
-- **Select**: Dropdown selection components
-- **Checkbox**: Selection controls
-- **Alert**: System messaging (success, warning, error, info)
-- **Card**: Content containers with various configurations
-
-### 3. Composite Components
-
-UI elements composed of multiple base components:
-
-- **Form**: Component composition with section support
-- **Navbar**: Site navigation with responsive behavior
-- **Sidebar**: Secondary navigation for dashboard layouts
-- **Table**: Data display with various styling options
-
-### 4. Layout Components
-
-Structural components for page organization:
-
-- **PageLayout**: Page structure templates (default, dashboard, auth)
-- **Container**: Width constraints with responsive behavior
-- **Grid**: Responsive grid system for columnar layouts
-
-### 5. Layout Patterns
-
-Standardized page structures for common scenarios:
-
-- **Dashboard Layout**: Admin interfaces with sidebar navigation
-- **Authentication Layout**: Login/registration pages
-- **Content Layout**: General content pages
-
-## Data Flow Patterns
-
-### Authentication Flow
-
-1. User submits login credentials
-2. Flask route handler validates input
-3. Authentication service verifies credentials against database
-4. Session is created upon successful authentication
-5. User is redirected based on role
-
-### Appointment Booking Flow
-
-1. Patient selects hospital → department → doctor → time slot
-2. System validates slot availability
-3. Appointment is created in database
-4. Confirmation is shown to patient
-
-### EHR Access Control Flow
-
-1. Doctor/patient requests EHR data
-2. Authorization middleware checks user role and permissions
-3. If authorized, EHR service retrieves data
-4. Data is filtered based on user role before being returned
-
-## Persistent Data Models
-
-Core data models and their relationships:
+Environment variables are loaded from a `.env` file and include:
 
 ```
-Users ─┬─ Patients
-       ├─ Doctors ─┬─ DoctorAvailability
-       │           └─ Departments
-       ├─ HospitalAdmins
-       ├─ SystemAdmins
-       ├─ TestAdmins
-       └─ GovtUsers
-
-Hospitals ─┬─ Departments
-           └─ Feedback
-
-Appointments ─┬─ Patients
-              ├─ Doctors
-              └─ Departments
-
-EHR ─┬─ Patients
-     ├─ Visits
-     ├─ Diagnoses
-     ├─ Medications
-     ├─ TestResults
-     └─ ProviderNotes
+FLASK_APP=app.py
+FLASK_ENV=development
+SECRET_KEY=your_secret_key_here
+SUPABASE_URL=your_supabase_url_here
+SUPABASE_KEY=your_supabase_anon_key_here
+DATABASE_URL=your_database_url_here
 ```
 
-This architecture supports modularity, maintainability, and the phased development approach outlined in the PRD.
+## Testing Strategy (Planned)
+
+Testing will be implemented with pytest:
+
+1. **Unit Tests**: For individual components and functions
+2. **Integration Tests**: For API endpoints and database interactions
+3. **Functional Tests**: For end-to-end user flows
+
+## Deployment Strategy (Planned)
+
+The application will be deployed using:
+
+1. **Web Server**: Gunicorn (included in requirements.txt)
+2. **Database**: Supabase (PostgreSQL)
+3. **Static Assets**: Served directly through Flask in initial deployment

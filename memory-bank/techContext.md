@@ -4,160 +4,297 @@
 
 ### Backend
 
-- **Primary Framework**: Python Flask
-- **API Structure**: RESTful API endpoints
-- **Authentication**: Database-based authentication (not using Supabase Auth)
-- **Business Logic**: Object-Oriented Python
-
-### Frontend
-
-- **HTML/CSS**: Semantic HTML5 with Tailwind CSS
-- **JavaScript**: Minimal vanilla JavaScript for interactivity
-- **Design System**: Comprehensive component library based on frontendExamples/
-- **UI Framework**: None (no React, Vue, Angular, etc.)
+- **Python 3.12**: Core programming language for backend development
+- **Flask 2.3.3**: Lightweight web framework for building the application
+- **Jinja2 3.1.2**: Templating engine for server-side HTML rendering
+- **Werkzeug 2.3.7**: WSGI utility library used by Flask
+- **Gunicorn 21.2.0**: WSGI HTTP Server for deployment
 
 ### Database
 
-- **Database System**: PostgreSQL (managed via Supabase)
-- **ORM/Access**: Direct SQL via supabase-py or psycopg2
-- **Schema Management**: Manual migrations
+- **PostgreSQL**: Relational database via Supabase
+- **Supabase 1.2.0**: Backend-as-a-Service for database management
+- **psycopg2-binary 2.9.9**: PostgreSQL adapter for Python
 
-### Infrastructure
+### Frontend
 
-- **Hosting**: Web hosting for Flask application (specific provider TBD)
-- **Database Hosting**: Supabase for PostgreSQL
-- **File Storage**: Local file system (initial implementation)
+- **HTML5**: Standard markup language for web pages
+- **Tailwind CSS**: Utility-first CSS framework for styling
+- **JavaScript**: Minimal usage for enhanced interactivity
 
-## Development Environment
+### Development Tools
 
-### Required Tools
+- **python-dotenv 1.0.0**: Environment variable management
+- **pytest 7.4.2**: Testing framework for Python
+- **Flask-WTF 1.2.1**: Form handling and validation for Flask
 
-- **Python**: 3.8+ with pip
-- **Node.js**: For Tailwind CSS compilation
-- **Git**: Version control
-- **Virtual Environment**: venv or similar for Python dependency isolation
+## Project Structure
 
-### Key Dependencies
-
-- **Flask**: Web framework
-- **psycopg2-binary**: PostgreSQL adapter
-- **supabase-py**: Python client for Supabase
-- **python-dotenv**: Environment variable management
-- **Tailwind CSS**: Utility-first CSS framework
-- **PyTest**: Testing framework
-
-## Design System Architecture
-
-### Component Organization
+The project follows a modular Flask application structure:
 
 ```
-design-system/
-├── components/
-│   ├── buttons/
-│   │   └── Button.js
-│   ├── forms/
-│   │   ├── Input.js
-│   │   ├── Select.js
-│   │   ├── Checkbox.js
-│   │   └── Form.js
-│   ├── layouts/
-│   │   ├── Container.js
-│   │   ├── Grid.js
-│   │   └── PageLayout.js
-│   ├── navigation/
-│   │   ├── Navbar.js
-│   │   └── Sidebar.js
-│   ├── Alert.js
-│   ├── Card.js
-│   └── Table.js
-└── docs/
-    ├── design-tokens.md
-    ├── layout-patterns.md
-    └── coding-standards.md
+shastho/
+  ├── app/                    # Main application package
+  │   ├── components/         # Reusable UI components
+  │   ├── models/             # Database models
+  │   ├── routes/             # API and view routes
+  │   ├── services/           # Business logic services
+  │   ├── static/             # Static assets (CSS, JS, images)
+  │   ├── templates/          # Jinja2 HTML templates
+  │   └── utils/              # Utility functions and helpers
+  ├── design-system/          # Design system documentation
+  ├── frontendExamples/       # Example UI implementations (reference)
+  ├── app.py                  # Application entry point
+  └── requirements.txt        # Python dependencies
 ```
 
-### Component Implementation Pattern
+## Development Environment Setup
 
-The design system uses a consistent class-based component pattern:
+### Local Development
 
-```javascript
-class ComponentName {
-  constructor() {
-    // Define base classes and defaults
-    this.baseClasses = "...";
-  }
+1. **Python Environment**:
 
-  // Main render method with options
-  render(options = {}) {
-    // Component logic & HTML generation
-    return `<div class="...">...</div>`;
-  }
+   - Python 3.12+ required
+   - Virtual environment using `venv` module
 
-  // Helper methods for variants
-  variantName(options = {}) {
-    return this.render({ variant: "variant", ...options });
-  }
-}
+2. **Dependencies**:
 
-export default new ComponentName();
+   - Installed via `pip install -r requirements.txt`
+
+3. **Environment Variables**:
+
+   - Stored in `.env` file (not version controlled)
+   - Required variables:
+     ```
+     FLASK_APP=app.py
+     FLASK_ENV=development
+     SECRET_KEY=your_secret_key_here
+     SUPABASE_URL=your_supabase_url_here
+     SUPABASE_KEY=your_supabase_anon_key_here
+     DATABASE_URL=your_database_url_here
+     ```
+
+4. **Running Locally**:
+   - Activate virtual environment
+   - Run `python app.py`
+   - Access at http://127.0.0.1:5000/
+
+### Version Control
+
+- **Git**: Source code versioning
+- **Repository Structure**:
+  - Main branch for stable releases
+  - Development branch for ongoing work
+  - Feature branches for new functionality
+
+## Key Technical Implementations
+
+### Flask Application Setup
+
+The application is initialized in `app.py`:
+
+```python
+import os
+from flask import Flask, render_template
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+def create_app():
+    app = Flask(__name__,
+                template_folder='app/templates',
+                static_folder='app/static')
+
+    # Configure the app
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-for-development')
+
+    # Register blueprints
+    from app.routes.main import main_bp
+    app.register_blueprint(main_bp)
+
+    return app
+
+app = create_app()
+
+if __name__ == '__main__':
+    app.run(debug=True)
 ```
 
-### Design Tokens
+### Component-Based UI Development
 
-Standardized design values documented in `design-tokens.md`:
+UI components are implemented as Python functions that generate HTML:
 
-- Color palette: Primary (cyan-600), neutrals, semantic colors
-- Typography: Font families, sizes, weights, line heights
-- Spacing: Standardized spacing scale
-- Borders, shadows, and other visual attributes
+```python
+# app/components/button.py
+def primary(text, type="button", size="md", full_width=False, icon=None, additional_classes=""):
+    """Generate HTML for a primary button."""
+    classes = "bg-primary hover:bg-primary-hover text-white rounded-lg font-medium transition-colors"
 
-### CSS Approach
+    # Size classes
+    size_classes = {
+        "sm": "px-3 py-1.5 text-sm",
+        "md": "px-4 py-2.5",
+        "lg": "px-6 py-3 text-lg"
+    }
 
-- Uses Tailwind CSS utility classes
-- Follows mobile-first responsive design
-- Consistent class composition pattern
-- No custom CSS (using only Tailwind utilities)
+    classes += f" {size_classes.get(size, size_classes['md'])}"
 
-## Integration Points
+    # Width class
+    if full_width:
+        classes += " w-full"
+
+    # Add any additional classes
+    if additional_classes:
+        classes += f" {additional_classes}"
+
+    # Add icon if provided
+    icon_html = f"{icon} " if icon else ""
+
+    return f'<button type="{type}" class="{classes}">{icon_html}{text}</button>'
+```
+
+### Tailwind CSS Integration
+
+Tailwind CSS is integrated via CDN in development and configured with design tokens:
+
+```html
+<!-- In app/templates/base.html -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: "#0891b2" /* cyan-600 */,
+          "primary-hover": "#0e7490" /* cyan-700 */,
+          "primary-light": "#ecfeff" /* cyan-50 */,
+          success: "#10b981" /* green-500 */,
+          warning: "#f59e0b" /* amber-500 */,
+          error: "#ef4444" /* red-500 */,
+          info: "#3b82f6" /* blue-500 */,
+        },
+      },
+    },
+  };
+</script>
+```
 
 ### Supabase Integration
 
-- PostgreSQL database access
-- No direct use of Supabase Auth, Storage, or Functions
-- Using Python API client for database operations
+Supabase is integrated as the database backend:
 
-### External APIs
+```python
+# app/utils/db.py
+import os
+from supabase import create_client
+from dotenv import load_dotenv
 
-- None for MVP (no NID, SMS, Email, AI/LLM APIs)
+# Load environment variables if not already loaded
+load_dotenv()
 
-## Security Considerations
+def get_supabase_client():
+    """Create and return a Supabase client instance."""
+    supabase_url = os.getenv("SUPABASE_URL")
+    supabase_key = os.getenv("SUPABASE_KEY")
 
-- **Authentication**: Password hashing with bcrypt
-- **Session Management**: Server-side sessions with Flask-Session
-- **Access Control**: Role-based access control (RBAC)
-- **Input Validation**: Server-side validation for all inputs
-- **SQL Injection Protection**: Parameterized queries
-- **CSRF Protection**: CSRF tokens for forms
+    if not supabase_url or not supabase_key:
+        raise ValueError("Supabase URL and key must be provided in environment variables")
 
-## Monitoring & Logging
+    return create_client(supabase_url, supabase_key)
+```
 
-- **Application Logs**: Python logging module
-- **Error Tracking**: Custom error pages and logging
-- **Performance Monitoring**: TBD for production
+## Database Structure (Planned)
 
-## Deployment Strategy
+The database will be implemented in Supabase with the following key tables:
 
-- **Development**: Local development environment
-- **Staging**: TBD
-- **Production**: Web hosting for Flask + Supabase for database
+1. **users**
+
+   - id (primary key)
+   - email
+   - password_hash
+   - role
+   - created_at
+   - last_login
+
+2. **patients**
+
+   - id (primary key)
+   - user_id (foreign key)
+   - name
+   - gender
+   - date_of_birth
+   - contact_info
+   - address
+
+3. **doctors**
+   - id (primary key)
+   - user_id (foreign key)
+   - name
+   - specialization
+   - license_number
+   - hospital_id (foreign key)
+   - department_id (foreign key)
+   - bio
+   - status (pending, active, suspended)
+
+Additional tables will be designed for hospitals, departments, appointments, EHR data, etc.
+
+## Authentication (Planned)
+
+A database-based authentication system will be implemented with features:
+
+1. **Registration**
+
+   - User information collection
+   - Password hashing
+   - Role assignment
+
+2. **Login**
+
+   - Credential verification
+   - Session creation
+   - Role-based redirection
+
+3. **Authorization**
+   - Role-based access control
+   - Permission checks
+   - Secure routes
+
+## Testing Approach (Planned)
+
+Testing will be implemented with pytest:
+
+1. **Unit Tests**
+
+   - Component functions
+   - Utility functions
+   - Service methods
+
+2. **Integration Tests**
+
+   - API endpoints
+   - Database interactions
+   - Form submissions
+
+3. **Functional Tests**
+   - End-to-end user flows
+   - UI interactions
+
+## Deployment (Planned)
+
+The application will be deployed using:
+
+1. **Application Server**: Gunicorn
+2. **Database**: Supabase (PostgreSQL)
+3. **Static Assets**: Initially served through Flask
 
 ## Technical Constraints
 
-1. **Simplicity**: Minimize technical complexity and external dependencies
-2. **Performance**: Optimize for Bangladesh's internet conditions
-3. **Internationalization**: Support for Bangla and English
-4. **Accessibility**: WCAG compliance (implemented in design system components)
-5. **Responsive Design**: Support for all device sizes (built into design system)
-6. **Offline Capability**: Not required for MVP
+The development adheres to the following constraints:
 
-This technical approach prioritizes straightforward implementation, maintainability, and alignment with the phased development approach outlined in the PRD.
+1. **Simplicity First**: Avoid unnecessary complexity
+2. **Minimal JavaScript**: Server-side rendering is preferred
+3. **Mobile Responsiveness**: All pages must work on mobile devices
+4. **Accessibility**: Must meet WCAG guidelines
+5. **Performance**: Fast page loads and minimal resource usage

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}shastho{% endblock %}</title>
+
+    <!-- Tailwind CSS CDN (for development) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configure Tailwind with our design tokens -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#0891b2" /* cyan-600 */,
+              "primary-hover": "#0e7490" /* cyan-700 */,
+              "primary-light": "#ecfeff" /* cyan-50 */,
+              success: "#10b981" /* green-500 */,
+              warning: "#f59e0b" /* amber-500 */,
+              error: "#ef4444" /* red-500 */,
+              info: "#3b82f6" /* blue-500 */,
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Additional CSS -->
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Header / Navigation -->
+    <header class="bg-white shadow-sm">
+      <nav
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <div class="flex items-center">
+          <a href="/" class="font-bold text-2xl text-primary">shastho</a>
+        </div>
+        <div class="hidden md:flex space-x-6">
+          <a href="/" class="font-medium text-gray-700 hover:text-primary"
+            >Home</a
+          >
+          <a href="#" class="font-medium text-gray-700 hover:text-primary"
+            >Services</a
+          >
+          <a href="#" class="font-medium text-gray-700 hover:text-primary"
+            >Doctors</a
+          >
+          <a href="#" class="font-medium text-gray-700 hover:text-primary"
+            >About</a
+          >
+          <a href="#" class="font-medium text-gray-700 hover:text-primary"
+            >Contact</a
+          >
+        </div>
+        <div>
+          <a
+            href="#"
+            class="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg font-medium"
+            >Login</a
+          >
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6 md:py-8">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t py-6">
+      <div class="container mx-auto px-4 text-center text-gray-600">
+        <p>&copy; 2023 shastho. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>
