@@ -1,15 +1,21 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
 from app.routes.auth import role_required, login_required
 from app.utils.db import Database
-from app.models.database import Hospital, Department, HospitalAdmin, User, UserStatus, Doctor, DoctorNote
+from app.models.database import Hospital, Department, HospitalAdmin, User, UserStatus, Doctor, DoctorNote, HospitalDepartment
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SelectField
+from wtforms import StringField, TextAreaField, SelectField, SelectMultipleField, widgets
 from wtforms.validators import DataRequired, Length, Optional
+from uuid import UUID
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 # Initialize database
 db = Database()
+
+class MultiCheckboxField(SelectMultipleField):
+    """A multiple-select, except displays a list of checkboxes."""
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
 
 # Form definitions
 class HospitalForm(FlaskForm):
@@ -17,36 +23,74 @@ class HospitalForm(FlaskForm):
     location = StringField('Location', validators=[DataRequired(), Length(min=2, max=100)])
     address = TextAreaField('Address', validators=[DataRequired(), Length(min=5, max=200)])
     contact_number = StringField('Contact Number', validators=[DataRequired(), Length(min=10, max=15)])
-    description = TextAreaField('Description', validators=[Optional(), Length(max=500)])
+    departments = MultiCheckboxField('Departments', coerce=str, validators=[Optional()])
 
 class DepartmentForm(FlaskForm):
     name = StringField('Department Name', validators=[DataRequired(), Length(min=2, max=100)])
     hospital_id = SelectField('Hospital', validators=[DataRequired()], coerce=str)
-    description = TextAreaField('Description', validators=[Optional(), Length(max=500)])
 
 @admin_bp.route('/')
 @role_required(['admin'])
 def dashboard():
-    """Admin dashboard landing page."""
-    # Get count of hospitals and departments for dashboard overview
+    """Admin dashboard."""
+
+    # Ensure common departments exist
+    ensure_common_departments()
+
+    # Count various entities for dashboard stats
     hospitals = db.get_all(Hospital)
     departments = db.get_all(Department)
+    hospital_count = len(hospitals) if hospitals else 0
+    department_count = len(departments) if departments else 0
 
-    hospital_count = len(hospitals)
-    department_count = len(departments)
-
-    # Get count of pending hospital admin applications
+    # Get pending admin applications
     from app.models.auth import find_users_by_role_and_status
-    pending_admins = find_users_by_role_and_status('hospital_admin', UserStatus.INACTIVE)
-    pending_admin_count = len(pending_admins)
+    pending_admin_users = find_users_by_role_and_status('hospital_admin', UserStatus.INACTIVE)
+    pending_admin_count = len(pending_admin_users) if pending_admin_users else 0
 
+    # Get pending doctor applications
+    pending_doctor_users = find_users_by_role_and_status('doctor', UserStatus.INACTIVE)
+    pending_doctor_count = len(pending_doctor_users) if pending_doctor_users else 0
+
+    # Prepare dashboard data
     stats = {
         'hospital_count': hospital_count,
         'department_count': department_count,
         'pending_admin_count': pending_admin_count,
+        'pending_doctor_count': pending_doctor_count
     }
 
-    return render_template('admin/dashboard.html', stats=stats)
+    # Get recent activity - for a real app, this could be audit logs or similar
+    recent_activities = []
+
+    return render_template('admin/dashboard.html', stats=stats, recent_activities=recent_activities)
+
+def ensure_common_departments():
+    """Ensure common department templates exist for hospital assignment."""
+    common_departments = [
+        {"name": "Emergency"},
+        {"name": "Cardiology"},
+        {"name": "Neurology"},
+        {"name": "Orthopedics"},
+        {"name": "Pediatrics"},
+        {"name": "Oncology"},
+        {"name": "Radiology"},
+        {"name": "Obstetrics & Gynecology"},
+        {"name": "Psychiatry"},
+        {"name": "General Medicine"}
+    ]
+
+    # Get all departments
+    all_departments = db.get_all(Department)
+    existing_names = [d.name.lower() for d in all_departments]
+
+    # Create any missing common departments
+    for dept in common_departments:
+        if dept["name"].lower() not in existing_names:
+            new_dept = Department(
+                name=dept["name"]
+            )
+            db.save(new_dept)
 
 @admin_bp.route('/hospitals')
 @role_required(['admin'])
@@ -69,26 +113,69 @@ def hospitals():
 @role_required(['admin'])
 def create_hospital():
     """Create a new hospital."""
+    print("\n=== CREATE HOSPITAL ROUTE ===")
+    print(f"Request method: {request.method}")
+
     form = HospitalForm()
 
+    # Get all departments for selection
+    all_departments = db.get_all(Department)
+    print(f"Total departments available: {len(all_departments)}")
+
+    if not all_departments:
+        # Ensure we have common departments
+        print("No departments found, creating common departments")
+        ensure_common_departments()
+        # Try again after ensuring departments exist
+        all_departments = db.get_all(Department)
+        print(f"After creating common departments, found {len(all_departments)} departments")
+
+    # Set the choices for the department selection
+    form.departments.choices = [(str(dep.id), dep.name) for dep in all_departments]
+
     if form.validate_on_submit():
-        # Create a new hospital object
-        hospital = Hospital(
-            name=form.name.data,
-            location=form.location.data,
-            address=form.address.data,
-            contact_number=form.contact_number.data,
-            description=form.description.data
-        )
+        print("Form validated successfully")
 
-        # Save the hospital to the database
-        saved_hospital = db.save(hospital)
+        try:
+            # Create a new hospital object
+            hospital = Hospital(
+                name=form.name.data,
+                location=form.location.data,
+                address=form.address.data,
+                contact_number=form.contact_number.data
+            )
 
-        if saved_hospital:
+            # Save the new hospital to the database
+            print(f"Creating hospital: {hospital.name}")
+            new_hospital = db.create(hospital)
+            print(f"Hospital created with ID: {new_hospital.id}")
+
+            # Get selected department IDs from form
+            selected_department_ids = request.form.getlist('departments')
+            print(f"Selected department IDs from form: {selected_department_ids}")
+
+            # Create hospital-department relationships
+            for dept_id in selected_department_ids:
+                hospital_dept = HospitalDepartment(
+                    hospital_id=new_hospital.id,
+                    department_id=UUID(dept_id)
+                )
+                print(f"Creating relationship with department ID: {dept_id}")
+                created_relation = db.create(hospital_dept)
+                print(f"Relationship created with ID: {created_relation.id if created_relation else 'Failed'}")
+
             flash('Hospital created successfully!', 'success')
             return redirect(url_for('admin.hospitals'))
-        else:
-            flash('Failed to create hospital.', 'error')
+
+        except Exception as e:
+            print(f"Error creating hospital: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            flash(f'Error creating hospital: {str(e)}', 'error')
+
+    # If there are form errors
+    if form.errors:
+        print(f"Form has errors: {form.errors}")
 
     return render_template('admin/hospital_form.html', form=form, is_edit=False)
 
@@ -96,6 +183,10 @@ def create_hospital():
 @role_required(['admin'])
 def edit_hospital(hospital_id):
     """Edit an existing hospital."""
+    print("\n=== EDIT HOSPITAL ROUTE ===")
+    print(f"Hospital ID: {hospital_id}")
+    print(f"Request method: {request.method}")
+
     # Get the hospital from the database
     hospital = db.get_by_id(Hospital, hospital_id)
 
@@ -103,24 +194,93 @@ def edit_hospital(hospital_id):
         flash('Hospital not found.', 'error')
         return redirect(url_for('admin.hospitals'))
 
+    print(f"Hospital found: {hospital.name}")
+
+    # Create form and populate with hospital data
     form = HospitalForm(obj=hospital)
 
+    # Get all departments for selection
+    all_departments = db.get_all(Department)
+    print(f"Total departments available: {len(all_departments)}")
+
+    # Set department choices
+    form.departments.choices = [(str(dep.id), dep.name) for dep in all_departments]
+
+    # Get current hospital-department relationships
+    hospital_departments = db.query(HospitalDepartment, hospital_id=hospital_id)
+    print(f"Found {len(hospital_departments)} existing department relationships")
+
+    # If this is GET request, set the current department selections
+    if request.method == 'GET':
+        # Extract current department IDs
+        current_department_ids = [str(hd.department_id) for hd in hospital_departments]
+        print(f"Current department IDs: {current_department_ids}")
+
+        # Set the selected departments in the form
+        form.departments.data = current_department_ids
+
+    # Handle form submission
     if form.validate_on_submit():
-        # Update hospital with form data
-        hospital.name = form.name.data
-        hospital.location = form.location.data
-        hospital.address = form.address.data
-        hospital.contact_number = form.contact_number.data
-        hospital.description = form.description.data
+        print("Form validated successfully")
 
-        # Save the updated hospital
-        updated_hospital = db.save(hospital)
+        try:
+            # Update hospital data
+            hospital.name = form.name.data
+            hospital.location = form.location.data
+            hospital.address = form.address.data
+            hospital.contact_number = form.contact_number.data
 
-        if updated_hospital:
+            # Save updated hospital
+            print(f"Saving hospital: {hospital.name}")
+            updated_hospital = db.save(hospital)
+            print(f"Hospital saved with ID: {updated_hospital.id}")
+
+            # Get selected department IDs from form
+            selected_department_ids = request.form.getlist('departments')
+            print(f"Selected department IDs from form: {selected_department_ids}")
+
+            # Convert to UUID objects
+            selected_department_uuids = [UUID(dept_id) for dept_id in selected_department_ids]
+
+            # Get current department IDs
+            current_department_uuids = [hd.department_id for hd in hospital_departments]
+
+            # Find departments to add and remove
+            departments_to_add = [dept_id for dept_id in selected_department_uuids
+                                  if dept_id not in current_department_uuids]
+
+            departments_to_remove = [hd for hd in hospital_departments
+                                     if hd.department_id not in selected_department_uuids]
+
+            print(f"Departments to add: {len(departments_to_add)}")
+            print(f"Departments to remove: {len(departments_to_remove)}")
+
+            # Add new department relationships
+            for dept_id in departments_to_add:
+                new_relation = HospitalDepartment(
+                    hospital_id=updated_hospital.id,
+                    department_id=dept_id
+                )
+                print(f"Creating relationship with department ID: {dept_id}")
+                db.create(new_relation)
+
+            # Remove old department relationships
+            for hd in departments_to_remove:
+                print(f"Removing relationship ID: {hd.id}")
+                db.delete(HospitalDepartment, hd.id)
+
             flash('Hospital updated successfully!', 'success')
             return redirect(url_for('admin.hospitals'))
-        else:
-            flash('Failed to update hospital.', 'error')
+
+        except Exception as e:
+            print(f"Error updating hospital: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            flash(f'Error updating hospital: {str(e)}', 'error')
+
+    # If there are form errors
+    if form.errors:
+        print(f"Form has errors: {form.errors}")
 
     return render_template('admin/hospital_form.html', form=form, hospital=hospital, is_edit=True)
 
@@ -128,172 +288,180 @@ def edit_hospital(hospital_id):
 @role_required(['admin'])
 def delete_hospital(hospital_id):
     """Delete a hospital."""
-    # Check if the hospital has departments
-    departments = db.get_by_field(Department, 'hospital_id', hospital_id)
+    print(f"\n=== DELETE HOSPITAL ROUTE ===")
+    print(f"Hospital ID: {hospital_id}")
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    print(f"Is AJAX request: {is_ajax}")
 
-    if departments:
-        # Return a JSON response for AJAX requests
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    try:
+        # Get the hospital
+        hospital = db.get_by_id(Hospital, hospital_id)
+
+        if not hospital:
+            print("Hospital not found")
+            if is_ajax:
+                return jsonify({
+                    'success': False,
+                    'message': 'Hospital not found.'
+                }), 404
+
+            flash('Hospital not found.', 'error')
+            return redirect(url_for('admin.hospitals'))
+
+        hospital_name = hospital.name
+        print(f"Found hospital: {hospital_name}")
+
+        # Check if the hospital has department relationships
+        hospital_departments = db.query(HospitalDepartment, hospital_id=hospital_id)
+        print(f"Found {len(hospital_departments)} department relationships")
+
+        # Delete all hospital-department relationships first
+        for hd in hospital_departments:
+            print(f"Deleting relationship ID: {hd.id}")
+            db.delete(HospitalDepartment, hd.id)
+
+        # Now delete the hospital
+        delete_result = db.delete(Hospital, hospital_id)
+        print(f"Hospital deletion result: {delete_result}")
+
+        if is_ajax:
+            return jsonify({
+                'success': True,
+                'message': f'Hospital "{hospital_name}" deleted successfully.'
+            })
+
+        flash(f'Hospital "{hospital_name}" deleted successfully.', 'success')
+        return redirect(url_for('admin.hospitals'))
+
+    except Exception as e:
+        print(f"Error deleting hospital: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+
+        if is_ajax:
             return jsonify({
                 'success': False,
-                'message': f'Cannot delete this hospital because it has {len(departments)} department(s) associated with it. Please delete or reassign the departments first.'
-            }), 400
+                'message': f'Error: {str(e)}'
+            }), 500
 
-        # Regular form submission
-        flash(f'Cannot delete this hospital because it has {len(departments)} department(s) associated with it. Please delete or reassign the departments first.', 'error')
+        flash(f'Error deleting hospital: {str(e)}', 'error')
         return redirect(url_for('admin.hospitals'))
-
-    # Get the hospital
-    hospital = db.get_by_id(Hospital, hospital_id)
-
-    if not hospital:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': False, 'message': 'Hospital not found.'}), 404
-
-        flash('Hospital not found.', 'error')
-        return redirect(url_for('admin.hospitals'))
-
-    # Delete the hospital
-    deleted = db.delete(hospital)
-
-    if deleted:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': True, 'message': 'Hospital deleted successfully.'})
-
-        flash('Hospital deleted successfully.', 'success')
-    else:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': False, 'message': 'Failed to delete hospital.'}), 500
-
-        flash('Failed to delete hospital.', 'error')
-
-    return redirect(url_for('admin.hospitals'))
 
 @admin_bp.route('/departments')
 @role_required(['admin'])
 def departments():
     """Department listing page."""
+    print("\n=== DEPARTMENTS ROUTE ===")
+
     # Get query parameters for searching and filtering
     search_query = request.args.get('search', '')
     hospital_id = request.args.get('hospital_id', '')
 
+    print(f"Search query: '{search_query}'")
+    print(f"Hospital filter: '{hospital_id}'")
+
     # Get all departments
-    departments = db.get_all(Department)
+    all_departments = db.get_all(Department)
+    print(f"Total departments: {len(all_departments)}")
 
     # Filter departments if search query is provided
     if search_query:
-        departments = [d for d in departments if search_query.lower() in d.name.lower()]
+        all_departments = [d for d in all_departments if search_query.lower() in d.name.lower()]
+        print(f"After search filter, {len(all_departments)} departments remain")
 
-    # Filter by hospital if specified
-    if hospital_id:
-        departments = [d for d in departments if str(d.hospital_id) == hospital_id]
+    # Get all hospital-department relationships
+    all_hospital_departments = db.get_all(HospitalDepartment)
+    print(f"Total hospital-department relationships: {len(all_hospital_departments)}")
 
-    # Get all hospitals for filtering
-    hospitals = db.get_all(Hospital)
+    # Get all hospitals for lookup
+    hospitals = {str(h.id): h for h in db.get_all(Hospital)}
+    print(f"Total hospitals: {len(hospitals)}")
 
-    # Create a mapping of hospital IDs to names for display
-    hospital_names = {str(h.id): h.name for h in hospitals}
+    # For each department, find its hospitals
+    departments_with_hospitals = []
+    for dept in all_departments:
+        dept_id = str(dept.id)
 
-    return render_template('admin/departments.html',
-                          departments=departments,
-                          search_query=search_query,
-                          hospital_id=hospital_id,
-                          hospitals=hospitals,
-                          hospital_names=hospital_names)
+        # Find all relationships for this department
+        dept_hospital_rels = [hd for hd in all_hospital_departments if str(hd.department_id) == dept_id]
+        print(f"Department '{dept.name}' has {len(dept_hospital_rels)} hospital relationships")
 
-@admin_bp.route('/departments/create', methods=['GET', 'POST'])
+        # Get hospital info for each relationship
+        dept_hospitals = []
+        for hd in dept_hospital_rels:
+            h_id = str(hd.hospital_id)
+            if h_id in hospitals:
+                dept_hospitals.append({
+                    'id': h_id,
+                    'rel_id': str(hd.id),  # Include relationship ID for deletion
+                    'name': hospitals[h_id].name
+                })
+
+        # Filter by hospital if specified
+        if hospital_id and not any(h['id'] == hospital_id for h in dept_hospitals):
+            continue
+
+        # Add department with its hospitals to the result list
+        departments_with_hospitals.append({
+            'department': dept,
+            'hospitals': dept_hospitals
+        })
+
+    print(f"Final departments to display: {len(departments_with_hospitals)}")
+    return render_template('admin/departments.html', departments=departments_with_hospitals)
+
+@admin_bp.route('/hospital-departments/<hospital_department_id>/delete', methods=['POST'])
 @role_required(['admin'])
-def create_department():
-    """Create a new department."""
-    form = DepartmentForm()
+def delete_hospital_department(hospital_department_id):
+    """Remove a department from a specific hospital."""
+    print(f"\n=== DELETE HOSPITAL-DEPARTMENT ROUTE ===")
+    print(f"Relationship ID: {hospital_department_id}")
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    print(f"Is AJAX request: {is_ajax}")
 
-    # Get hospitals for dropdown
-    hospitals = db.get_all(Hospital)
-    form.hospital_id.choices = [(str(h.id), h.name) for h in hospitals]
+    try:
+        # Get the hospital-department relationship
+        hospital_dept = db.get_by_id(HospitalDepartment, hospital_department_id)
 
-    if form.validate_on_submit():
-        # Create a new department object
-        department = Department(
-            name=form.name.data,
-            hospital_id=form.hospital_id.data,
-            description=form.description.data if hasattr(form, 'description') else None
-        )
+        if not hospital_dept:
+            print(f"Hospital-Department relationship not found with ID: {hospital_department_id}")
+            if is_ajax:
+                return jsonify({
+                    'success': False,
+                    'message': 'Hospital-Department relationship not found.'
+                }), 404
 
-        # Save the department to the database
-        saved_department = db.save(department)
-
-        if saved_department:
-            flash('Department created successfully!', 'success')
+            flash('Hospital-Department relationship not found.', 'error')
             return redirect(url_for('admin.departments'))
-        else:
-            flash('Failed to create department.', 'error')
 
-    return render_template('admin/department_form.html', form=form, is_edit=False)
+        print(f"Found relationship: hospital_id={hospital_dept.hospital_id}, department_id={hospital_dept.department_id}")
 
-@admin_bp.route('/departments/<department_id>/edit', methods=['GET', 'POST'])
-@role_required(['admin'])
-def edit_department(department_id):
-    """Edit an existing department."""
-    # Get the department from the database
-    department = db.get_by_id(Department, department_id)
+        # Delete the relationship
+        delete_result = db.delete(HospitalDepartment, hospital_department_id)
+        print(f"Delete result: {delete_result}")
 
-    if not department:
-        flash('Department not found.', 'error')
+        if is_ajax:
+            return jsonify({
+                'success': True,
+                'message': 'Department removed from hospital successfully.'
+            })
+
+        flash('Department removed from hospital successfully.', 'success')
         return redirect(url_for('admin.departments'))
 
-    form = DepartmentForm(obj=department)
+    except Exception as e:
+        print(f"Error deleting hospital-department relationship: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
 
-    # Get hospitals for dropdown
-    hospitals = db.get_all(Hospital)
-    form.hospital_id.choices = [(str(h.id), h.name) for h in hospitals]
+        if is_ajax:
+            return jsonify({
+                'success': False,
+                'message': f'Error: {str(e)}'
+            }), 500
 
-    if form.validate_on_submit():
-        # Update department with form data
-        department.name = form.name.data
-        department.hospital_id = form.hospital_id.data
-        if hasattr(form, 'description'):
-            department.description = form.description.data
-
-        # Save the updated department
-        updated_department = db.save(department)
-
-        if updated_department:
-            flash('Department updated successfully!', 'success')
-            return redirect(url_for('admin.departments'))
-        else:
-            flash('Failed to update department.', 'error')
-
-    return render_template('admin/department_form.html', form=form, department=department, is_edit=True)
-
-@admin_bp.route('/departments/<department_id>/delete', methods=['POST'])
-@role_required(['admin'])
-def delete_department(department_id):
-    """Delete a department."""
-    # Get the department
-    department = db.get_by_id(Department, department_id)
-
-    if not department:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': False, 'message': 'Department not found.'}), 404
-
-        flash('Department not found.', 'error')
+        flash(f'Error removing department from hospital: {str(e)}', 'error')
         return redirect(url_for('admin.departments'))
-
-    # Delete the department
-    deleted = db.delete(department)
-
-    if deleted:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': True, 'message': 'Department deleted successfully.'})
-
-        flash('Department deleted successfully.', 'success')
-    else:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'success': False, 'message': 'Failed to delete department.'}), 500
-
-        flash('Failed to delete department.', 'error')
-
-    return redirect(url_for('admin.departments'))
 
 @admin_bp.route('/pending-admins')
 @role_required(['admin'])

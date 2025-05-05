@@ -2,7 +2,16 @@ from datetime import datetime, date, time
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union
 from uuid import UUID, uuid4
-from sqlalchemy import Column, String, Text, ForeignKey, Boolean
+from dateutil.parser import isoparse
+
+# Helper function to parse ISO dates safely
+def parse_iso_datetime(date_string: Optional[str]) -> Optional[datetime]:
+    if date_string:
+        try:
+            return isoparse(date_string)
+        except (ValueError, TypeError):
+            return None
+    return None
 
 
 class UserRole(str, Enum):
@@ -72,8 +81,8 @@ class User:
             password_hash=data.get('password_hash'),
             role=UserRole(data.get('role')) if data.get('role') else None,
             status=UserStatus(data.get('status')) if data.get('status') else UserStatus.ACTIVE,
-            created_at=data.get('created_at'),
-            updated_at=data.get('updated_at'),
+            created_at=parse_iso_datetime(data.get('created_at')),
+            updated_at=parse_iso_datetime(data.get('updated_at')),
             profile_picture_url=data.get('profile_picture_url'),
             language_preference=Language(data.get('language_preference')) if data.get('language_preference') else Language.ENGLISH
         )
@@ -123,48 +132,191 @@ class Hospital:
             location=data.get('location'),
             address=data.get('address'),
             contact_number=data.get('contact_number'),
-            created_at=data.get('created_at'),
-            updated_at=data.get('updated_at')
+            created_at=parse_iso_datetime(data.get('created_at')),
+            updated_at=parse_iso_datetime(data.get('updated_at'))
         )
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert instance to a dictionary."""
+        # Ensure created_at and updated_at are properly formatted
+        created_at_iso = None
+        if self.created_at:
+            if isinstance(self.created_at, str):
+                created_at_iso = self.created_at
+            else:
+                created_at_iso = self.created_at.isoformat()
+
+        updated_at_iso = None
+        if self.updated_at:
+            if isinstance(self.updated_at, str):
+                updated_at_iso = self.updated_at
+            else:
+                updated_at_iso = self.updated_at.isoformat()
+
         return {
             'id': str(self.id),
             'name': self.name,
             'location': self.location,
             'address': self.address,
             'contact_number': self.contact_number,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'created_at': created_at_iso,
+            'updated_at': updated_at_iso
         }
 
 
-class Department(SQLiteEntity):
-    """Department model."""
+class Department:
+    """Model representing a department in the system."""
 
-    __tablename__ = 'department'
+    def __init__(
+        self,
+        id: Optional[UUID] = None,
+        name: str = None,
+        created_at: datetime = None,
+        updated_at: datetime = None
+    ):
+        self.id = id or uuid4()
+        self.name = name
+        self.created_at = created_at or datetime.now()
+        self.updated_at = updated_at or datetime.now()
 
-    name = Column(String(100), nullable=False)
-    description = Column(Text)
-    hospital_id = Column(ForeignKey("hospital.id"), nullable=False)
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'Department':
+        """Create a Department instance from a dictionary."""
+        return cls(
+            id=data.get('id'),
+            name=data.get('name'),
+            created_at=parse_iso_datetime(data.get('created_at')),
+            updated_at=parse_iso_datetime(data.get('updated_at'))
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instance to a dictionary."""
+        # Ensure created_at and updated_at are properly formatted
+        created_at_iso = None
+        if self.created_at:
+            if isinstance(self.created_at, str):
+                created_at_iso = self.created_at
+            else:
+                created_at_iso = self.created_at.isoformat()
+
+        updated_at_iso = None
+        if self.updated_at:
+            if isinstance(self.updated_at, str):
+                updated_at_iso = self.updated_at
+            else:
+                updated_at_iso = self.updated_at.isoformat()
+
+        return {
+            'id': str(self.id),
+            'name': self.name,
+            'created_at': created_at_iso,
+            'updated_at': updated_at_iso
+        }
 
 
-class Patient(SQLiteEntity):
+class HospitalDepartment:
+    """Model representing the many-to-many relationship between hospitals and departments."""
+
+    def __init__(
+        self,
+        id: Optional[UUID] = None,
+        hospital_id: UUID = None,
+        department_id: UUID = None,
+        created_at: datetime = None,
+        updated_at: datetime = None
+    ):
+        self.id = id or uuid4()
+        self.hospital_id = hospital_id
+        self.department_id = department_id
+        self.created_at = created_at or datetime.now()
+        self.updated_at = updated_at or datetime.now()
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'HospitalDepartment':
+        """Create a HospitalDepartment instance from a dictionary."""
+        try:
+            # Convert string IDs to UUID objects safely
+            id_val = data.get('id')
+            hospital_id_val = data.get('hospital_id')
+            department_id_val = data.get('department_id')
+
+            # ID conversion
+            if id_val:
+                if isinstance(id_val, str):
+                    id_val = UUID(id_val)
+                elif isinstance(id_val, UUID):
+                    pass  # Already a UUID
+                else:
+                    print(f"Warning: Unexpected ID type: {type(id_val)}")
+                    id_val = None  # Will generate a new UUID in __init__
+
+            # Hospital ID conversion
+            if hospital_id_val:
+                if isinstance(hospital_id_val, str):
+                    hospital_id_val = UUID(hospital_id_val)
+                elif isinstance(hospital_id_val, UUID):
+                    pass  # Already a UUID
+                else:
+                    print(f"Warning: Unexpected hospital_id type: {type(hospital_id_val)}")
+                    hospital_id_val = None
+
+            # Department ID conversion
+            if department_id_val:
+                if isinstance(department_id_val, str):
+                    department_id_val = UUID(department_id_val)
+                elif isinstance(department_id_val, UUID):
+                    pass  # Already a UUID
+                else:
+                    print(f"Warning: Unexpected department_id type: {type(department_id_val)}")
+                    department_id_val = None
+
+            # Parse dates
+            created_at = parse_iso_datetime(data.get('created_at'))
+            updated_at = parse_iso_datetime(data.get('updated_at'))
+
+            return cls(
+                id=id_val,
+                hospital_id=hospital_id_val,
+                department_id=department_id_val,
+                created_at=created_at,
+                updated_at=updated_at
+            )
+        except Exception as e:
+            print(f"Error in HospitalDepartment.from_dict: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            print(f"Raw data: {data}")
+            # Return a new instance with only the ID if possible
+            return cls(id=UUID(data.get('id')) if data.get('id') and isinstance(data.get('id'), str) else None)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instance to a dictionary."""
+        # Ensure created_at and updated_at are properly formatted
+        created_at_iso = None
+        if self.created_at:
+            if isinstance(self.created_at, str):
+                created_at_iso = self.created_at
+            else:
+                created_at_iso = self.created_at.isoformat()
+
+        updated_at_iso = None
+        if self.updated_at:
+            if isinstance(self.updated_at, str):
+                updated_at_iso = self.updated_at
+            else:
+                updated_at_iso = self.updated_at.isoformat()
+
+        return {
+            'id': str(self.id),
+            'hospital_id': str(self.hospital_id) if self.hospital_id else None,
+            'department_id': str(self.department_id) if self.department_id else None,
+            'created_at': created_at_iso,
+            'updated_at': updated_at_iso
+        }
+
+
+class Patient:
     """Model representing a patient in the system."""
-
-    __tablename__ = 'patient'
-
-    user_id = Column(ForeignKey("user.id"), nullable=False)
-    full_name = Column(String(100), nullable=False)
-    date_of_birth = Column(Date)
-    gender = Column(String(10))
-    contact_number = Column(String(20))
-    address = Column(Text)
-    emergency_contact_name = Column(String(100))
-    emergency_contact_number = Column(String(20))
-    created_at = Column(DateTime)
-    updated_at = Column(DateTime)
 
     def __init__(
         self,
@@ -226,20 +378,67 @@ class Patient(SQLiteEntity):
         }
 
 
-class Doctor(SQLiteEntity):
-    """Doctor model."""
+class Doctor:
+    """Model representing a doctor in the system."""
 
-    __tablename__ = 'doctor'
+    def __init__(
+        self,
+        id: Optional[UUID] = None,
+        user_id: UUID = None,
+        full_name: str = None,
+        specialization: str = None,
+        credentials: str = None,
+        contact_number: str = None,
+        hospital_id: UUID = None,
+        department_id: UUID = None,
+        first_login_complete: bool = False,
+        created_at: datetime = None,
+        updated_at: datetime = None
+    ):
+        self.id = id or uuid4()
+        self.user_id = user_id
+        self.full_name = full_name
+        self.specialization = specialization
+        self.credentials = credentials
+        self.contact_number = contact_number
+        self.hospital_id = hospital_id
+        self.department_id = department_id
+        self.first_login_complete = first_login_complete
+        self.created_at = created_at or datetime.now()
+        self.updated_at = updated_at or datetime.now()
 
-    user_id = Column(ForeignKey("user.id"), nullable=False, unique=True)
-    full_name = Column(String(100), nullable=False)
-    specialization = Column(String(100), nullable=False)
-    credentials = Column(Text)
-    contact_number = Column(String(20))
-    hospital_id = Column(ForeignKey("hospital.id"), nullable=True)
-    department_id = Column(ForeignKey("department.id"), nullable=True)
-    first_login_complete = Column(Boolean, default=False)
-    # Other doctor info can be added here
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'Doctor':
+        """Create a Doctor instance from a dictionary."""
+        return cls(
+            id=data.get('id'),
+            user_id=data.get('user_id'),
+            full_name=data.get('full_name'),
+            specialization=data.get('specialization'),
+            credentials=data.get('credentials'),
+            contact_number=data.get('contact_number'),
+            hospital_id=data.get('hospital_id'),
+            department_id=data.get('department_id'),
+            first_login_complete=data.get('first_login_complete', False),
+            created_at=parse_iso_datetime(data.get('created_at')),
+            updated_at=parse_iso_datetime(data.get('updated_at'))
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instance to a dictionary."""
+        return {
+            'id': str(self.id),
+            'user_id': str(self.user_id) if self.user_id else None,
+            'full_name': self.full_name,
+            'specialization': self.specialization,
+            'credentials': self.credentials,
+            'contact_number': self.contact_number,
+            'hospital_id': str(self.hospital_id) if self.hospital_id else None,
+            'department_id': str(self.department_id) if self.department_id else None,
+            'first_login_complete': self.first_login_complete,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
 
 
 class DoctorAvailabilitySlot:

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from app.models.database import (
     User, Hospital, Department, Patient, Doctor,
     DoctorAvailabilitySlot, Appointment, PasswordResetToken,
-    DoctorNote
+    DoctorNote, UserSession, HospitalDepartment
 )
 from app.models.ehr import (
     EHR, EHR_Visit, EHR_Diagnosis, EHR_Medication,
@@ -24,7 +24,7 @@ T = TypeVar('T', User, Hospital, Department, Patient, Doctor,
             DoctorAvailabilitySlot, Appointment, EHR, EHR_Visit,
             EHR_Diagnosis, EHR_Medication, EHR_Allergy, EHR_Procedure,
             EHR_Vital, EHR_Immunization, EHR_TestResult, EHR_ProviderNote,
-            Prescription, PasswordResetToken, DoctorNote)
+            Prescription, PasswordResetToken, DoctorNote, UserSession, HospitalDepartment)
 
 class Database:
     """Database utility for Supabase interactions."""
@@ -42,10 +42,57 @@ class Database:
         supabase_url = os.getenv("SUPABASE_URL")
         supabase_key = os.getenv("SUPABASE_KEY")
 
-        if not supabase_url or not supabase_key:
-            raise ValueError("SUPABASE_URL and SUPABASE_KEY environment variables must be set")
+        print(f"\n=== INITIALIZING SUPABASE CONNECTION ===")
 
-        self.client: Client = create_client(supabase_url, supabase_key)
+        # Validate environment variables
+        if not supabase_url:
+            print("ERROR: SUPABASE_URL is not set in environment variables")
+            raise ValueError("SUPABASE_URL environment variable must be set")
+
+        if not supabase_key:
+            print("ERROR: SUPABASE_KEY is not set in environment variables")
+            raise ValueError("SUPABASE_KEY environment variable must be set")
+
+        print(f"URL: {supabase_url[:30]}...") # Only print part of the URL for security
+        print(f"Key: {supabase_key[:15]}...") # Only print part of the key for security
+
+        # Try to connect with retry logic
+        max_retries = 3
+        retry_count = 0
+        last_error = None
+
+        while retry_count < max_retries:
+            try:
+                print(f"Connecting to Supabase (attempt {retry_count + 1}/{max_retries})...")
+                self.client = create_client(supabase_url, supabase_key)
+
+                # Test the connection with a simple query
+                print("Testing connection...")
+                test_result = self.client.table("hospitals").select("id").limit(1).execute()
+
+                if hasattr(test_result, 'error') and test_result.error:
+                    print(f"Connection test error: {test_result.error}")
+                    raise Exception(f"Connection test failed: {test_result.error}")
+
+                record_count = len(test_result.data) if hasattr(test_result, 'data') else 0
+                print(f"Connection successful! Found {record_count} hospital records in the test query.")
+                return
+
+            except Exception as e:
+                retry_count += 1
+                last_error = e
+                print(f"Connection attempt {retry_count} failed: {str(e)}")
+                if retry_count < max_retries:
+                    print(f"Retrying in 1 second...")
+                    import time
+                    time.sleep(1)
+
+        # If we get here, all retries failed
+        print(f"Failed to connect to Supabase after {max_retries} attempts")
+        import traceback
+        print(f"Last error: {str(last_error)}")
+        print(traceback.format_exc())
+        raise last_error
 
     # Generic CRUD operations
 
@@ -74,7 +121,11 @@ class Database:
             # Password reset token
             PasswordResetToken: "password_reset_tokens",
             # Doctor notes
-            DoctorNote: "doctor_notes"
+            DoctorNote: "doctor_notes",
+            # User sessions
+            UserSession: "user_sessions",
+            # Hospital-Department relationship
+            HospitalDepartment: "hospital_departments"
         }
 
         if model_class not in table_map:
@@ -84,18 +135,71 @@ class Database:
 
     def create(self, model: T) -> T:
         """Create a new record in the database."""
-        table_name = self._get_table_name(model.__class__)
-        data = model.to_dict()
+        try:
+            table_name = self._get_table_name(model.__class__)
+            data = model.to_dict()
 
-        # Remove None values
-        data = {k: v for k, v in data.items() if v is not None}
+            # Print debug information
+            print(f"\n=== CREATE OPERATION ===")
+            print(f"Table: {table_name}")
+            print(f"Data being sent: {data}")
 
-        response = self.client.table(table_name).insert(data).execute()
+            # Remove None values and ensure ID is a string
+            clean_data = {}
+            for k, v in data.items():
+                if v is not None:
+                    # Convert UUID objects to strings
+                    if isinstance(v, UUID):
+                        clean_data[k] = str(v)
+                    else:
+                        clean_data[k] = v
 
-        if response.data and len(response.data) > 0:
-            return model.__class__.from_dict(response.data[0])
+            print(f"Data after cleaning: {clean_data}")
 
-        return model
+            # Execute the insert operation
+            response = self.client.table(table_name).insert(clean_data).execute()
+
+            # Log response details
+            print(f"Response status: {getattr(response, 'status_code', 'Unknown')}")
+            if hasattr(response, 'data'):
+                print(f"Response data: {response.data}")
+            else:
+                print("No response.data attribute")
+
+            if hasattr(response, 'error') and response.error:
+                print(f"Response error: {response.error}")
+                if hasattr(response.error, 'details'):
+                    print(f"Error details: {response.error.details}")
+                return model  # Return original model on error
+
+            # Process response data
+            if hasattr(response, 'data') and response.data and len(response.data) > 0:
+                try:
+                    # Create a new model instance from the response data
+                    new_model = model.__class__.from_dict(response.data[0])
+                    print(f"Successfully created record with ID: {new_model.id}")
+                    print(f"Returning: {new_model.to_dict()}")
+                    return new_model
+                except Exception as parse_error:
+                    print(f"Error parsing response data: {str(parse_error)}")
+                    import traceback
+                    print(traceback.format_exc())
+                    # If we failed to parse the response, but have confirmation it was created,
+                    # return the original model with the ID from the response
+                    if 'id' in response.data[0]:
+                        model.id = response.data[0]['id']
+                        print(f"Setting ID on original model: {model.id}")
+                        return model
+
+            print("No data in response, returning original model")
+            return model
+
+        except Exception as e:
+            print(f"Exception in create: {str(e)}")
+            print(f"Exception type: {type(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            return model
 
     def get_by_id(self, model_class: Type[T], id: Union[str, UUID]) -> Optional[T]:
         """Get a record by ID."""
@@ -135,29 +239,143 @@ class Database:
 
         return []
 
+    def get_by_field(self, model_class: Type[T], field: str, value: Any) -> List[T]:
+        """Get records by a specific field value."""
+        table_name = self._get_table_name(model_class)
+
+        response = self.client.table(table_name).select("*").eq(field, value).execute()
+
+        if response.data:
+            return [model_class.from_dict(item) for item in response.data]
+
+        return []
+
     def update(self, model: T) -> T:
         """Update a record in the database."""
-        table_name = self._get_table_name(model.__class__)
-        data = model.to_dict()
+        try:
+            table_name = self._get_table_name(model.__class__)
+            data = model.to_dict()
 
-        # Remove None values and id (for update)
-        id_str = data.pop('id', None)
-        data = {k: v for k, v in data.items() if v is not None}
+            # Print debug information
+            print(f"\n=== UPDATE OPERATION ===")
+            print(f"Table: {table_name}")
+            print(f"ID being updated: {data.get('id')}")
+            print(f"Data being sent: {data}")
 
-        response = self.client.table(table_name).update(data).eq("id", id_str).execute()
+            # Extract ID for the WHERE clause
+            id_str = str(data.pop('id', None))
+            if not id_str:
+                print("ERROR: Cannot update without an ID")
+                return model
 
-        if response.data and len(response.data) > 0:
-            return model.__class__.from_dict(response.data[0])
+            # Clean the data
+            clean_data = {}
+            for k, v in data.items():
+                if v is not None:
+                    # Convert UUID objects to strings
+                    if isinstance(v, UUID):
+                        clean_data[k] = str(v)
+                    else:
+                        clean_data[k] = v
 
-        return model
+            print(f"Data after cleaning: {clean_data}")
+            print(f"ID for WHERE clause: {id_str}")
+
+            # Execute the update operation
+            response = self.client.table(table_name).update(clean_data).eq("id", id_str).execute()
+
+            # Log response details
+            print(f"Response status: {getattr(response, 'status_code', 'Unknown')}")
+            if hasattr(response, 'data'):
+                print(f"Response data: {response.data}")
+            else:
+                print("No response.data attribute")
+
+            if hasattr(response, 'error') and response.error:
+                print(f"Response error: {response.error}")
+                if hasattr(response.error, 'details'):
+                    print(f"Error details: {response.error.details}")
+                return model  # Return original model on error
+
+            # Process response data
+            if hasattr(response, 'data') and response.data and len(response.data) > 0:
+                try:
+                    # Create a new model instance from the response data
+                    updated_model = model.__class__.from_dict(response.data[0])
+                    print(f"Successfully updated record with ID: {updated_model.id}")
+                    print(f"Returning: {updated_model.to_dict()}")
+                    return updated_model
+                except Exception as parse_error:
+                    print(f"Error parsing response data: {str(parse_error)}")
+                    import traceback
+                    print(traceback.format_exc())
+                    # If we failed to parse but have confirmation, return original with ID
+                    if 'id' in response.data[0]:
+                        model.id = response.data[0]['id']
+                        print(f"Preserving ID on original model: {model.id}")
+                        return model
+
+            # Add the ID back to the model before returning
+            model.id = UUID(id_str) if not isinstance(model.id, UUID) else model.id
+            print("No data in response or update may have failed, returning original model")
+            return model
+
+        except Exception as e:
+            print(f"Exception in update: {str(e)}")
+            print(f"Exception type: {type(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            return model
+
+    def save(self, model: T) -> T:
+        """Save a record to the database.
+        This method determines whether to create or update based on whether the ID exists.
+        """
+        try:
+            print(f"\n=== SAVE OPERATION ===")
+            print(f"Model type: {model.__class__.__name__}")
+            print(f"Model ID: {model.id}")
+
+            if not model.id:
+                print("No ID found - calling create()")
+                return self.create(model)
+            else:
+                print("ID found - calling update()")
+                return self.update(model)
+        except Exception as e:
+            print(f"Exception in save: {str(e)}")
+            print(f"Exception type: {type(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            return model
 
     def delete(self, model_class: Type[T], id: Union[str, UUID]) -> bool:
         """Delete a record by ID."""
-        table_name = self._get_table_name(model_class)
+        try:
+            table_name = self._get_table_name(model_class)
 
-        response = self.client.table(table_name).delete().eq("id", str(id)).execute()
+            print(f"\n=== DELETE OPERATION ===")
+            print(f"Table: {table_name}")
+            print(f"ID being deleted: {id}")
 
-        return response.data is not None and len(response.data) > 0
+            response = self.client.table(table_name).delete().eq("id", str(id)).execute()
+            print(f"Response status: {getattr(response, 'status_code', 'Unknown')}")
+            print(f"Response data: {response.data}")
+
+            if hasattr(response, 'error') and response.error:
+                print(f"Response error: {response.error}")
+                if hasattr(response.error, 'details'):
+                    print(f"Error details: {response.error.details}")
+
+            result = response.data is not None and len(response.data) > 0
+            print(f"Delete successful: {result}")
+            return result
+        except Exception as e:
+            print(f"Exception in delete: {str(e)}")
+            print(f"Exception type: {type(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            return False
 
     # User-specific operations
 

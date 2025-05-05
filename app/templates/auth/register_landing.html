@@ -1,0 +1,129 @@
+{% extends "base.html" %} {% block title %}Register - shastho{% endblock %} {%
+block content %}
+<div
+  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 to-blue-50 px-4 sm:px-6 lg:px-8 py-12"
+>
+  <div class="max-w-4xl w-full bg-white rounded-xl shadow-lg p-8">
+    <div class="text-center mb-12">
+      <div class="flex justify-center mb-4">
+        <img
+          src="{{ url_for('static', filename='images/logo.svg') }}"
+          alt="shastho Logo"
+          class="h-16 w-16"
+        />
+      </div>
+      <h2 class="text-3xl font-bold text-gray-900">shastho</h2>
+      <p class="mt-2 text-lg text-gray-600">Choose your registration type</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div
+      class="rounded-md p-4 mb-6 {% if category == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}"
+    >
+      {{ message }}
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Patient Registration Card -->
+      <div
+        class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+      >
+        <div class="p-6">
+          <div class="text-center mb-4">
+            <div
+              class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-cyan-100 text-cyan-600 mb-3"
+            >
+              <i data-lucide="user" class="h-6 w-6"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900">Patient</h3>
+          </div>
+          <p class="mb-6 text-gray-600 text-center">
+            Register as a patient to book appointments, view medical records,
+            and manage your healthcare
+          </p>
+          <a
+            href="{{ url_for('auth.register_patient') }}"
+            class="block w-full text-center py-2.5 px-4 rounded-lg border border-transparent shadow-sm bg-cyan-600 text-white font-medium hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-colors"
+          >
+            Register as Patient
+          </a>
+        </div>
+      </div>
+
+      <!-- Doctor Registration Card -->
+      <div
+        class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+      >
+        <div class="p-6">
+          <div class="text-center mb-4">
+            <div
+              class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 text-blue-600 mb-3"
+            >
+              <i data-lucide="stethoscope" class="h-6 w-6"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900">Doctor</h3>
+          </div>
+          <p class="mb-6 text-gray-600 text-center">
+            Register as a doctor to manage patient appointments, access medical
+            records, and collaborate with other healthcare providers
+          </p>
+          <a
+            href="{{ url_for('auth.register_doctor') }}"
+            class="block w-full text-center py-2.5 px-4 rounded-lg border border-transparent shadow-sm bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+          >
+            Register as Doctor
+          </a>
+        </div>
+      </div>
+
+      <!-- Hospital Admin Registration Card -->
+      <div
+        class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+      >
+        <div class="p-6">
+          <div class="text-center mb-4">
+            <div
+              class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 mb-3"
+            >
+              <i data-lucide="building" class="h-6 w-6"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900">Hospital Admin</h3>
+          </div>
+          <p class="mb-6 text-gray-600 text-center">
+            Register as a hospital administrator to manage staff, resources, and
+            hospital operations
+          </p>
+          <a
+            href="{{ url_for('auth.register_hospital_admin') }}"
+            class="block w-full text-center py-2.5 px-4 rounded-lg border border-transparent shadow-sm bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+          >
+            Register as Admin
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-10">
+      <p class="text-sm text-gray-600">
+        Already have an account?
+        <a
+          href="{{ url_for('auth.login') }}"
+          class="font-medium text-cyan-600 hover:text-cyan-500"
+        >
+          Sign in
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize Lucide icons
+    lucide.createIcons();
+  });
+</script>
+{% endblock %}

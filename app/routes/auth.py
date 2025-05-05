@@ -226,114 +226,70 @@ def login():
 
     return render_template('auth/login.html', form=form)
 
-@auth_bp.route('/register', methods=['GET', 'POST'])
+@auth_bp.route('/register', methods=['GET'])
 def register():
+    """Registration landing page with options for different user types"""
+    return render_template('auth/register_landing.html')
+
+@auth_bp.route('/register/patient', methods=['GET', 'POST'])
+def register_patient():
+    """Patient registration page"""
     form = RegistrationForm()
 
-    # Populate hospital choices for hospital admin and doctor registration
-    if request.method == 'GET':
-        try:
-            from app.models.database import Hospital, Department
-            from app.utils.db import db
-            hospitals = db.get_all(Hospital)
-            form.hospital_id.choices = [(str(h.id), h.name) for h in hospitals]
-            form.hospital_id.choices.insert(0, ('', 'Select Hospital'))
+    # Set the role field to patient by default
+    form.role.data = 'patient'
 
-            # Initialize empty department choices
-            form.department_id.choices = [('', 'Select Hospital First')]
-        except Exception as e:
-            # Handle any exceptions gracefully
-            form.hospital_id.choices = [('', 'Error loading hospitals')]
-            form.department_id.choices = [('', 'Error loading departments')]
-            print(f"Error loading hospitals or departments: {str(e)}")
+    # Always populate choices for SelectFields to avoid "Choices cannot be None" error
+    try:
+        from app.models.database import Gender
 
-    # Handle AJAX request to get departments for a hospital
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.args.get('hospital_id'):
-        hospital_id = request.args.get('hospital_id')
-        try:
-            from app.models.database import Department
-            from app.utils.db import db
-            departments = db.query(Department, hospital_id=hospital_id)
-            return jsonify([{'id': str(d.id), 'name': d.name} for d in departments])
-        except Exception as e:
-            return jsonify([]), 400
+        # Set gender choices
+        form.gender.choices = [('', 'Select Gender')] + [(g.value, g.name.title()) for g in Gender]
+
+        # Explicitly set choices for fields not used by patients to prevent validation errors
+        form.hospital_id.choices = []
+        form.department_id.choices = []
+
+    except Exception as e:
+        # Handle any exceptions gracefully
+        form.gender.choices = [('', 'Error loading gender options')]
+        print(f"Error loading gender options: {str(e)}")
 
     if form.validate_on_submit():
-        # Additional server-side validation for patient fields if the role is 'patient'
+        # Additional server-side validation for patient fields
         validation_errors = []
 
-        if form.role.data == 'patient':
-            # Date of birth validation
-            if not form.date_of_birth.data:
-                validation_errors.append('Date of birth is required for patients.')
-            elif form.date_of_birth.data > datetime.now().date():
-                validation_errors.append('Date of birth cannot be in the future.')
+        # Date of birth validation
+        if not form.date_of_birth.data:
+            validation_errors.append('Date of birth is required for patients.')
+        elif form.date_of_birth.data > datetime.now().date():
+            validation_errors.append('Date of birth cannot be in the future.')
 
-            # Gender validation
-            if not form.gender.data:
-                validation_errors.append('Gender is required for patients.')
+        # Gender validation
+        if not form.gender.data:
+            validation_errors.append('Gender is required for patients.')
 
-            # Contact number validation
-            if not form.contact_number.data:
-                validation_errors.append('Contact number is required for patients.')
-            elif len(form.contact_number.data) < 10 or len(form.contact_number.data) > 15:
-                validation_errors.append('Contact number must be between 10 and 15 characters.')
+        # Contact number validation
+        if not form.contact_number.data:
+            validation_errors.append('Contact number is required for patients.')
+        elif len(form.contact_number.data) < 10 or len(form.contact_number.data) > 15:
+            validation_errors.append('Contact number must be between 10 and 15 characters.')
 
-            # Address validation
-            if not form.address.data:
-                validation_errors.append('Address is required for patients.')
-            elif len(form.address.data) < 5:
-                validation_errors.append('Address must be at least 5 characters.')
+        # Address validation
+        if not form.address.data:
+            validation_errors.append('Address is required for patients.')
+        elif len(form.address.data) < 5:
+            validation_errors.append('Address must be at least 5 characters.')
 
-            # Emergency contact name validation
-            if not form.emergency_contact_name.data:
-                validation_errors.append('Emergency contact name is required for patients.')
+        # Emergency contact name validation
+        if not form.emergency_contact_name.data:
+            validation_errors.append('Emergency contact name is required for patients.')
 
-            # Emergency contact number validation
-            if not form.emergency_contact_number.data:
-                validation_errors.append('Emergency contact number is required for patients.')
-            elif len(form.emergency_contact_number.data) < 10 or len(form.emergency_contact_number.data) > 15:
-                validation_errors.append('Emergency contact number must be between 10 and 15 characters.')
-
-        # Validate hospital_admin-specific fields
-        elif form.role.data == 'hospital_admin':
-            # Hospital selection validation
-            if not form.hospital_id.data:
-                validation_errors.append('Hospital selection is required for Hospital Administrators.')
-
-            # Contact number validation
-            if not form.contact_number.data:
-                validation_errors.append('Contact number is required for Hospital Administrators.')
-            elif len(form.contact_number.data) < 10 or len(form.contact_number.data) > 15:
-                validation_errors.append('Contact number must be between 10 and 15 characters.')
-
-            # Address validation
-            if not form.address.data:
-                validation_errors.append('Address is required for Hospital Administrators.')
-
-        # Validate doctor-specific fields
-        elif form.role.data == 'doctor':
-            # Specialization validation
-            if not form.specialization.data:
-                validation_errors.append('Specialization is required for doctors.')
-
-            # Credentials validation
-            if not form.credentials.data:
-                validation_errors.append('Credentials/Qualifications are required for doctors.')
-
-            # Hospital selection validation
-            if not form.hospital_id.data:
-                validation_errors.append('Hospital selection is required for doctors.')
-
-            # Department selection validation
-            if not form.department_id.data:
-                validation_errors.append('Department selection is required for doctors.')
-
-            # Contact number validation
-            if not form.contact_number.data:
-                validation_errors.append('Contact number is required for doctors.')
-            elif len(form.contact_number.data) < 10 or len(form.contact_number.data) > 15:
-                validation_errors.append('Contact number must be between 10 and 15 characters.')
+        # Emergency contact number validation
+        if not form.emergency_contact_number.data:
+            validation_errors.append('Emergency contact number is required for patients.')
+        elif len(form.emergency_contact_number.data) < 10 or len(form.emergency_contact_number.data) > 15:
+            validation_errors.append('Emergency contact number must be between 10 and 15 characters.')
 
         # Check for uniqueness of username/email
         existing_user = find_user_by_username(form.email.data)
@@ -344,128 +300,287 @@ def register():
         if validation_errors:
             for error in validation_errors:
                 flash(error, 'error')
-            return render_template('auth/register.html', form=form)
+            return render_template('auth/register_patient.html', form=form)
 
         # All validations passed, create the user
         user = create_user(
             username=form.email.data,
             password=form.password.data,
-            role=form.role.data,
+            role='patient',
             full_name=form.full_name.data
         )
 
         if user:
-            # If registering as a patient, create a patient record
-            if form.role.data == 'patient':
-                try:
-                    from app.models.database import Patient, Gender
+            try:
+                from app.models.database import Patient, Gender
 
-                    # Create patient record linked to user
-                    patient = Patient(
-                        user_id=user.id,
-                        full_name=form.full_name.data,
-                        date_of_birth=form.date_of_birth.data if form.date_of_birth.data else None,
-                        gender=Gender(form.gender.data) if form.gender.data else None,
-                        contact_number=form.contact_number.data,
-                        address=form.address.data,
-                        emergency_contact_name=form.emergency_contact_name.data,
-                        emergency_contact_number=form.emergency_contact_number.data
-                    )
+                # Create patient record linked to user
+                patient = Patient(
+                    user_id=user.id,
+                    full_name=form.full_name.data,
+                    date_of_birth=form.date_of_birth.data if form.date_of_birth.data else None,
+                    gender=Gender(form.gender.data) if form.gender.data else None,
+                    contact_number=form.contact_number.data,
+                    address=form.address.data,
+                    emergency_contact_name=form.emergency_contact_name.data,
+                    emergency_contact_number=form.emergency_contact_number.data
+                )
 
-                    # Save patient to database (using a mock database for now)
-                    from app.models.patient import save_patient
-                    saved_patient = save_patient(patient)
+                # Save patient to database (using a mock database for now)
+                from app.models.patient import save_patient
+                saved_patient = save_patient(patient)
 
-                    if saved_patient:
-                        # Save user ID and role in session for redirection to success page
-                        session['temp_user_id'] = str(user.id)
-                        session['temp_user_role'] = user.role.value if user.role else 'patient'
+                if saved_patient:
+                    # Save user ID and role in session for redirection to success page
+                    session['temp_user_id'] = str(user.id)
+                    session['temp_user_role'] = user.role.value if user.role else 'patient'
 
-                        # Redirect to registration success page
-                        flash('Registration successful! Your patient account has been created.', 'success')
-                        return redirect(url_for('auth.registration_success'))
-                    else:
-                        # Handle patient save failure
-                        flash('There was an error creating your patient profile. Please try again.', 'error')
-                        return render_template('auth/register.html', form=form)
-                except Exception as e:
-                    # Handle any exceptions during patient creation
-                    flash(f'An error occurred: {str(e)}. Please try again.', 'error')
-                    return render_template('auth/register.html', form=form)
-            # If registering as a hospital admin, create a hospital admin record
-            elif form.role.data == 'hospital_admin':
-                try:
-                    from app.models.database import HospitalAdmin
-                    from app.utils.db import db
-
-                    # Create hospital admin record linked to user
-                    hospital_admin = HospitalAdmin(
-                        user_id=user.id,
-                        full_name=form.full_name.data,
-                        hospital_id=form.hospital_id.data,
-                        contact_number=form.contact_number.data,
-                        address=form.address.data
-                    )
-
-                    # Save hospital admin to database
-                    saved_admin = db.save(hospital_admin)
-
-                    if saved_admin:
-                        # We don't immediately log in hospital admins - they require approval
-                        flash('Registration successful! Your Hospital Administrator account requires approval. You will be notified when your account is activated.', 'success')
-                        return redirect(url_for('auth.login'))
-                    else:
-                        # Handle admin save failure
-                        flash('There was an error creating your Hospital Administrator profile. Please try again.', 'error')
-                        return render_template('auth/register.html', form=form)
-                except Exception as e:
-                    # Handle any exceptions during hospital admin creation
-                    flash(f'An error occurred: {str(e)}. Please try again.', 'error')
-                    return render_template('auth/register.html', form=form)
-            # If registering as a doctor, create a doctor record with pending status
-            elif form.role.data == 'doctor':
-                try:
-                    from app.models.database import Doctor, UserStatus
-                    from app.utils.db import db
-
-                    # Update user status to pending
-                    update_user_status(user.id, UserStatus.INACTIVE)
-
-                    # Create doctor record linked to user
-                    doctor = Doctor(
-                        user_id=user.id,
-                        full_name=form.full_name.data,
-                        specialization=form.specialization.data,
-                        credentials=form.credentials.data,
-                        hospital_id=form.hospital_id.data,
-                        department_id=form.department_id.data,
-                        contact_number=form.contact_number.data
-                    )
-
-                    # Save doctor to database
-                    saved_doctor = db.create(doctor)
-
-                    if saved_doctor:
-                        flash('Registration successful! Your doctor account requires administrative approval. You will be notified when your account is activated.', 'success')
-                        return redirect(url_for('auth.login'))
-                    else:
-                        # Handle doctor save failure
-                        flash('There was an error creating your doctor profile. Please try again.', 'error')
-                        return render_template('auth/register.html', form=form)
-                except Exception as e:
-                    # Handle any exceptions during doctor creation
-                    flash(f'An error occurred: {str(e)}. Please try again.', 'error')
-                    return render_template('auth/register.html', form=form)
-            else:
-                # For other user types, redirect to login
-                flash('Registration successful! Please log in.', 'success')
-                return redirect(url_for('auth.login'))
+                    # Redirect to registration success page
+                    flash('Registration successful! Your patient account has been created.', 'success')
+                    return redirect(url_for('auth.registration_success'))
+                else:
+                    # Handle patient save failure
+                    flash('There was an error creating your patient profile. Please try again.', 'error')
+                    return render_template('auth/register_patient.html', form=form)
+            except Exception as e:
+                # Handle any exceptions during patient creation
+                flash(f'An error occurred: {str(e)}. Please try again.', 'error')
+                return render_template('auth/register_patient.html', form=form)
         else:
             # Handle user creation failure
             flash('There was an error creating your account. Please try again.', 'error')
-            return render_template('auth/register.html', form=form)
+            return render_template('auth/register_patient.html', form=form)
 
-    return render_template('auth/register.html', form=form)
+    return render_template('auth/register_patient.html', form=form)
+
+@auth_bp.route('/register/doctor', methods=['GET', 'POST'])
+def register_doctor():
+    """Doctor registration page"""
+    form = RegistrationForm()
+
+    # Set the role field to doctor by default
+    form.role.data = 'doctor'
+
+    # Always populate choices for SelectFields to avoid "Choices cannot be None" error
+    try:
+        from app.models.database import Hospital, Department
+        from app.utils.db import db
+
+        # Initialize hospital choices
+        hospitals = db.get_all(Hospital)
+        form.hospital_id.choices = [('', 'Select Hospital')] + [(str(h.id), h.name) for h in hospitals]
+
+        # Initialize department choices with a default empty choice
+        form.department_id.choices = [('', 'Select Hospital First')]
+
+        # Handle AJAX request to get departments for a hospital
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.args.get('hospital_id'):
+            hospital_id = request.args.get('hospital_id')
+            print(f"AJAX request received for hospital_id: {hospital_id}")
+            try:
+                # Query departments using the correct hospital_id parameter
+                departments = db.query(Department, hospital_id=hospital_id)
+
+                # Debug information
+                print(f"Found {len(departments)} departments for hospital {hospital_id}")
+                for dept in departments:
+                    print(f"  - Department: {dept.id}, {dept.name}")
+
+                # Format departments for JSON response
+                result = [{'id': str(dept.id), 'name': dept.name} for dept in departments]
+                return jsonify(result)
+            except Exception as e:
+                print(f"Error fetching departments for hospital {hospital_id}: {str(e)}")
+                return jsonify({"error": str(e)}), 500
+
+        # If this is a POST request and hospital_id is provided, load departments for form validation
+        if request.method == 'POST' and form.hospital_id.data:
+            departments = db.query(Department, hospital_id=form.hospital_id.data)
+            form.department_id.choices = [('', 'Select Department')] + [(str(d.id), d.name) for d in departments]
+    except Exception as e:
+        # Handle any exceptions gracefully
+        form.hospital_id.choices = [('', 'Error loading hospitals')]
+        form.department_id.choices = [('', 'Error loading departments')]
+        print(f"Error loading hospitals or departments: {str(e)}")
+
+    if form.validate_on_submit():
+        # Additional server-side validation for doctor fields
+        validation_errors = []
+
+        # Specialization validation
+        if not form.specialization.data:
+            validation_errors.append('Specialization is required for doctors.')
+
+        # Credentials validation
+        if not form.credentials.data:
+            validation_errors.append('Credentials/Qualifications are required for doctors.')
+
+        # Hospital selection validation
+        if not form.hospital_id.data:
+            validation_errors.append('Hospital selection is required for doctors.')
+
+        # Department selection validation
+        if not form.department_id.data:
+            validation_errors.append('Department selection is required for doctors.')
+
+        # Contact number validation
+        if not form.contact_number.data:
+            validation_errors.append('Contact number is required for doctors.')
+        elif len(form.contact_number.data) < 10 or len(form.contact_number.data) > 15:
+            validation_errors.append('Contact number must be between 10 and 15 characters.')
+
+        # Check for uniqueness of username/email
+        existing_user = find_user_by_username(form.email.data)
+        if existing_user:
+            validation_errors.append('A user with that email already exists.')
+
+        # If there are validation errors, show them
+        if validation_errors:
+            for error in validation_errors:
+                flash(error, 'error')
+            return render_template('auth/register_doctor.html', form=form)
+
+        # All validations passed, create the user
+        user = create_user(
+            username=form.email.data,
+            password=form.password.data,
+            role='doctor',
+            full_name=form.full_name.data
+        )
+
+        if user:
+            try:
+                from app.models.database import Doctor, UserStatus
+                from app.utils.db import db
+
+                # Update user status to pending
+                update_user_status(user.id, UserStatus.INACTIVE)
+
+                # Create doctor record linked to user
+                doctor = Doctor(
+                    user_id=user.id,
+                    full_name=form.full_name.data,
+                    specialization=form.specialization.data,
+                    credentials=form.credentials.data,
+                    hospital_id=form.hospital_id.data,
+                    department_id=form.department_id.data,
+                    contact_number=form.contact_number.data
+                )
+
+                # Save doctor to database
+                saved_doctor = db.create(doctor)
+
+                if saved_doctor:
+                    flash('Registration successful! Your doctor account requires administrative approval. You will be notified when your account is activated.', 'success')
+                    return redirect(url_for('auth.login'))
+                else:
+                    # Handle doctor save failure
+                    flash('There was an error creating your doctor profile. Please try again.', 'error')
+                    return render_template('auth/register_doctor.html', form=form)
+            except Exception as e:
+                # Handle any exceptions during doctor creation
+                flash(f'An error occurred: {str(e)}. Please try again.', 'error')
+                return render_template('auth/register_doctor.html', form=form)
+        else:
+            # Handle user creation failure
+            flash('There was an error creating your account. Please try again.', 'error')
+            return render_template('auth/register_doctor.html', form=form)
+
+    return render_template('auth/register_doctor.html', form=form)
+
+@auth_bp.route('/register/hospital-admin', methods=['GET', 'POST'])
+def register_hospital_admin():
+    """Hospital Admin registration page"""
+    form = RegistrationForm()
+
+    # Set the role field to hospital_admin by default
+    form.role.data = 'hospital_admin'
+
+    # Always populate choices for SelectFields to avoid "Choices cannot be None" error
+    try:
+        from app.models.database import Hospital
+        from app.utils.db import db
+
+        # Initialize hospital choices
+        hospitals = db.get_all(Hospital)
+        form.hospital_id.choices = [('', 'Select Hospital')] + [(str(h.id), h.name) for h in hospitals]
+    except Exception as e:
+        # Handle any exceptions gracefully
+        form.hospital_id.choices = [('', 'Error loading hospitals')]
+        print(f"Error loading hospitals: {str(e)}")
+
+    if form.validate_on_submit():
+        # Additional server-side validation for hospital admin fields
+        validation_errors = []
+
+        # Hospital selection validation
+        if not form.hospital_id.data:
+            validation_errors.append('Hospital selection is required for Hospital Administrators.')
+
+        # Contact number validation
+        if not form.contact_number.data:
+            validation_errors.append('Contact number is required for Hospital Administrators.')
+        elif len(form.contact_number.data) < 10 or len(form.contact_number.data) > 15:
+            validation_errors.append('Contact number must be between 10 and 15 characters.')
+
+        # Address validation
+        if not form.address.data:
+            validation_errors.append('Address is required for Hospital Administrators.')
+
+        # Check for uniqueness of username/email
+        existing_user = find_user_by_username(form.email.data)
+        if existing_user:
+            validation_errors.append('A user with that email already exists.')
+
+        # If there are validation errors, show them
+        if validation_errors:
+            for error in validation_errors:
+                flash(error, 'error')
+            return render_template('auth/register_hospital_admin.html', form=form)
+
+        # All validations passed, create the user
+        user = create_user(
+            username=form.email.data,
+            password=form.password.data,
+            role='hospital_admin',
+            full_name=form.full_name.data
+        )
+
+        if user:
+            try:
+                from app.models.database import HospitalAdmin
+                from app.utils.db import db
+
+                # Create hospital admin record linked to user
+                hospital_admin = HospitalAdmin(
+                    user_id=user.id,
+                    full_name=form.full_name.data,
+                    hospital_id=form.hospital_id.data,
+                    contact_number=form.contact_number.data,
+                    address=form.address.data
+                )
+
+                # Save hospital admin to database
+                saved_admin = db.save(hospital_admin)
+
+                if saved_admin:
+                    # We don't immediately log in hospital admins - they require approval
+                    flash('Registration successful! Your Hospital Administrator account requires approval. You will be notified when your account is activated.', 'success')
+                    return redirect(url_for('auth.login'))
+                else:
+                    # Handle admin save failure
+                    flash('There was an error creating your Hospital Administrator profile. Please try again.', 'error')
+                    return render_template('auth/register_hospital_admin.html', form=form)
+            except Exception as e:
+                # Handle any exceptions during hospital admin creation
+                flash(f'An error occurred: {str(e)}. Please try again.', 'error')
+                return render_template('auth/register_hospital_admin.html', form=form)
+        else:
+            # Handle user creation failure
+            flash('There was an error creating your account. Please try again.', 'error')
+            return render_template('auth/register_hospital_admin.html', form=form)
+
+    return render_template('auth/register_hospital_admin.html', form=form)
 
 @auth_bp.route('/registration-success', methods=['GET'])
 def registration_success():

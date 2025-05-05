@@ -1,0 +1,293 @@
+{% extends "base.html" %} {% block title %}Hospital Administrator Registration -
+shastho{% endblock %} {% block content %}
+<div
+  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 to-blue-50 px-4 sm:px-6 lg:px-8 py-8"
+>
+  <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8 my-8">
+    <div class="text-center mb-8">
+      <div class="flex justify-center mb-4">
+        <img
+          src="{{ url_for('static', filename='images/logo.svg') }}"
+          alt="shastho Logo"
+          class="h-16 w-16"
+        />
+      </div>
+      <h2 class="text-3xl font-bold text-gray-900">shastho</h2>
+      <p class="mt-2 text-sm text-gray-600">
+        Create a hospital administrator account
+      </p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div
+      class="rounded-md p-4 mb-4 {% if category == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}"
+    >
+      {{ message }}
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <form method="POST" class="space-y-6">
+      {{ form.csrf_token }} {{ form.role(style="display: none;") }}
+
+      <div>
+        <label
+          for="full_name"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Full Name</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="user-circle" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.full_name(id="full_name", class="appearance-none block w-full
+          pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Enter your full name") }}
+        </div>
+        {% if form.full_name.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.full_name.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-1"
+          >Email</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="mail" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.email(id="email", class="appearance-none block w-full pl-10
+          pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Enter your email") }}
+        </div>
+        {% if form.email.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.email.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label
+          for="password"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Password</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.password(id="password", class="appearance-none block w-full
+          pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Create a password") }}
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <button
+              type="button"
+              class="text-gray-400 hover:text-gray-500 focus:outline-none password-toggle"
+            >
+              <i data-lucide="eye" class="h-4 w-4"></i>
+            </button>
+          </div>
+        </div>
+        <p class="mt-1 text-xs text-gray-500">
+          Password must be at least 8 characters
+        </p>
+        {% if form.password.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.password.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label
+          for="confirm_password"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Confirm Password</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.confirm_password(id="confirm_password", type="password",
+          class="appearance-none block w-full pl-10 pr-10 py-2.5 border
+          border-gray-300 rounded-lg shadow-sm placeholder-gray-400
+          focus:outline-none focus:ring-cyan-500 focus:border-cyan-500",
+          placeholder="Confirm your password") }}
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <button
+              type="button"
+              class="text-gray-400 hover:text-gray-500 focus:outline-none password-toggle"
+            >
+              <i data-lucide="eye" class="h-4 w-4"></i>
+            </button>
+          </div>
+        </div>
+        {% if form.confirm_password.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.confirm_password.errors %} {{ error }} {% endfor
+          %}
+        </div>
+        {% endif %}
+      </div>
+
+      <h3
+        class="text-lg font-medium text-gray-800 border-b border-gray-200 pb-2 mb-4 mt-8"
+      >
+        Hospital Administrator Information
+      </h3>
+
+      <div>
+        <label
+          for="hospital_id"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Hospital*</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="building" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.hospital_id(id="hospital_id", class="appearance-none block
+          w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", required=True) }}
+        </div>
+        {% if form.hospital_id.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.hospital_id.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label
+          for="contact_number"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Contact Number*</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="phone" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.contact_number(id="contact_number", class="appearance-none
+          block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg
+          shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Enter your contact number",
+          required=True) }}
+        </div>
+        {% if form.contact_number.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.contact_number.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label
+          for="address"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Address*</label
+        >
+        <div class="relative">
+          <div
+            class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none"
+          >
+            <i data-lucide="map-pin" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.address(id="address", class="appearance-none block w-full
+          pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Enter your address", rows="3",
+          required=True) }}
+        </div>
+        {% if form.address.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.address.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div
+        class="p-4 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 text-sm mt-4"
+      >
+        <strong>Note:</strong> Hospital Administrator accounts require approval
+        by a System Administrator. Your account will be pending until approved.
+      </div>
+
+      <div class="mt-8">
+        <button
+          type="submit"
+          class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150"
+        >
+          Create Administrator Account
+        </button>
+      </div>
+    </form>
+
+    <div class="text-center mt-6">
+      <p class="text-sm text-gray-600">
+        Already have an account?
+        <a
+          href="{{ url_for('auth.login') }}"
+          class="font-medium text-indigo-600 hover:text-indigo-500"
+        >
+          Sign in
+        </a>
+      </p>
+      <p class="text-sm text-gray-600 mt-2">
+        <a
+          href="{{ url_for('auth.register') }}"
+          class="font-medium text-gray-600 hover:text-gray-500"
+        >
+          <i data-lucide="chevron-left" class="inline h-4 w-4"></i> Back to
+          registration options
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Set up password toggles
+    document.querySelectorAll(".password-toggle").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var passwordField = this.closest(".relative").querySelector("input");
+        var icon = this.querySelector("i");
+
+        if (passwordField.type === "password") {
+          passwordField.type = "text";
+          icon.setAttribute("data-lucide", "eye-off");
+        } else {
+          passwordField.type = "password";
+          icon.setAttribute("data-lucide", "eye");
+        }
+
+        lucide.createIcons();
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -6,7 +6,8 @@ from uuid import UUID, uuid4
 from app.models.database import (
     User, Hospital, Department, Patient, Doctor,
     DoctorAvailabilitySlot, Appointment,
-    UserRole, UserStatus, Gender, AppointmentStatus
+    UserRole, UserStatus, Gender, AppointmentStatus,
+    HospitalDepartment
 )
 from app.utils.db import Database
 
@@ -71,24 +72,20 @@ class TestDatabaseModels(unittest.TestCase):
     def test_department_model(self):
         """Test the Department model."""
         department_id = uuid4()
-        hospital_id = uuid4()
         department = Department(
             id=department_id,
-            name="Cardiology",
-            hospital_id=hospital_id
+            name="Cardiology"
         )
 
         # Test to_dict
         department_dict = department.to_dict()
         self.assertEqual(department_dict["id"], str(department_id))
         self.assertEqual(department_dict["name"], "Cardiology")
-        self.assertEqual(department_dict["hospital_id"], str(hospital_id))
 
         # Test from_dict
         new_department = Department.from_dict(department_dict)
         self.assertEqual(str(new_department.id), str(department_id))
         self.assertEqual(new_department.name, "Cardiology")
-        self.assertEqual(str(new_department.hospital_id), str(hospital_id))
 
     def test_patient_model(self):
         """Test the Patient model."""
@@ -241,6 +238,30 @@ class TestDatabaseModels(unittest.TestCase):
         self.assertEqual(str(new_appointment.hospital_id), str(hospital_id))
         self.assertEqual(str(new_appointment.department_id), str(department_id))
         self.assertEqual(new_appointment.status, AppointmentStatus.SCHEDULED)
+
+    def test_hospital_department_model(self):
+        """Test the HospitalDepartment model."""
+        hospital_department_id = uuid4()
+        hospital_id = uuid4()
+        department_id = uuid4()
+
+        hospital_department = HospitalDepartment(
+            id=hospital_department_id,
+            hospital_id=hospital_id,
+            department_id=department_id
+        )
+
+        # Test to_dict
+        hospital_department_dict = hospital_department.to_dict()
+        self.assertEqual(hospital_department_dict["id"], str(hospital_department_id))
+        self.assertEqual(hospital_department_dict["hospital_id"], str(hospital_id))
+        self.assertEqual(hospital_department_dict["department_id"], str(department_id))
+
+        # Test from_dict
+        new_hospital_department = HospitalDepartment.from_dict(hospital_department_dict)
+        self.assertEqual(str(new_hospital_department.id), str(hospital_department_id))
+        self.assertEqual(str(new_hospital_department.hospital_id), str(hospital_id))
+        self.assertEqual(str(new_hospital_department.department_id), str(department_id))
 
 
 @patch('app.utils.db.create_client')

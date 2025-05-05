@@ -6,6 +6,7 @@ from flask_session import Session
 from datetime import timedelta
 from dotenv import load_dotenv
 from app.utils.localization import setup_localization
+from flask_wtf.csrf import CSRFProtect
 
 def create_app():
     """Create and configure the Flask application."""
@@ -29,6 +30,9 @@ def create_app():
 
     # Initialize Flask-Session
     Session(app)
+
+    # Initialize CSRF protection
+    csrf = CSRFProtect(app)
 
     # Set up localization
     setup_localization(app)

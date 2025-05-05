@@ -102,20 +102,44 @@ endblock %} {% block breadcrumb %}
                 {% endif %}
               </div>
 
-              <!-- Description -->
+              <!-- Departments -->
               <div class="col-span-6">
                 <label
-                  for="description"
-                  class="block text-sm font-medium text-gray-700"
-                  >Description</label
+                  for="departments"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Departments</label
                 >
-                {{ form.description(rows=3, class="mt-1 focus:ring-indigo-500
-                focus:border-indigo-500 block w-full shadow-sm sm:text-sm
-                border-gray-300 rounded-md") }} {% if form.description.errors %}
-                <div class="text-red-500 text-sm mt-1">
-                  {% for error in form.description.errors %}
-                  <span>{{ error }}</span>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+                  {% for choice in form.departments.choices %}
+                  <div class="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="departments"
+                      value="{{ choice[0] }}"
+                      id="department-{{ choice[0] }}"
+                      class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      {%
+                      if
+                      form.departments.data
+                      and
+                      choice[0]
+                      in
+                      form.departments.data
+                      %}checked{%
+                      endif
+                      %}
+                    />
+                    <label
+                      for="department-{{ choice[0] }}"
+                      class="ml-2 block text-sm text-gray-700"
+                      >{{ choice[1] }}</label
+                    >
+                  </div>
                   {% endfor %}
+                </div>
+                {% if form.departments.errors %}
+                <div class="text-red-500 text-sm mt-1">
+                  {{ form.departments.errors[0] }}
                 </div>
                 {% endif %}
               </div>

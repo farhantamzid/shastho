@@ -197,7 +197,8 @@ breadcrumb %}
                 </svg>
               </a>
               <button
-                onclick="confirmDelete('{{ hospital.id }}', '{{ hospital.name }}')"
+                data-delete-hospital="{{ hospital.id }}"
+                data-hospital-name="{{ hospital.name }}"
                 class="inline-flex items-center p-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
                 <svg
@@ -336,7 +337,13 @@ breadcrumb %}
 </div>
 
 <script>
-  function confirmDelete(hospitalId, hospitalName) {
+  // Close modal function
+  function closeModal() {
+    document.getElementById("deleteModal").classList.add("hidden");
+  }
+
+  // Show modal function
+  function showModal(hospitalId, hospitalName) {
     document.getElementById("deleteForm").action =
       "{{ url_for('admin.delete_hospital', hospital_id='PLACEHOLDER') }}".replace(
         "PLACEHOLDER",
@@ -348,108 +355,143 @@ breadcrumb %}
     document.getElementById("deleteModal").classList.remove("hidden");
   }
 
-  function closeModal() {
-    document.getElementById("deleteModal").classList.add("hidden");
-  }
+  // Set up event listeners when DOM is loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    // Handle delete buttons
+    document.querySelectorAll("[data-delete-hospital]").forEach((button) => {
+      button.addEventListener("click", function () {
+        const hospitalId = this.getAttribute("data-delete-hospital");
+        const hospitalName = this.getAttribute("data-hospital-name");
+        showModal(hospitalId, hospitalName);
+      });
+    });
 
-  // Close modal when clicking outside
-  document.addEventListener("click", function (event) {
-    const modal = document.getElementById("deleteModal");
-    const modalContent = document.querySelector(
-      "#deleteModal > div > div:last-child"
-    );
+    // Handle form submission
+    document
+      .getElementById("deleteForm")
+      .addEventListener("submit", function (e) {
+        e.preventDefault();
 
-    if (
-      modal &&
-      !modal.classList.contains("hidden") &&
-      !modalContent.contains(event.target)
-    ) {
-      closeModal();
-    }
-  });
+        // Get CSRF token
+        const csrfToken = document
+          .querySelector("meta[name='csrf-token']")
+          ?.getAttribute("content");
 
-  // Ajax delete handler
-  document
-    .getElementById("deleteForm")
-    .addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      fetch(this.action, {
-        method: "POST",
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          closeModal();
-          if (data.success) {
-            // Show success message
-            const flashContainer = document.createElement("div");
-            flashContainer.className =
-              "mb-4 p-4 rounded-md bg-green-50 text-green-800";
-            flashContainer.innerHTML = `
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm">${data.message}</p>
-            </div>
-          </div>
-        `;
-
-            // Insert at the top of the content area
-            const contentArea = document.querySelector(".bg-white.shadow");
-            contentArea.parentNode.insertBefore(flashContainer, contentArea);
-
-            // Remove the deleted hospital from the list
-            const hospitalId = this.action.split("/").pop();
-            const listItem = document
-              .querySelector(`button[onclick*="${hospitalId}"]`)
-              .closest("li");
-            listItem.remove();
-
-            // Check if we need to show the "no hospitals" message
-            const hospitalItems = document.querySelectorAll(".divide-y > li");
-            if (hospitalItems.length === 0) {
-              const noHospitalsMessage = document.createElement("div");
-              noHospitalsMessage.className = "px-4 py-5 sm:p-6 text-center";
-              noHospitalsMessage.innerHTML =
-                '<p class="text-gray-500">No hospitals have been added yet.</p>';
-
-              const listContainer = document.querySelector(".divide-y");
-              if (listContainer) {
-                listContainer.parentNode.replaceChild(
-                  noHospitalsMessage,
-                  listContainer
-                );
-              }
+        fetch(this.action, {
+          method: "POST",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken || "",
+          },
+          credentials: "same-origin",
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
             }
+            return response.json();
+          })
+          .then((data) => {
+            closeModal();
+            if (data.success) {
+              // Show success message
+              const flashContainer = document.createElement("div");
+              flashContainer.className =
+                "mb-4 p-4 rounded-md bg-green-50 text-green-800";
+              flashContainer.innerHTML = `
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm">${data.message}</p>
+                </div>
+              </div>
+            `;
 
-            // Auto-remove the flash message after 5 seconds
-            setTimeout(() => {
-              flashContainer.remove();
-            }, 5000);
-          } else {
+              // Insert at the top of the content area
+              const contentArea = document.querySelector(".bg-white.shadow");
+              contentArea.parentNode.insertBefore(flashContainer, contentArea);
+
+              // Remove the deleted hospital from the list
+              const hospitalId = this.action.split("/").pop();
+              const listItem = document
+                .querySelector(`button[data-delete-hospital="${hospitalId}"]`)
+                .closest("li");
+              listItem.remove();
+
+              // Check if we need to show the "no hospitals" message
+              const hospitalItems = document.querySelectorAll(".divide-y > li");
+              if (hospitalItems.length === 0) {
+                const noHospitalsMessage = document.createElement("div");
+                noHospitalsMessage.className = "px-4 py-5 sm:p-6 text-center";
+                noHospitalsMessage.innerHTML =
+                  '<p class="text-gray-500">No hospitals have been added yet.</p>';
+
+                const listContainer = document.querySelector(".divide-y");
+                if (listContainer) {
+                  listContainer.parentNode.replaceChild(
+                    noHospitalsMessage,
+                    listContainer
+                  );
+                }
+              }
+
+              // Auto-remove the flash message after 5 seconds
+              setTimeout(() => {
+                flashContainer.remove();
+              }, 5000);
+            } else {
+              // Show error message
+              const flashContainer = document.createElement("div");
+              flashContainer.className =
+                "mb-4 p-4 rounded-md bg-red-50 text-red-800";
+              flashContainer.innerHTML = `
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm">${data.message}</p>
+                </div>
+              </div>
+            `;
+
+              // Insert at the top of the content area
+              const contentArea = document.querySelector(".bg-white.shadow");
+              contentArea.parentNode.insertBefore(flashContainer, contentArea);
+
+              // Auto-remove the flash message after 5 seconds
+              setTimeout(() => {
+                flashContainer.remove();
+              }, 5000);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            closeModal();
+
             // Show error message
             const flashContainer = document.createElement("div");
             flashContainer.className =
               "mb-4 p-4 rounded-md bg-red-50 text-red-800";
             flashContainer.innerHTML = `
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm">An error occurred while deleting the hospital.</p>
+              </div>
             </div>
-            <div class="ml-3">
-              <p class="text-sm">${data.message}</p>
-            </div>
-          </div>
-        `;
+          `;
 
             // Insert at the top of the content area
             const contentArea = document.querySelector(".bg-white.shadow");
@@ -459,38 +501,24 @@ breadcrumb %}
             setTimeout(() => {
               flashContainer.remove();
             }, 5000);
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          closeModal();
+          });
+      });
 
-          // Show error message
-          const flashContainer = document.createElement("div");
-          flashContainer.className =
-            "mb-4 p-4 rounded-md bg-red-50 text-red-800";
-          flashContainer.innerHTML = `
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm">An error occurred while deleting the hospital.</p>
-          </div>
-        </div>
-      `;
+    // Close modal when clicking outside
+    document.addEventListener("click", function (event) {
+      const modal = document.getElementById("deleteModal");
+      const modalContent = document.querySelector(
+        "#deleteModal > div > div:last-child"
+      );
 
-          // Insert at the top of the content area
-          const contentArea = document.querySelector(".bg-white.shadow");
-          contentArea.parentNode.insertBefore(flashContainer, contentArea);
-
-          // Auto-remove the flash message after 5 seconds
-          setTimeout(() => {
-            flashContainer.remove();
-          }, 5000);
-        });
+      if (
+        modal &&
+        !modal.classList.contains("hidden") &&
+        !modalContent.contains(event.target)
+      ) {
+        closeModal();
+      }
     });
+  });
 </script>
 {% endblock %}

@@ -1,0 +1,462 @@
+{% extends "base.html" %} {% block title %}Doctor Registration - shastho{%
+endblock %} {% block content %}
+<div
+  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 to-blue-50 px-4 sm:px-6 lg:px-8 py-8"
+>
+  <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8 my-8">
+    <div class="text-center mb-8">
+      <div class="flex justify-center mb-4">
+        <img
+          src="{{ url_for('static', filename='images/logo.svg') }}"
+          alt="shastho Logo"
+          class="h-16 w-16"
+        />
+      </div>
+      <h2 class="text-3xl font-bold text-gray-900">shastho</h2>
+      <p class="mt-2 text-sm text-gray-600">Create a doctor account</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div
+      class="rounded-md p-4 mb-4 {% if category == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}"
+    >
+      {{ message }}
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <form method="POST" class="space-y-6">
+      {{ form.csrf_token }} {{ form.role(style="display: none;") }}
+
+      <div>
+        <label
+          for="full_name"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Full Name</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="user-circle" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.full_name(id="full_name", class="appearance-none block w-full
+          pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Enter your full name") }}
+        </div>
+        {% if form.full_name.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.full_name.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-1"
+          >Email</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="mail" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.email(id="email", class="appearance-none block w-full pl-10
+          pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Enter your email") }}
+        </div>
+        {% if form.email.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.email.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label
+          for="password"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Password</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.password(id="password", class="appearance-none block w-full
+          pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Create a password") }}
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <button
+              type="button"
+              class="text-gray-400 hover:text-gray-500 focus:outline-none password-toggle"
+            >
+              <i data-lucide="eye" class="h-4 w-4"></i>
+            </button>
+          </div>
+        </div>
+        <p class="mt-1 text-xs text-gray-500">
+          Password must be at least 8 characters
+        </p>
+        {% if form.password.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.password.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label
+          for="confirm_password"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Confirm Password</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.confirm_password(id="confirm_password", type="password",
+          class="appearance-none block w-full pl-10 pr-10 py-2.5 border
+          border-gray-300 rounded-lg shadow-sm placeholder-gray-400
+          focus:outline-none focus:ring-cyan-500 focus:border-cyan-500",
+          placeholder="Confirm your password") }}
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <button
+              type="button"
+              class="text-gray-400 hover:text-gray-500 focus:outline-none password-toggle"
+            >
+              <i data-lucide="eye" class="h-4 w-4"></i>
+            </button>
+          </div>
+        </div>
+        {% if form.confirm_password.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.confirm_password.errors %} {{ error }} {% endfor
+          %}
+        </div>
+        {% endif %}
+      </div>
+
+      <h3
+        class="text-lg font-medium text-gray-800 border-b border-gray-200 pb-2 mb-4 mt-8"
+      >
+        Doctor Information
+      </h3>
+
+      <div>
+        <label
+          for="specialization"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Specialization*</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="stethoscope" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.specialization(id="specialization", class="appearance-none
+          block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg
+          shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Enter your specialization",
+          required=True) }}
+        </div>
+        {% if form.specialization.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.specialization.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label
+          for="credentials"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Credentials/Qualifications*</label
+        >
+        <div class="relative">
+          <div
+            class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none"
+          >
+            <i data-lucide="award" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.credentials(id="credentials", class="appearance-none block
+          w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Enter your credentials and
+          qualifications", rows="3", required=True) }}
+        </div>
+        {% if form.credentials.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.credentials.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label
+          for="hospital_id"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Hospital*</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="building" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.hospital_id(id="hospital_id", class="appearance-none block
+          w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", required=True) }}
+        </div>
+        {% if form.hospital_id.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.hospital_id.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label
+          for="department_id"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Department*</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="activity" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.department_id(id="department_id", class="appearance-none block
+          w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm
+          placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", required=True) }}
+        </div>
+        {% if form.department_id.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.department_id.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <label
+          for="contact_number"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Contact Number*</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="phone" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          {{ form.contact_number(id="contact_number", class="appearance-none
+          block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg
+          shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500
+          focus:border-cyan-500", placeholder="Enter your contact number",
+          required=True) }}
+        </div>
+        {% if form.contact_number.errors %}
+        <div class="text-red-500 text-sm mt-1">
+          {% for error in form.contact_number.errors %} {{ error }} {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div
+        class="p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-sm mt-4"
+      >
+        <strong>Note:</strong> Doctor accounts require approval by a Hospital
+        Administrator. Your account will be pending until approved.
+      </div>
+
+      <div class="mt-8">
+        <button
+          type="submit"
+          class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150"
+        >
+          Create Doctor Account
+        </button>
+      </div>
+    </form>
+
+    <div class="text-center mt-6">
+      <p class="text-sm text-gray-600">
+        Already have an account?
+        <a
+          href="{{ url_for('auth.login') }}"
+          class="font-medium text-blue-600 hover:text-blue-500"
+        >
+          Sign in
+        </a>
+      </p>
+      <p class="text-sm text-gray-600 mt-2">
+        <a
+          href="{{ url_for('auth.register') }}"
+          class="font-medium text-gray-600 hover:text-gray-500"
+        >
+          <i data-lucide="chevron-left" class="inline h-4 w-4"></i> Back to
+          registration options
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM Loaded. Initializing doctor registration script."); // DEBUG
+    const hospitalSelect = document.getElementById("hospital_id");
+    const departmentSelect = document.getElementById("department_id");
+    const departmentLabel = document.querySelector(
+      'label[for="department_id"]'
+    );
+
+    if (hospitalSelect && departmentSelect) {
+      console.log("Hospital and Department select elements found."); // DEBUG
+
+      const updateDepartments = (departments) => {
+        console.log("Updating departments. Received data:", departments); // DEBUG
+        departmentSelect.innerHTML = ""; // Clear all
+        const placeholderOption = document.createElement("option");
+        placeholderOption.value = "";
+
+        if (departments && departments.length > 0) {
+          placeholderOption.textContent = "Select Department";
+          departmentSelect.appendChild(placeholderOption);
+
+          departments.forEach((department) => {
+            const option = document.createElement("option");
+            option.value = department.id;
+            option.textContent = department.name;
+            departmentSelect.appendChild(option);
+            console.log(
+              `Added department option: ${department.name} (${department.id})`
+            ); // DEBUG
+          });
+          departmentSelect.disabled = false;
+          if (departmentLabel)
+            departmentLabel.classList.remove("text-gray-400");
+          console.log("Departments populated and dropdown enabled."); // DEBUG
+        } else {
+          placeholderOption.textContent = "No departments available";
+          departmentSelect.appendChild(placeholderOption);
+          departmentSelect.disabled = true;
+          if (departmentLabel) departmentLabel.classList.add("text-gray-400");
+          console.log("No departments found or received. Dropdown disabled."); // DEBUG
+        }
+      };
+
+      // Initial state check
+      if (!hospitalSelect.value) {
+        console.log(
+          "No initial hospital selected. Disabling department dropdown."
+        ); // DEBUG
+        departmentSelect.disabled = true;
+        const initialOption = document.createElement("option");
+        initialOption.value = "";
+        initialOption.textContent = "Select Hospital First";
+        departmentSelect.appendChild(initialOption);
+        if (departmentLabel) departmentLabel.classList.add("text-gray-400");
+      } else {
+        console.log("Initial hospital selected:", hospitalSelect.value); // DEBUG
+        // Optional: Trigger initial load if needed, though backend usually handles initial render
+        // hospitalSelect.dispatchEvent(new Event('change')); // Uncomment if initial load via JS is desired
+      }
+
+      hospitalSelect.addEventListener("change", function () {
+        const hospitalId = this.value;
+        console.log(
+          `Hospital selection changed. Selected Hospital ID: ${hospitalId}`
+        ); // DEBUG
+
+        departmentSelect.innerHTML = "";
+        const loadingOption = document.createElement("option");
+        loadingOption.value = "";
+        loadingOption.textContent = "Loading...";
+        departmentSelect.appendChild(loadingOption);
+        departmentSelect.disabled = true;
+        if (departmentLabel) departmentLabel.classList.add("text-gray-400");
+        console.log("Department dropdown cleared and set to 'Loading...'."); // DEBUG
+
+        if (hospitalId) {
+          const fetchUrl = `/auth/register/doctor?hospital_id=${hospitalId}`;
+          console.log(`Fetching departments from: ${fetchUrl}`); // DEBUG
+
+          fetch(fetchUrl, {
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+            },
+          })
+            .then((response) => {
+              console.log(`Fetch response status: ${response.status}`); // DEBUG
+              if (!response.ok) {
+                console.error(
+                  `HTTP error! status: ${response.status}, statusText: ${response.statusText}`
+                ); // DEBUG
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then((data) => {
+              console.log("Received JSON data:", data); // DEBUG
+              if (data.error) {
+                console.error("Backend returned an error:", data.error); // DEBUG
+                updateDepartments([]);
+              } else {
+                updateDepartments(data);
+              }
+            })
+            .catch((error) => {
+              console.error("Error during fetch or processing:", error); // DEBUG
+              updateDepartments([]);
+            });
+        } else {
+          console.log("No hospital selected. Resetting department dropdown."); // DEBUG
+          const placeholderOption = document.createElement("option");
+          placeholderOption.value = "";
+          placeholderOption.textContent = "Select Hospital First";
+          departmentSelect.innerHTML = "";
+          departmentSelect.appendChild(placeholderOption);
+          departmentSelect.disabled = true;
+          if (departmentLabel) departmentLabel.classList.add("text-gray-400");
+        }
+      });
+
+      console.log("Event listener attached to hospital select."); // DEBUG
+    } else {
+      console.error(
+        "Could not find hospital or department select elements on the page."
+      ); // DEBUG
+    }
+
+    // --- Password Toggle ---
+    console.log("Setting up password toggles."); // DEBUG
+    document.querySelectorAll(".password-toggle").forEach((button) => {
+      button.addEventListener("click", function () {
+        const input = this.closest(".relative").querySelector("input");
+        const icon = this.querySelector("i");
+        if (input.type === "password") {
+          input.type = "text";
+          icon.setAttribute("data-lucide", "eye-off");
+        } else {
+          input.type = "password";
+          icon.setAttribute("data-lucide", "eye");
+        }
+        if (typeof lucide !== "undefined") {
+          lucide.createIcons();
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

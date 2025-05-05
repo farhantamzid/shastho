@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}shastho{% endblock %}</title>
+    <title>
+      {% block title %}Shastho - Healthcare Management System{% endblock %}
+    </title>
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <!-- Tailwind CSS CDN (for development) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -355,6 +358,6 @@
     </script>
 
     <!-- Additional JavaScript -->
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}{% endblock %} {% block scripts %}{% endblock %}
   </body>
 </html>
