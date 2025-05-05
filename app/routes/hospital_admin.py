@@ -35,12 +35,15 @@ def dashboard():
     # Get the current user's information
     user_id = session.get('user_id')
 
-    # Get the hospital admin profile
-    hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', user_id)
+    # Get the hospital admin profile records
+    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
 
-    if not hospital_admin:
+    if not hospital_admin_records:
         flash('Hospital Administrator profile not found.', 'error')
         return redirect(url_for('main.index'))
+
+    # Get the first hospital admin record
+    hospital_admin = hospital_admin_records[0]
 
     # Get the hospital information
     hospital = db.get_by_id(Hospital, hospital_admin.hospital_id)
@@ -74,12 +77,15 @@ def profile():
     # Get the current user's information
     user_id = session.get('user_id')
 
-    # Get the hospital admin profile
-    hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', user_id)
+    # Get the hospital admin profile records
+    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
 
-    if not hospital_admin:
+    if not hospital_admin_records:
         flash('Hospital Administrator profile not found.', 'error')
         return redirect(url_for('main.index'))
+
+    # Get the first hospital admin record
+    hospital_admin = hospital_admin_records[0]
 
     # Get the hospital information
     hospital = db.get_by_id(Hospital, hospital_admin.hospital_id)
@@ -116,12 +122,15 @@ def list_admin_requests():
     # Get the current user's information
     user_id = session.get('user_id')
 
-    # Get the hospital admin profile
-    hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', user_id)
+    # Get the hospital admin profile records
+    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
 
-    if not hospital_admin:
+    if not hospital_admin_records:
         flash('Hospital Administrator profile not found.', 'error')
         return redirect(url_for('main.index'))
+
+    # Get the first hospital admin record
+    hospital_admin = hospital_admin_records[0]
 
     # Get all admin requests for this hospital
     admin_requests = db.get_by_field(TestImageAdminRequest, 'hospital_id', hospital_admin.hospital_id)
@@ -170,14 +179,12 @@ def list_admin_requests():
         admin_requests = sorted(admin_requests, key=lambda r: r.created_at or db.get_current_time(), reverse=(sort_dir == 'desc'))
 
     # Count requests by status for statistics
+    all_hospital_requests = db.get_by_field(TestImageAdminRequest, 'hospital_id', hospital_admin.hospital_id)
     status_counts = {
-        'total': len(db.get_by_field(TestImageAdminRequest, 'hospital_id', hospital_admin.hospital_id)),
-        'pending': len([r for r in db.get_by_field(TestImageAdminRequest, 'hospital_id', hospital_admin.hospital_id)
-                      if r.status == AdminRequestStatus.PENDING]),
-        'approved': len([r for r in db.get_by_field(TestImageAdminRequest, 'hospital_id', hospital_admin.hospital_id)
-                       if r.status == AdminRequestStatus.APPROVED]),
-        'rejected': len([r for r in db.get_by_field(TestImageAdminRequest, 'hospital_id', hospital_admin.hospital_id)
-                       if r.status == AdminRequestStatus.REJECTED])
+        'total': len(all_hospital_requests),
+        'pending': len([r for r in all_hospital_requests if r.status == AdminRequestStatus.PENDING]),
+        'approved': len([r for r in all_hospital_requests if r.status == AdminRequestStatus.APPROVED]),
+        'rejected': len([r for r in all_hospital_requests if r.status == AdminRequestStatus.REJECTED])
     }
 
     return render_template(
@@ -202,12 +209,15 @@ def new_admin_request():
     # Get the current user's information
     user_id = session.get('user_id')
 
-    # Get the hospital admin profile
-    hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', user_id)
+    # Get the hospital admin profile records
+    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
 
-    if not hospital_admin:
+    if not hospital_admin_records:
         flash('Hospital Administrator profile not found.', 'error')
         return redirect(url_for('main.index'))
+
+    # Get the first hospital admin record
+    hospital_admin = hospital_admin_records[0]
 
     form = TestImageAdminRequestForm()
 
@@ -245,15 +255,15 @@ def new_admin_request():
 @role_required(['hospital_admin'])
 def update_admin_request_status(request_id):
     """Update the status of a Test/Imaging Admin request."""
-    # Get the current user's information
+    # Get the current user's information to verify they belong to the correct hospital
     user_id = session.get('user_id')
+    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
 
-    # Get the hospital admin profile
-    hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', user_id)
+    if not hospital_admin_records:
+        flash('Your administrator profile could not be found.', 'error')
+        return redirect(url_for('hospital_admin.list_admin_requests'))
 
-    if not hospital_admin:
-        flash('Hospital Administrator profile not found.', 'error')
-        return redirect(url_for('main.index'))
+    hospital_admin = hospital_admin_records[0]
 
     # Get the request
     admin_request = db.get_by_id(TestImageAdminRequest, request_id)
@@ -295,16 +305,16 @@ def update_admin_request_status(request_id):
 @hospital_admin_bp.route('/admin-request/<request_id>/approval-confirmation')
 @role_required(['hospital_admin'])
 def admin_approval_confirmation(request_id):
-    """Display confirmation page after approving an admin request."""
-    # Get the current user's information
+    """Display confirmation page after approving a test admin request."""
+    # Get the current user's information to verify they belong to the correct hospital
     user_id = session.get('user_id')
+    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
 
-    # Get the hospital admin profile
-    hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', user_id)
-
-    if not hospital_admin:
-        flash('Hospital Administrator profile not found.', 'error')
+    if not hospital_admin_records:
+        flash('Your administrator profile could not be found.', 'error')
         return redirect(url_for('main.index'))
+
+    hospital_admin = hospital_admin_records[0]
 
     # Get the request
     admin_request = db.get_by_id(TestImageAdminRequest, request_id)
@@ -323,15 +333,15 @@ def admin_approval_confirmation(request_id):
 @role_required(['hospital_admin'])
 def view_admin_request(request_id):
     """View details of a specific Test/Imaging Admin request."""
-    # Get the current user's information
+    # Get the current user's information to verify they belong to the correct hospital
     user_id = session.get('user_id')
+    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
 
-    # Get the hospital admin profile
-    hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', user_id)
-
-    if not hospital_admin:
-        flash('Hospital Administrator profile not found.', 'error')
+    if not hospital_admin_records:
+        flash('Your administrator profile could not be found.', 'error')
         return redirect(url_for('main.index'))
+
+    hospital_admin = hospital_admin_records[0]
 
     # Get the request
     admin_request = db.get_by_id(TestImageAdminRequest, request_id)

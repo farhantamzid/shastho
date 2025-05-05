@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
 from app.routes.auth import role_required, login_required
 from app.utils.db import Database
-from app.models.database import Hospital, Department, HospitalAdmin, User, UserStatus, Doctor, DoctorNote, HospitalDepartment
+from app.models.database import Hospital, Department, HospitalAdmin, User, UserStatus, Doctor, DoctorNote, HospitalDepartment, parse_iso_datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, SelectMultipleField, widgets
 from wtforms.validators import DataRequired, Length, Optional
@@ -478,20 +478,37 @@ def pending_admins():
     # Get additional hospital admin info for each user
     admin_details = []
     for user in pending_admins:
-        # Find the HospitalAdmin record for this user
-        hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', user.id)
-        if hospital_admin:
+        # Find the HospitalAdmin record(s) for this user
+        hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user.id)
+
+        # Check if any records were found
+        if hospital_admin_records:
+            # Use the first record found (assuming one user maps to one hospital admin role for now)
+            hospital_admin = hospital_admin_records[0]
+
+            # Ensure created_at is a datetime object
+            if isinstance(hospital_admin.created_at, str):
+                hospital_admin.created_at = parse_iso_datetime(hospital_admin.created_at)
+
             # Get the hospital name
             hospital = db.get_by_id(Hospital, hospital_admin.hospital_id) if hospital_admin.hospital_id else None
             hospital_name = hospital.name if hospital else "Unknown Hospital"
 
             admin_details.append({
                 'user': user,
-                'admin': hospital_admin,
+                'admin': hospital_admin, # Use the single hospital_admin object
                 'hospital_name': hospital_name
             })
+        # Optional: Add an else block here to handle cases where a user has the role but no HospitalAdmin record exists, if necessary.
+        # else:
+        #     # Handle case where HospitalAdmin record is missing for a pending user
+        #     print(f"Warning: User {user.id} has pending hospital_admin role but no HospitalAdmin record.")
+        #     # Optionally append with default/error values or skip
 
-    return render_template('admin/pending_admins.html', admin_details=admin_details)
+    # Create a dummy form instance for CSRF token
+    form = DummyForm()
+
+    return render_template('admin/pending_admins.html', admin_details=admin_details, form=form)
 
 @admin_bp.route('/pending-admins/<user_id>/approve', methods=['POST'])
 @role_required(['admin'])

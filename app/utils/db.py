@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from app.models.database import (
     User, Hospital, Department, Patient, Doctor,
     DoctorAvailabilitySlot, Appointment, PasswordResetToken,
-    DoctorNote, UserSession, HospitalDepartment
+    DoctorNote, UserSession, HospitalDepartment, HospitalAdmin
 )
 from app.models.ehr import (
     EHR, EHR_Visit, EHR_Diagnosis, EHR_Medication,
@@ -24,7 +24,7 @@ T = TypeVar('T', User, Hospital, Department, Patient, Doctor,
             DoctorAvailabilitySlot, Appointment, EHR, EHR_Visit,
             EHR_Diagnosis, EHR_Medication, EHR_Allergy, EHR_Procedure,
             EHR_Vital, EHR_Immunization, EHR_TestResult, EHR_ProviderNote,
-            Prescription, PasswordResetToken, DoctorNote, UserSession, HospitalDepartment)
+            Prescription, PasswordResetToken, DoctorNote, UserSession, HospitalDepartment, HospitalAdmin)
 
 class Database:
     """Database utility for Supabase interactions."""
@@ -125,7 +125,9 @@ class Database:
             # User sessions
             UserSession: "user_sessions",
             # Hospital-Department relationship
-            HospitalDepartment: "hospital_departments"
+            HospitalDepartment: "hospital_departments",
+            # Hospital Admin
+            HospitalAdmin: "hospital_admins"
         }
 
         if model_class not in table_map:

@@ -519,12 +519,14 @@ def register_hospital_admin():
         # Initialize hospital choices
         hospitals = db.get_all(Hospital)
         form.hospital_id.choices = [('', 'Select Hospital')] + [(str(h.id), h.name) for h in hospitals]
-        # Also initialize department choices (even if not used for admin, to prevent error)
-        form.department_id.choices = [('', 'Select Department')] # Default empty choice
+
+        # Initialize department_id choices with a default empty list
+        # Even though it's not used for hospital admins, it needs valid choices to prevent errors
+        form.department_id.choices = [('', 'Not Required for Hospital Admin')]
     except Exception as e:
         # Handle any exceptions gracefully
         form.hospital_id.choices = [('', 'Error loading hospitals')]
-        form.department_id.choices = [('', 'Error loading departments')] # Fallback for department
+        form.department_id.choices = [('', 'Not Required for Hospital Admin')]
         print(f"Error loading hospitals: {str(e)}")
 
     if form.validate_on_submit():
@@ -579,7 +581,7 @@ def register_hospital_admin():
                 )
 
                 # Save hospital admin to database
-                saved_admin = db.save(hospital_admin)
+                saved_admin = db.create(hospital_admin)
 
                 # Check if the save operation returned a model with an ID
                 if saved_admin and saved_admin.id:

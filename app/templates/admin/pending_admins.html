@@ -76,8 +76,11 @@ Approvals{% endblock %} {% block admin_content %}
                     clip-rule="evenodd"
                   />
                 </svg>
-                Registered: {{ detail.admin.created_at.strftime('%Y-%m-%d') if
-                detail.admin.created_at else 'Unknown' }}
+                Registered:
+                <td class="py-2 px-3 border-b border-gray-200">
+                  {{ detail.admin.created_at.strftime('%Y-%m-%d') if
+                  detail.admin.created_at else 'N/A' }}
+                </td>
               </div>
               <div
                 class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6"
@@ -101,6 +104,7 @@ Approvals{% endblock %} {% block admin_content %}
                   method="POST"
                   action="{{ url_for('admin.approve_admin', user_id=detail.user.id) }}"
                 >
+                  {{ form.hidden_tag() }}
                   <button
                     type="submit"
                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
@@ -112,6 +116,7 @@ Approvals{% endblock %} {% block admin_content %}
                   method="POST"
                   action="{{ url_for('admin.reject_admin', user_id=detail.user.id) }}"
                 >
+                  {{ form.hidden_tag() }}
                   <button
                     type="submit"
                     class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
