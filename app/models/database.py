@@ -15,9 +15,10 @@ def parse_iso_datetime(date_string: Optional[str]) -> Optional[datetime]:
 
 
 class UserRole(str, Enum):
+    """User roles in the system."""
     ADMIN = 'admin'
-    PATIENT = 'patient'
     DOCTOR = 'doctor'
+    PATIENT = 'patient'
     STAFF = 'staff'
     HOSPITAL_ADMIN = 'hospital_admin'
     TEST_ADMIN = 'test_admin'
@@ -621,6 +622,61 @@ class HospitalAdmin:
         }
 
 
+class TestAdmin:
+    """Model representing a Test/Imaging Administrator in the system."""
+
+    def __init__(
+        self,
+        id: Optional[UUID] = None,
+        user_id: UUID = None,
+        full_name: str = None,
+        hospital_id: UUID = None,
+        contact_number: str = None,
+        department: str = None,
+        qualification: str = None,
+        created_at: datetime = None,
+        updated_at: datetime = None
+    ):
+        self.id = id or uuid4()
+        self.user_id = user_id
+        self.full_name = full_name
+        self.hospital_id = hospital_id
+        self.contact_number = contact_number
+        self.department = department
+        self.qualification = qualification
+        self.created_at = created_at or datetime.now()
+        self.updated_at = updated_at or datetime.now()
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'TestAdmin':
+        """Create a TestAdmin instance from a dictionary."""
+        return cls(
+            id=data.get('id'),
+            user_id=data.get('user_id'),
+            full_name=data.get('full_name'),
+            hospital_id=data.get('hospital_id'),
+            contact_number=data.get('contact_number'),
+            department=data.get('department'),
+            qualification=data.get('qualification'),
+            created_at=parse_iso_datetime(data.get('created_at')),
+            updated_at=parse_iso_datetime(data.get('updated_at'))
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instance to a dictionary."""
+        return {
+            'id': str(self.id),
+            'user_id': str(self.user_id) if self.user_id else None,
+            'full_name': self.full_name,
+            'hospital_id': str(self.hospital_id) if self.hospital_id else None,
+            'contact_number': self.contact_number,
+            'department': self.department,
+            'qualification': self.qualification,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
 class AdminRequestStatus(str, Enum):
     PENDING = 'pending'
     APPROVED = 'approved'
@@ -663,6 +719,15 @@ class TestImageAdminRequest:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'TestImageAdminRequest':
         """Create a TestImageAdminRequest instance from a dictionary."""
+        created_at = data.get('created_at')
+        updated_at = data.get('updated_at')
+
+        # Convert string timestamps to datetime objects
+        if isinstance(created_at, str):
+            created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+        if isinstance(updated_at, str):
+            updated_at = datetime.fromisoformat(updated_at.replace('Z', '+00:00'))
+
         return cls(
             id=data.get('id'),
             hospital_id=data.get('hospital_id'),
@@ -675,8 +740,8 @@ class TestImageAdminRequest:
             reason=data.get('reason'),
             submitted_by=data.get('submitted_by'),
             status=AdminRequestStatus(data.get('status')) if data.get('status') else AdminRequestStatus.PENDING,
-            created_at=data.get('created_at'),
-            updated_at=data.get('updated_at')
+            created_at=created_at,
+            updated_at=updated_at
         )
 
     def to_dict(self) -> Dict[str, Any]:

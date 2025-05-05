@@ -1,32 +1,27 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, Email, Length
+from wtforms.validators import DataRequired, Email, Length, Optional
 from app.routes.auth import role_required, login_required
 from app.utils.db import Database
-from app.models.database import HospitalAdmin, Hospital, User, TestImageAdminRequest, AdminRequestStatus, UserRole, UserStatus
+from app.models.database import HospitalAdmin, Hospital, User, TestImageAdminRequest, AdminRequestStatus, UserRole, UserStatus, TestAdmin
 from uuid import UUID
+from datetime import datetime
 
 hospital_admin_bp = Blueprint('hospital_admin', __name__, url_prefix='/hospital-admin')
 
 # Initialize database
 db = Database()
 
-# Form for Test/Imaging Admin request
-class TestImageAdminRequestForm(FlaskForm):
-    full_name = StringField('Full Name', validators=[DataRequired(), Length(min=2, max=100)])
-    email = StringField('Email Address', validators=[DataRequired(), Email()])
-    contact_number = StringField('Contact Number', validators=[DataRequired(), Length(min=10, max=15)])
-    department = StringField('Department/Area', validators=[DataRequired(), Length(min=2, max=100)])
-    qualification = StringField('Qualifications', validators=[DataRequired(), Length(min=2, max=200)])
-    experience = TextAreaField('Experience', validators=[DataRequired(), Length(min=10, max=500)])
-    reason = TextAreaField('Reason for Role Request', validators=[DataRequired(), Length(min=10, max=500)])
+# Dummy form for CSRF protection
+class DummyForm(FlaskForm):
+    pass
 
 # Form for Hospital Admin profile updates
 class HospitalAdminProfileForm(FlaskForm):
     full_name = StringField('Full Name', validators=[DataRequired(), Length(min=2, max=100)])
     contact_number = StringField('Contact Number', validators=[DataRequired(), Length(min=10, max=15)])
-    address = TextAreaField('Address', validators=[DataRequired(), Length(min=5, max=200)])
+    address = TextAreaField('Address', validators=[Optional(), Length(max=200)])
 
 @hospital_admin_bp.route('/')
 @role_required(['hospital_admin'])
@@ -48,32 +43,45 @@ def dashboard():
     # Get the hospital information
     hospital = db.get_by_id(Hospital, hospital_admin.hospital_id)
 
-    # Get all pending Test/Imaging Admin applications
-    pending_requests = db.get_by_fields(
-        TestImageAdminRequest,
-        {
-            'hospital_id': hospital_admin.hospital_id,
-            'status': AdminRequestStatus.PENDING
-        }
-    )
-    pending_requests_count = len(pending_requests)
+    # Get all pending Test/Imaging Admin users for this hospital
+    from app.models.auth import find_users_by_role_and_status
+    pending_test_admins = find_users_by_role_and_status('test_admin', UserStatus.INACTIVE)
+
+    # Filter test admin users by hospital
+    test_admin_details = []
+    for user in pending_test_admins:
+        # Find the TestAdmin record(s) for this user
+        test_admin_records = db.get_by_field(TestAdmin, 'user_id', user.id)
+
+        # Check if any records were found and belong to this hospital
+        if test_admin_records:
+            test_admin = test_admin_records[0]
+
+            # Only include admins for this hospital
+            if str(test_admin.hospital_id) == str(hospital_admin.hospital_id):
+                test_admin_details.append({
+                    'user': user,
+                    'admin': test_admin
+                })
+
+    pending_test_admins_count = len(test_admin_details)
 
     stats = {
         'hospital_name': hospital.name if hospital else "Unknown Hospital",
-        'pending_requests_count': pending_requests_count,
+        'pending_test_admins_count': pending_test_admins_count,
     }
 
     return render_template(
         'hospital_admin/dashboard.html',
         stats=stats,
         hospital_admin=hospital_admin,
-        pending_requests=pending_requests
+        test_admin_details=test_admin_details
     )
 
-@hospital_admin_bp.route('/profile', methods=['GET', 'POST'])
+@hospital_admin_bp.route('/profile')
 @role_required(['hospital_admin'])
 def profile():
-    """View and update Hospital Admin profile."""
+    """Hospital Admin profile page."""
     # Get the current user's information
     user_id = session.get('user_id')
 
@@ -90,40 +98,42 @@ def profile():
     # Get the hospital information
     hospital = db.get_by_id(Hospital, hospital_admin.hospital_id)
 
-    # Create form instance
-    form = HospitalAdminProfileForm(obj=hospital_admin)
-
-    if form.validate_on_submit():
-        # Update the hospital admin profile
-        hospital_admin.full_name = form.full_name.data
-        hospital_admin.contact_number = form.contact_number.data
-        hospital_admin.address = form.address.data
-        hospital_admin.updated_at = db.get_current_time()
-
-        # Save to database
-        updated = db.update(hospital_admin)
-
-        if updated:
-            flash('Profile updated successfully!', 'success')
-        else:
-            flash('There was an error updating your profile. Please try again.', 'error')
-
     return render_template(
         'hospital_admin/profile.html',
-        form=form,
         hospital_admin=hospital_admin,
         hospital=hospital
     )
 
-@hospital_admin_bp.route('/admin-requests')
+@hospital_admin_bp.route('/pending-test-admins')
 @role_required(['hospital_admin'])
-def list_admin_requests():
-    """List all Test/Imaging Admin requests with advanced filtering."""
+def pending_test_admins():
+    """View pending Test/Imaging Admin applications."""
     # Get the current user's information
     user_id = session.get('user_id')
+    print(f"\n=== PENDING TEST ADMINS DEBUG ===")
+    print(f"Current user ID: {user_id}")
 
-    # Get the hospital admin profile records
+    # Get all test admin users regardless of hospital first for debugging
+    from app.models.auth import find_users_by_role_and_status
+    from app.models.database import UserRole, UserStatus
+    all_test_admins = find_users_by_role_and_status('test_admin', UserStatus.INACTIVE)
+    print(f"Found total {len(all_test_admins)} test admin users with status INACTIVE")
+
+    # Debug output all test admins
+    for user in all_test_admins:
+        print(f"Test Admin User: ID={user.id}, Username={user.username}, Role={user.role.value}, Status={user.status.value}")
+
+        # Get the TestAdmin record for this user
+        test_admin_records = db.get_by_field(TestAdmin, 'user_id', user.id)
+        if test_admin_records:
+            print(f"  Found {len(test_admin_records)} test admin records")
+            for admin in test_admin_records:
+                print(f"  Admin Record: ID={admin.id}, Hospital ID={admin.hospital_id}, Full name={admin.full_name}")
+        else:
+            print(f"  No TestAdmin records found for this user")
+
     hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
+    print(f"Found {len(hospital_admin_records)} hospital admin records")
 
     if not hospital_admin_records:
         flash('Hospital Administrator profile not found.', 'error')
@@ -131,232 +141,184 @@ def list_admin_requests():
 
     # Get the first hospital admin record
     hospital_admin = hospital_admin_records[0]
+    print(f"Hospital admin ID: {hospital_admin.id}")
+    print(f"Hospital admin's hospital ID: {hospital_admin.hospital_id}")
+    print(f"Type of hospital ID: {type(hospital_admin.hospital_id)}")
 
-    # Get all admin requests for this hospital
-    admin_requests = db.get_by_field(TestImageAdminRequest, 'hospital_id', hospital_admin.hospital_id)
+    # Helper function to normalize IDs for comparison
+    def normalize_id(id_value):
+        if id_value is None:
+            return None
+        # Convert UUID to string for comparison
+        if isinstance(id_value, UUID):
+            return str(id_value)
+        # If already a string, return as is
+        if isinstance(id_value, str):
+            return id_value
+        # Otherwise, convert to string
+        return str(id_value)
 
-    # Get filter parameters
-    status_filter = request.args.get('status')
-    search_query = request.args.get('search', '').strip().lower()
-    sort_by = request.args.get('sort', 'created_at').lower()
-    sort_dir = request.args.get('dir', 'desc').lower()
-    department_filter = request.args.get('department')
+    # Normalize hospital admin's hospital ID for comparison
+    hospital_admin_hospital_id = normalize_id(hospital_admin.hospital_id)
+    print(f"Normalized hospital admin's hospital ID: {hospital_admin_hospital_id}")
 
-    # Apply status filter
-    if status_filter:
-        try:
-            status = AdminRequestStatus(status_filter)
-            admin_requests = [req for req in admin_requests if req.status == status]
-        except ValueError:
-            # Invalid status, ignore filter
-            pass
+    # Get all inactive users with Test Admin role
+    from app.models.auth import find_users_by_role_and_status
+    pending_users = find_users_by_role_and_status('test_admin', UserStatus.INACTIVE)
+    print(f"Found {len(pending_users)} pending test admin users")
 
-    # Apply department filter if provided
-    if department_filter:
-        admin_requests = [req for req in admin_requests if req.department.lower() == department_filter.lower()]
+    if len(pending_users) > 0:
+        for idx, user in enumerate(pending_users):
+            print(f"Pending User {idx+1}: ID={user.id}, Username={user.username}")
 
-    # Apply search filter if provided
-    if search_query:
-        filtered_requests = []
-        for req in admin_requests:
-            # Search in multiple fields
-            searchable_text = f"{req.full_name} {req.email} {req.department} {req.qualification}".lower()
-            if search_query in searchable_text:
-                filtered_requests.append(req)
-        admin_requests = filtered_requests
+    # Get additional test admin info for each user
+    admin_details = []
+    for user in pending_users:
+        print(f"Processing user: {user.id}, {user.username}")
 
-    # Get unique departments for the filter dropdown
-    all_departments = sorted(list(set(req.department for req in db.get_by_field(TestImageAdminRequest, 'hospital_id', hospital_admin.hospital_id))))
+        # Find the TestAdmin record(s) for this user
+        test_admin_records = db.get_by_field(TestAdmin, 'user_id', user.id)
+        print(f"  Found {len(test_admin_records)} test admin records for this user")
 
-    # Sort the requests
-    if sort_by == 'name':
-        admin_requests = sorted(admin_requests, key=lambda r: r.full_name.lower(), reverse=(sort_dir == 'desc'))
-    elif sort_by == 'department':
-        admin_requests = sorted(admin_requests, key=lambda r: r.department.lower(), reverse=(sort_dir == 'desc'))
-    elif sort_by == 'status':
-        admin_requests = sorted(admin_requests, key=lambda r: r.status.value, reverse=(sort_dir == 'desc'))
-    else:  # Default sort by created_at
-        admin_requests = sorted(admin_requests, key=lambda r: r.created_at or db.get_current_time(), reverse=(sort_dir == 'desc'))
+        # Debug each test admin record
+        for idx, record in enumerate(test_admin_records):
+            print(f"  Record {idx+1}: ID={record.id}, Hospital ID={record.hospital_id}, Type of hospital ID={type(record.hospital_id)}")
 
-    # Count requests by status for statistics
-    all_hospital_requests = db.get_by_field(TestImageAdminRequest, 'hospital_id', hospital_admin.hospital_id)
-    status_counts = {
-        'total': len(all_hospital_requests),
-        'pending': len([r for r in all_hospital_requests if r.status == AdminRequestStatus.PENDING]),
-        'approved': len([r for r in all_hospital_requests if r.status == AdminRequestStatus.APPROVED]),
-        'rejected': len([r for r in all_hospital_requests if r.status == AdminRequestStatus.REJECTED])
-    }
+        # Check if any records were found
+        if test_admin_records:
+            test_admin = test_admin_records[0]
+            test_admin_hospital_id = normalize_id(test_admin.hospital_id)
+            print(f"  Test admin hospital ID: {test_admin.hospital_id}")
+            print(f"  Normalized test admin hospital ID: {test_admin_hospital_id}")
+            print(f"  Hospital admin hospital ID: {hospital_admin.hospital_id}")
+            print(f"  Normalized hospital admin hospital ID: {hospital_admin_hospital_id}")
+            print(f"  IDs match: {test_admin_hospital_id == hospital_admin_hospital_id}")
 
-    return render_template(
-        'hospital_admin/admin_requests.html',
-        admin_requests=admin_requests,
-        hospital_admin=hospital_admin,
-        status_counts=status_counts,
-        departments=all_departments,
-        current_filters={
-            'status': status_filter,
-            'search': search_query,
-            'sort': sort_by,
-            'dir': sort_dir,
-            'department': department_filter
-        }
-    )
+            # IMPORTANT: Add to admin_details regardless of hospital ID match for debugging
+            # This way we'll see all pending test admins in the UI even if there's a matching issue
+            print(f"  Adding to admin_details for debugging")
 
-@hospital_admin_bp.route('/new-admin-request', methods=['GET', 'POST'])
-@role_required(['hospital_admin'])
-def new_admin_request():
-    """Create a new Test/Imaging Admin request."""
-    # Get the current user's information
-    user_id = session.get('user_id')
+            # Ensure created_at is a datetime object
+            if isinstance(test_admin.created_at, str):
+                test_admin.created_at = datetime.fromisoformat(test_admin.created_at.replace('Z', '+00:00'))
 
-    # Get the hospital admin profile records
-    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
-
-    if not hospital_admin_records:
-        flash('Hospital Administrator profile not found.', 'error')
-        return redirect(url_for('main.index'))
-
-    # Get the first hospital admin record
-    hospital_admin = hospital_admin_records[0]
-
-    form = TestImageAdminRequestForm()
-
-    if form.validate_on_submit():
-        # Create a new request
-        admin_request = TestImageAdminRequest(
-            hospital_id=hospital_admin.hospital_id,
-            full_name=form.full_name.data,
-            email=form.email.data,
-            contact_number=form.contact_number.data,
-            department=form.department.data,
-            qualification=form.qualification.data,
-            experience=form.experience.data,
-            reason=form.reason.data,
-            submitted_by=UUID(user_id) if user_id else None,
-            status=AdminRequestStatus.PENDING
-        )
-
-        # Save to database
-        created_request = db.create(admin_request)
-
-        if created_request:
-            flash('Test/Imaging Admin request submitted successfully!', 'success')
-            return redirect(url_for('hospital_admin.list_admin_requests'))
+            admin_details.append({
+                'user': user,
+                'admin': test_admin,
+                'hospital_match': test_admin_hospital_id == hospital_admin_hospital_id
+            })
         else:
-            flash('There was an error submitting the request. Please try again.', 'error')
+            print(f"  No test admin records found for this user")
 
-    return render_template(
-        'hospital_admin/new_admin_request.html',
-        form=form,
-        hospital_admin=hospital_admin
-    )
+    print(f"Final admin_details count: {len(admin_details)}")
+    for idx, detail in enumerate(admin_details):
+        print(f"Detail {idx+1}: User={detail['user'].username}, Admin={detail['admin'].full_name}, Hospital Match={detail['hospital_match']}")
 
-@hospital_admin_bp.route('/admin-request/<request_id>/update-status', methods=['POST'])
+    # Create a dummy form instance for CSRF token
+    form = DummyForm()
+
+    return render_template('hospital_admin/pending_test_admins.html', admin_details=admin_details, hospital_admin=hospital_admin, form=form)
+
+@hospital_admin_bp.route('/approve-test-admin/<user_id>', methods=['POST'])
 @role_required(['hospital_admin'])
-def update_admin_request_status(request_id):
-    """Update the status of a Test/Imaging Admin request."""
-    # Get the current user's information to verify they belong to the correct hospital
-    user_id = session.get('user_id')
-    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
+def approve_test_admin(user_id):
+    """Approve a pending Test/Imaging Admin account"""
+    try:
+        # Verify the hospital admin has permission (belongs to same hospital)
+        current_user_id = session.get('user_id')
+        hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', current_user_id)[0]
 
-    if not hospital_admin_records:
-        flash('Your administrator profile could not be found.', 'error')
-        return redirect(url_for('hospital_admin.list_admin_requests'))
+        # Get the test admin user
+        user = db.get_by_id(User, user_id)
+        if not user:
+            flash('User not found.', 'error')
+            return redirect(url_for('hospital_admin.pending_test_admins'))
 
-    hospital_admin = hospital_admin_records[0]
+        # Get the test admin record
+        test_admin_records = db.get_by_field(TestAdmin, 'user_id', user_id)
+        if not test_admin_records:
+            flash('Test Admin record not found.', 'error')
+            return redirect(url_for('hospital_admin.pending_test_admins'))
 
-    # Get the request
-    admin_request = db.get_by_id(TestImageAdminRequest, request_id)
+        test_admin = test_admin_records[0]
 
-    if not admin_request:
-        flash('Admin request not found.', 'error')
-        return redirect(url_for('hospital_admin.list_admin_requests'))
+        # Helper function to normalize IDs for comparison
+        def normalize_id(id_value):
+            if id_value is None:
+                return None
+            # Convert UUID to string for comparison
+            if isinstance(id_value, UUID):
+                return str(id_value)
+            # If already a string, return as is
+            if isinstance(id_value, str):
+                return id_value
+            # Otherwise, convert to string
+            return str(id_value)
 
-    # Verify the request belongs to this hospital admin's hospital
-    if str(admin_request.hospital_id) != str(hospital_admin.hospital_id):
-        flash('You do not have permission to update this request.', 'error')
-        return redirect(url_for('hospital_admin.list_admin_requests'))
+        # Check if the test admin belongs to the same hospital as the hospital admin
+        if normalize_id(test_admin.hospital_id) != normalize_id(hospital_admin.hospital_id):
+            flash('You do not have permission to approve this Test Admin.', 'error')
+            return redirect(url_for('hospital_admin.pending_test_admins'))
 
-    # Get the new status from the form
-    new_status = request.form.get('status')
+        # Update the user status to active
+        user.status = UserStatus.ACTIVE
+        db.update(user)
 
-    if not new_status or new_status not in [status.value for status in AdminRequestStatus]:
-        flash('Invalid status value.', 'error')
-        return redirect(url_for('hospital_admin.list_admin_requests'))
+        flash(f'Test Admin {test_admin.full_name} has been approved successfully.', 'success')
 
-    # Update the request status
-    admin_request.status = AdminRequestStatus(new_status)
-    admin_request.updated_at = db.get_current_time()
+    except Exception as e:
+        flash(f'Error approving Test Admin: {str(e)}', 'error')
 
-    # Save the updated request
-    updated = db.update(admin_request)
+    return redirect(url_for('hospital_admin.pending_test_admins'))
 
-    if updated:
-        if new_status == AdminRequestStatus.APPROVED.value:
-            flash('Admin request has been approved. The user can now register with the approved email.', 'success')
-            return redirect(url_for('hospital_admin.admin_approval_confirmation', request_id=request_id))
-        else:
-            flash('Admin request has been rejected.', 'success')
-    else:
-        flash('There was an error updating the request. Please try again.', 'error')
-
-    return redirect(url_for('hospital_admin.list_admin_requests'))
-
-@hospital_admin_bp.route('/admin-request/<request_id>/approval-confirmation')
+@hospital_admin_bp.route('/reject-test-admin/<user_id>', methods=['POST'])
 @role_required(['hospital_admin'])
-def admin_approval_confirmation(request_id):
-    """Display confirmation page after approving a test admin request."""
-    # Get the current user's information to verify they belong to the correct hospital
-    user_id = session.get('user_id')
-    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
+def reject_test_admin(user_id):
+    """Reject a pending Test/Imaging Admin account"""
+    try:
+        # Verify the hospital admin has permission (belongs to same hospital)
+        current_user_id = session.get('user_id')
+        hospital_admin = db.get_by_field(HospitalAdmin, 'user_id', current_user_id)[0]
 
-    if not hospital_admin_records:
-        flash('Your administrator profile could not be found.', 'error')
-        return redirect(url_for('main.index'))
+        # Get the test admin user
+        user = db.get_by_id(User, user_id)
+        if not user:
+            flash('User not found.', 'error')
+            return redirect(url_for('hospital_admin.pending_test_admins'))
 
-    hospital_admin = hospital_admin_records[0]
+        # Get the test admin record
+        test_admin_records = db.get_by_field(TestAdmin, 'user_id', user_id)
+        if not test_admin_records:
+            flash('Test Admin record not found.', 'error')
+            return redirect(url_for('hospital_admin.pending_test_admins'))
 
-    # Get the request
-    admin_request = db.get_by_id(TestImageAdminRequest, request_id)
+        test_admin = test_admin_records[0]
 
-    if not admin_request:
-        flash('Admin request not found.', 'error')
-        return redirect(url_for('hospital_admin.list_admin_requests'))
+        # Helper function to normalize IDs for comparison
+        def normalize_id(id_value):
+            if id_value is None:
+                return None
+            # Convert UUID to string for comparison
+            if isinstance(id_value, UUID):
+                return str(id_value)
+            # If already a string, return as is
+            if isinstance(id_value, str):
+                return id_value
+            # Otherwise, convert to string
+            return str(id_value)
 
-    return render_template(
-        'hospital_admin/approval_confirmation.html',
-        admin_request=admin_request,
-        hospital_admin=hospital_admin
-    )
+        # Check if the test admin belongs to the same hospital as the hospital admin
+        if normalize_id(test_admin.hospital_id) != normalize_id(hospital_admin.hospital_id):
+            flash('You do not have permission to reject this Test Admin.', 'error')
+            return redirect(url_for('hospital_admin.pending_test_admins'))
 
-@hospital_admin_bp.route('/admin-request/<request_id>')
-@role_required(['hospital_admin'])
-def view_admin_request(request_id):
-    """View details of a specific Test/Imaging Admin request."""
-    # Get the current user's information to verify they belong to the correct hospital
-    user_id = session.get('user_id')
-    hospital_admin_records = db.get_by_field(HospitalAdmin, 'user_id', user_id)
+        # Update the user status to suspended (effectively rejecting them)
+        user.status = UserStatus.SUSPENDED
+        db.update(user)
 
-    if not hospital_admin_records:
-        flash('Your administrator profile could not be found.', 'error')
-        return redirect(url_for('main.index'))
+        flash(f'Test Admin {test_admin.full_name} has been rejected.', 'success')
 
-    hospital_admin = hospital_admin_records[0]
+    except Exception as e:
+        flash(f'Error rejecting Test Admin: {str(e)}', 'error')
 
-    # Get the request
-    admin_request = db.get_by_id(TestImageAdminRequest, request_id)
-
-    if not admin_request:
-        flash('Admin request not found.', 'error')
-        return redirect(url_for('hospital_admin.list_admin_requests'))
-
-    # Verify the request belongs to this hospital admin's hospital
-    if str(admin_request.hospital_id) != str(hospital_admin.hospital_id):
-        flash('You do not have permission to view this request.', 'error')
-        return redirect(url_for('hospital_admin.list_admin_requests'))
-
-    return render_template(
-        'hospital_admin/view_admin_request.html',
-        admin_request=admin_request,
-        hospital_admin=hospital_admin
-    )
+    return redirect(url_for('hospital_admin.pending_test_admins'))

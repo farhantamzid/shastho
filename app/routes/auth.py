@@ -42,7 +42,8 @@ class RegistrationForm(FlaskForm):
         ('doctor', 'Doctor'),
         ('admin', 'Administrator'),
         ('staff', 'Staff'),
-        ('hospital_admin', 'Hospital Administrator')
+        ('hospital_admin', 'Hospital Administrator'),
+        ('test_admin', 'Test/Imaging Administrator')
     ], validators=[DataRequired()])
 
     # Patient-specific fields (shown conditionally when role='patient')
@@ -602,6 +603,121 @@ def register_hospital_admin():
             return render_template('auth/register_hospital_admin.html', form=form)
 
     return render_template('auth/register_hospital_admin.html', form=form)
+
+@auth_bp.route('/register/test-admin', methods=['GET', 'POST'])
+def register_test_admin():
+    """Test/Imaging Admin registration page"""
+    form = RegistrationForm()
+
+    # Set the role field to test_admin by default
+    form.role.data = 'test_admin'
+
+    # Always populate choices for SelectFields to avoid "Choices cannot be None" error
+    try:
+        from app.models.database import Hospital
+        from app.utils.db import db
+
+        # Initialize hospital choices
+        hospitals = db.get_all(Hospital)
+        form.hospital_id.choices = [('', 'Select Hospital')] + [(str(h.id), h.name) for h in hospitals]
+
+        # Initialize department_id choices with a default empty list
+        # Even though it's not used for test admins, it needs valid choices to prevent errors
+        form.department_id.choices = [('', 'Not Required for Test/Imaging Admin')]
+    except Exception as e:
+        # Handle any exceptions gracefully
+        form.hospital_id.choices = [('', 'Error loading hospitals')]
+        form.department_id.choices = [('', 'Not Required for Test/Imaging Admin')]
+        print(f"Error loading hospitals: {str(e)}")
+
+    # Process form submission
+    if form.validate_on_submit():
+        print("\n=== TEST ADMIN REGISTRATION DEBUG ===")
+        print(f"Form data hospital_id: {form.hospital_id.data}, Type: {type(form.hospital_id.data)}")
+
+        from app.models.database import UserRole, UserStatus
+        from app.models.auth import create_user
+
+        # Create the user account
+        user = create_user(
+            username=form.email.data,
+            password=form.password.data,
+            role='test_admin',
+            full_name=form.full_name.data
+        )
+
+        if user:
+            try:
+                from app.models.database import TestAdmin
+                from app.utils.db import db
+                from uuid import UUID
+
+                # Update user status to inactive - requires approval
+                update_user_status(user.id, UserStatus.INACTIVE)
+
+                # Convert hospital_id to UUID before creating test admin
+                hospital_id = None
+                if form.hospital_id.data and form.hospital_id.data.strip():
+                    try:
+                        # Debug the hospital ID conversion
+                        print(f"Raw hospital_id from form: {form.hospital_id.data}")
+                        print(f"Type before conversion: {type(form.hospital_id.data)}")
+
+                        # Ensure valid UUID format
+                        hospital_id = UUID(form.hospital_id.data)
+                        print(f"Converted hospital_id to UUID: {hospital_id}")
+                        print(f"Type after conversion: {type(hospital_id)}")
+                    except (ValueError, TypeError) as e:
+                        print(f"Error converting hospital_id to UUID: {e}")
+                        flash('Invalid hospital selected. Please try again.', 'error')
+                        return render_template('auth/register_test_admin.html', form=form)
+
+                # Create test admin record linked to user
+                test_admin = TestAdmin(
+                    user_id=user.id,
+                    full_name=form.full_name.data,
+                    hospital_id=hospital_id,  # This is now a UUID object
+                    contact_number=form.contact_number.data,
+                    department=form.department.data if hasattr(form, 'department') else None,
+                    qualification=form.qualification.data if hasattr(form, 'qualification') else None
+                )
+
+                print(f"TestAdmin object created with hospital_id: {test_admin.hospital_id}")
+                print(f"Type of hospital_id in TestAdmin: {type(test_admin.hospital_id)}")
+
+                # Save test admin to database
+                saved_admin = db.create(test_admin)
+
+                # Debug the saved admin
+                if saved_admin:
+                    print(f"Saved TestAdmin with ID: {saved_admin.id}")
+                    print(f"Saved hospital_id: {saved_admin.hospital_id}")
+                    print(f"Type of saved hospital_id: {type(saved_admin.hospital_id)}")
+                else:
+                    print("Failed to save TestAdmin record")
+
+                # Check if the save operation returned a model with an ID
+                if saved_admin and saved_admin.id:
+                    # We don't immediately log in test admins - they require approval
+                    flash('Registration successful! Your Test/Imaging Administrator account requires approval. You will be notified when your account is activated.', 'success')
+                    return redirect(url_for('auth.login'))
+                else:
+                    # Handle admin save failure
+                    flash('There was an error creating your Test/Imaging Administrator profile. Please try again.', 'error')
+                    return render_template('auth/register_test_admin.html', form=form)
+            except Exception as e:
+                # Handle any exceptions during test admin creation
+                print(f"Error creating test admin: {str(e)}")
+                import traceback
+                print(traceback.format_exc())
+                flash(f'An error occurred: {str(e)}. Please try again.', 'error')
+                return render_template('auth/register_test_admin.html', form=form)
+        else:
+            # Handle user creation failure
+            flash('There was an error creating your account. Please try again.', 'error')
+            return render_template('auth/register_test_admin.html', form=form)
+
+    return render_template('auth/register_test_admin.html', form=form)
 
 @auth_bp.route('/registration-success', methods=['GET'])
 def registration_success():

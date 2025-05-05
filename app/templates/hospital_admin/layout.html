@@ -54,11 +54,11 @@ endblock %} {% block content %}
             </a>
 
             <a
-              href="{{ url_for('hospital_admin.list_admin_requests') }}"
-              class="{% if request.endpoint == 'hospital_admin.list_admin_requests' %}bg-indigo-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group flex items-center px-2 py-2 text-sm font-medium rounded-md"
+              href="{{ url_for('hospital_admin.pending_test_admins') }}"
+              class="{% if request.endpoint == 'hospital_admin.pending_test_admins' %}bg-indigo-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group flex items-center px-2 py-2 text-sm font-medium rounded-md"
             >
               <svg
-                class="{% if request.endpoint == 'hospital_admin.list_admin_requests' %}text-indigo-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %} mr-3 h-6 w-6"
+                class="{% if request.endpoint == 'hospital_admin.pending_test_admins' %}text-indigo-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %} mr-3 h-6 w-6"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -73,28 +73,6 @@ endblock %} {% block content %}
                 />
               </svg>
               Admin Requests
-            </a>
-
-            <a
-              href="{{ url_for('hospital_admin.new_admin_request') }}"
-              class="{% if request.endpoint == 'hospital_admin.new_admin_request' %}bg-indigo-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group flex items-center px-2 py-2 text-sm font-medium rounded-md"
-            >
-              <svg
-                class="{% if request.endpoint == 'hospital_admin.new_admin_request' %}text-indigo-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %} mr-3 h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              New Admin Request
             </a>
           </nav>
         </div>
@@ -185,16 +163,10 @@ endblock %} {% block content %}
           My Profile
         </a>
         <a
-          href="{{ url_for('hospital_admin.list_admin_requests') }}"
-          class="{% if request.endpoint == 'hospital_admin.list_admin_requests' %}bg-indigo-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} block px-3 py-2 rounded-md text-base font-medium"
+          href="{{ url_for('hospital_admin.pending_test_admins') }}"
+          class="{% if request.endpoint == 'hospital_admin.pending_test_admins' %}bg-indigo-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} block px-3 py-2 rounded-md text-base font-medium"
         >
           Admin Requests
-        </a>
-        <a
-          href="{{ url_for('hospital_admin.new_admin_request') }}"
-          class="{% if request.endpoint == 'hospital_admin.new_admin_request' %}bg-indigo-50 text-indigo-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} block px-3 py-2 rounded-md text-base font-medium"
-        >
-          New Admin Request
         </a>
       </div>
     </div>

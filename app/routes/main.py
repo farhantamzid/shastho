@@ -17,6 +17,8 @@ def dashboard():
     # Redirect to appropriate dashboard based on role
     if user_role == 'admin':
         return redirect(url_for('admin.dashboard'))
+    elif user_role == 'hospital_admin':
+        return redirect(url_for('hospital_admin.dashboard'))
     elif user_role == 'doctor':
         return render_template('doctor_dashboard.html')
     elif user_role == 'patient':

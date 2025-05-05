@@ -3,7 +3,7 @@ block content %}
 <div
   class="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 to-blue-50 px-4 sm:px-6 lg:px-8 py-12"
 >
-  <div class="max-w-4xl w-full bg-white rounded-xl shadow-lg p-8">
+  <div class="max-w-5xl w-full bg-white rounded-xl shadow-lg p-8">
     <div class="text-center mb-12">
       <div class="flex justify-center mb-4">
         <img
@@ -25,7 +25,7 @@ block content %}
     </div>
     {% endfor %} {% endif %} {% endwith %}
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Patient Registration Card -->
       <div
         class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
@@ -100,6 +100,34 @@ block content %}
             class="block w-full text-center py-2.5 px-4 rounded-lg border border-transparent shadow-sm bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
           >
             Register as Admin
+          </a>
+        </div>
+      </div>
+
+      <!-- Test/Imaging Admin Registration Card -->
+      <div
+        class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+      >
+        <div class="p-6">
+          <div class="text-center mb-4">
+            <div
+              class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-purple-100 text-purple-600 mb-3"
+            >
+              <i data-lucide="microscope" class="h-6 w-6"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900">
+              Test/Imaging Admin
+            </h3>
+          </div>
+          <p class="mb-6 text-gray-600 text-center">
+            Register as a test/imaging administrator to manage diagnostic tests,
+            imaging services, and laboratory results
+          </p>
+          <a
+            href="{{ url_for('auth.register_test_admin') }}"
+            class="block w-full text-center py-2.5 px-4 rounded-lg border border-transparent shadow-sm bg-purple-600 text-white font-medium hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+          >
+            Register as Test Admin
           </a>
         </div>
       </div>
