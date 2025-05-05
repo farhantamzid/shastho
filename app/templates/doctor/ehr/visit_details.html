@@ -1,0 +1,487 @@
+{% extends "doctor/layout.html" %} {% block title %}Visit Details - {{
+patient.full_name }}{% endblock %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="flex items-center mb-6">
+    <a
+      href="{{ url_for('doctor.view_ehr', patient_id=patient.id) }}"
+      class="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-1"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Back to EHR
+    </a>
+    <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+      <ol class="list-none p-0 inline-flex">
+        <li class="flex items-center">
+          <a
+            href="{{ url_for('doctor.dashboard') }}"
+            class="hover:text-gray-900"
+            >Dashboard</a
+          >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 mx-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </li>
+        <li class="flex items-center">
+          <a
+            href="{{ url_for('doctor.patient_search') }}"
+            class="hover:text-gray-900"
+            >Patient Search</a
+          >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 mx-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </li>
+        <li class="flex items-center">
+          <a
+            href="{{ url_for('doctor.view_ehr', patient_id=patient.id) }}"
+            class="hover:text-gray-900"
+            >EHR: {{ patient.full_name }}</a
+          >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 mx-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </li>
+        <li class="text-gray-900 font-medium">
+          Visit: {{ visit.date.strftime('%Y-%m-%d') if visit.date else 'N/A' }}
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800">
+            {{ patient.full_name }}
+          </h1>
+          <div
+            class="flex flex-col md:flex-row md:items-center mt-2 text-gray-600"
+          >
+            <div class="mr-6 mb-2 md:mb-0">
+              <span class="font-medium">Visit Date:</span> {{
+              visit.date.strftime('%Y-%m-%d') if visit.date else 'N/A' }}
+            </div>
+            <div class="mr-6 mb-2 md:mb-0">
+              <span class="font-medium">Visit Type:</span> {{ visit.visit_type
+              or 'N/A' }}
+            </div>
+            <div>
+              <span class="font-medium">Chief Complaint:</span> {{
+              visit.chief_complaint or 'N/A' }}
+            </div>
+          </div>
+        </div>
+        <div class="flex">
+          <button
+            onclick="window.print()"
+            class="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Print
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visit Sections -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Diagnoses Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800">Diagnoses</h2>
+        <a
+          href="{{ url_for('doctor.add_diagnosis', patient_id=patient.id, visit_id=visit.id) }}"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Add Diagnosis
+        </a>
+      </div>
+
+      {% if diagnoses %}
+      <div class="space-y-4">
+        {% for diagnosis in diagnoses %}
+        <div class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+          <h3 class="font-medium text-lg text-gray-800">
+            {{ diagnosis.diagnosis_description }}
+          </h3>
+          <div
+            class="mt-1 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600"
+          >
+            <div>
+              <span class="font-medium">Code:</span> {{ diagnosis.diagnosis_code
+              or 'N/A' }}
+            </div>
+            <div>
+              <span class="font-medium">Diagnosed:</span> {{
+              diagnosis.diagnosed_at.strftime('%Y-%m-%d') if
+              diagnosis.diagnosed_at else 'N/A' }}
+            </div>
+          </div>
+          <div class="mt-2 flex justify-end">
+            <a
+              href="{{ url_for('doctor.edit_diagnosis', patient_id=patient.id, visit_id=visit.id, diagnosis_id=diagnosis.id) }}"
+              class="text-sm text-indigo-600 hover:text-indigo-900 mr-2"
+            >
+              Edit
+            </a>
+            <form
+              method="POST"
+              action="{{ url_for('doctor.delete_diagnosis', patient_id=patient.id, visit_id=visit.id, diagnosis_id=diagnosis.id) }}"
+              class="inline"
+              onsubmit="return confirm('Are you sure you want to delete this diagnosis?');"
+            >
+              <button
+                type="submit"
+                class="text-sm text-red-600 hover:text-red-900"
+              >
+                Delete
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="py-4 text-center text-gray-500">
+        <p>No diagnoses recorded for this visit.</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Vitals Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800">Vitals</h2>
+        <button
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Add Vitals
+        </button>
+      </div>
+
+      {% if vitals %}
+      <div class="space-y-4">
+        {% for vital in vitals %}
+        <div class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+          <div class="text-sm text-gray-500 mb-2">
+            Recorded: {{ vital.recorded_at.strftime('%Y-%m-%d %H:%M') if
+            vital.recorded_at else 'N/A' }}
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <h4 class="text-xs uppercase text-gray-500">Temperature</h4>
+              <p class="font-medium">{{ vital.temperature }}°F</p>
+            </div>
+            <div>
+              <h4 class="text-xs uppercase text-gray-500">Pulse</h4>
+              <p class="font-medium">{{ vital.pulse }} bpm</p>
+            </div>
+            <div>
+              <h4 class="text-xs uppercase text-gray-500">Blood Pressure</h4>
+              <p class="font-medium">{{ vital.blood_pressure }}</p>
+            </div>
+            <div>
+              <h4 class="text-xs uppercase text-gray-500">Respiratory Rate</h4>
+              <p class="font-medium">{{ vital.respiratory_rate }} bpm</p>
+            </div>
+          </div>
+          <div class="mt-2 flex justify-end">
+            <button class="text-sm text-indigo-600 hover:text-indigo-900">
+              Edit
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="py-4 text-center text-gray-500">
+        <p>No vitals recorded for this visit.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Medications & Prescriptions -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Medications Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800">Medications</h2>
+        <a
+          href="{{ url_for('doctor.add_medication', patient_id=patient.id, visit_id=visit.id) }}"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Add Medication
+        </a>
+      </div>
+
+      {% if medications %}
+      <div class="space-y-4">
+        {% for medication in medications %}
+        <div class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+          <h3 class="font-medium text-lg text-gray-800">
+            {{ medication.medication_name }}
+          </h3>
+          <div
+            class="mt-1 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600"
+          >
+            <div>
+              <span class="font-medium">Dosage:</span> {{ medication.dosage or
+              'N/A' }}
+            </div>
+            <div>
+              <span class="font-medium">Frequency:</span> {{
+              medication.frequency or 'N/A' }}
+            </div>
+            <div>
+              <span class="font-medium">Start Date:</span> {{
+              medication.start_date.strftime('%Y-%m-%d') if
+              medication.start_date else 'N/A' }}
+            </div>
+            <div>
+              <span class="font-medium">End Date:</span> {{
+              medication.end_date.strftime('%Y-%m-%d') if medication.end_date
+              else 'Ongoing' }}
+            </div>
+          </div>
+          <div class="mt-2 flex justify-end">
+            <a
+              href="{{ url_for('doctor.edit_medication', patient_id=patient.id, visit_id=visit.id, medication_id=medication.id) }}"
+              class="text-sm text-indigo-600 hover:text-indigo-900 mr-2"
+            >
+              Edit
+            </a>
+            <form
+              method="POST"
+              action="{{ url_for('doctor.delete_medication', patient_id=patient.id, visit_id=visit.id, medication_id=medication.id) }}"
+              class="inline"
+              onsubmit="return confirm('Are you sure you want to delete this medication?');"
+            >
+              <button
+                type="submit"
+                class="text-sm text-red-600 hover:text-red-900"
+              >
+                Delete
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="py-4 text-center text-gray-500">
+        <p>No medications recorded for this visit.</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Prescriptions Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800">Prescriptions</h2>
+        <button
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Write Prescription
+        </button>
+      </div>
+
+      {% if prescriptions %}
+      <div class="space-y-4">
+        {% for prescription in prescriptions %}
+        <div class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+          <h3 class="font-medium text-lg text-gray-800">
+            {{ prescription.medication_name }}
+          </h3>
+          <div
+            class="mt-1 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600"
+          >
+            <div>
+              <span class="font-medium">Dosage:</span> {{ prescription.dosage or
+              'N/A' }}
+            </div>
+            <div>
+              <span class="font-medium">Frequency:</span> {{
+              prescription.frequency or 'N/A' }}
+            </div>
+            <div class="col-span-2">
+              <span class="font-medium">Instructions:</span> {{
+              prescription.instructions or 'N/A' }}
+            </div>
+            <div class="col-span-2">
+              <span class="font-medium">Prescribed:</span> {{
+              prescription.prescribed_at.strftime('%Y-%m-%d') if
+              prescription.prescribed_at else 'N/A' }}
+            </div>
+          </div>
+          <div class="mt-2 flex justify-end space-x-2">
+            <button class="text-sm text-indigo-600 hover:text-indigo-900">
+              Edit
+            </button>
+            <button
+              class="text-sm px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+            >
+              Print
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="py-4 text-center text-gray-500">
+        <p>No prescriptions recorded for this visit.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Procedures & Notes -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Procedures Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800">Procedures</h2>
+        <button
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Add Procedure
+        </button>
+      </div>
+
+      {% if procedures %}
+      <div class="space-y-4">
+        {% for procedure in procedures %}
+        <div class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+          <h3 class="font-medium text-lg text-gray-800">
+            {{ procedure.procedure_description }}
+          </h3>
+          <div
+            class="mt-1 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600"
+          >
+            <div>
+              <span class="font-medium">Code:</span> {{ procedure.procedure_code
+              or 'N/A' }}
+            </div>
+            <div>
+              <span class="font-medium">Performed:</span> {{
+              procedure.performed_at.strftime('%Y-%m-%d') if
+              procedure.performed_at else 'N/A' }}
+            </div>
+          </div>
+          <div class="mt-2 flex justify-end">
+            <button class="text-sm text-indigo-600 hover:text-indigo-900">
+              Edit
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="py-4 text-center text-gray-500">
+        <p>No procedures recorded for this visit.</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Provider Notes Section -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800">Provider Notes</h2>
+        <a
+          href="{{ url_for('doctor.add_note', patient_id=patient.id, visit_id=visit.id) }}"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Add Note
+        </a>
+      </div>
+
+      {% if notes %}
+      <div class="space-y-4">
+        {% for note in notes %}
+        <div class="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+          <div class="text-sm text-gray-500 mb-2">
+            {{ note.created_at.strftime('%Y-%m-%d %H:%M') if note.created_at
+            else 'N/A' }}
+          </div>
+          <div class="bg-gray-50 p-3 rounded">
+            <p class="text-gray-700 whitespace-pre-line">
+              {{ note.note_text }}
+            </p>
+          </div>
+          <div class="mt-2 flex justify-end">
+            <a
+              href="{{ url_for('doctor.edit_note', patient_id=patient.id, visit_id=visit.id, note_id=note.id) }}"
+              class="text-sm text-indigo-600 hover:text-indigo-900"
+            >
+              Edit
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="py-4 text-center text-gray-500">
+        <p>No provider notes recorded for this visit.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

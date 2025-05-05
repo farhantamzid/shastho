@@ -1,168 +1,364 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Doctor Portal - Shastho{% endblock %}</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-      defer
-    ></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    {% block extra_head %}{% endblock %}
-  </head>
-  <body class="bg-gray-100 min-h-screen flex flex-col">
-    <!-- Top Navigation -->
-    <nav class="bg-cyan-600 text-white shadow-md">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center">
+{% extends "base.html" %} {% block title %}Doctor Portal - Shastho{% endblock %}
+{% block content %}
+<div class="flex h-screen bg-gray-100">
+  <!-- Sidebar -->
+  <div class="hidden md:flex md:flex-shrink-0">
+    <div class="flex flex-col w-64 border-r border-gray-200 bg-white">
+      <div class="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
+        <div class="flex items-center flex-shrink-0 px-4">
+          <h1 class="text-xl font-semibold text-cyan-700">Doctor Portal</h1>
+        </div>
+        <div class="mt-5 flex-grow flex flex-col">
+          <nav class="flex-1 px-2 space-y-1">
             <a
               href="{{ url_for('doctor.dashboard') }}"
-              class="flex-shrink-0 flex items-center"
+              class="{% if request.endpoint == 'doctor.dashboard' %}bg-cyan-50 text-cyan-700{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %} group flex items-center px-2 py-2 text-sm font-medium rounded-md"
             >
-              <img
-                class="h-10 w-auto"
-                src="{{ url_for('static', filename='images/logo.png') }}"
-                alt="Shastho"
-              />
-              <span class="ml-2 text-xl font-bold">Shastho</span>
+              <svg
+                class="{% if request.endpoint == 'doctor.dashboard' %}text-cyan-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %} mr-3 flex-shrink-0 h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                />
+              </svg>
+              Dashboard
             </a>
-          </div>
-          <div class="flex items-center">
-            <div class="ml-4 flex items-center md:ml-6">
-              <!-- Profile dropdown -->
-              <div class="ml-3 relative" x-data="{ open: false }">
-                <div>
-                  <button
-                    @click="open = !open"
-                    class="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:shadow-solid"
-                    id="user-menu"
-                    aria-haspopup="true"
-                  >
-                    {% if session.get('profile_picture_url') %}
-                    <img
-                      class="h-8 w-8 rounded-full"
-                      src="{{ session.get('profile_picture_url') }}"
-                      alt=""
-                    />
-                    {% else %}
-                    <div
-                      class="h-8 w-8 rounded-full bg-cyan-300 flex items-center justify-center"
-                    >
-                      <span class="text-cyan-800 font-semibold"
-                        >{{ session.get('user_name', 'U')[0] }}</span
-                      >
-                    </div>
-                    {% endif %}
-                    <span class="ml-2 text-white"
-                      >{{ session.get('user_name', 'User') }}</span
-                    >
-                    <i data-lucide="chevron-down" class="ml-1 h-4 w-4"></i>
-                  </button>
-                </div>
-                <div
-                  x-show="open"
-                  @click.away="open = false"
-                  class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg"
-                >
-                  <div class="py-1 rounded-md bg-white shadow-xs">
-                    <a
-                      href="{{ url_for('auth.profile') }}"
-                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >Your Profile</a
-                    >
-                    <a
-                      href="{{ url_for('auth.logout') }}"
-                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >Sign out</a
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+
+            <a
+              href="{{ url_for('doctor.profile') }}"
+              class="{% if request.endpoint == 'doctor.profile' %}bg-cyan-50 text-cyan-700{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %} group flex items-center px-2 py-2 text-sm font-medium rounded-md"
+            >
+              <svg
+                class="{% if request.endpoint == 'doctor.profile' %}text-cyan-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %} mr-3 flex-shrink-0 h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+              My Profile
+            </a>
+
+            <a
+              href="#"
+              class="text-gray-700 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
+            >
+              <svg
+                class="text-gray-400 group-hover:text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              Availability
+            </a>
+
+            <a
+              href="#"
+              class="text-gray-700 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
+            >
+              <svg
+                class="text-gray-400 group-hover:text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Appointments
+            </a>
+
+            <a
+              href="{{ url_for('doctor.patient_search') }}"
+              class="text-gray-700 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
+            >
+              <svg
+                class="text-gray-400 group-hover:text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+              Patient Records
+            </a>
+
+            <a
+              href="{{ url_for('auth.profile') }}"
+              class="text-gray-700 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
+            >
+              <svg
+                class="text-gray-400 group-hover:text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              Account Settings
+            </a>
+          </nav>
         </div>
       </div>
-    </nav>
-
-    <!-- Sidebar -->
-    <div class="flex-1 flex overflow-hidden">
-      <div class="md:flex md:flex-shrink-0">
-        <div class="flex flex-col w-64 border-r border-gray-200 bg-white">
-          <div class="h-0 flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-            <nav class="mt-5 flex-1 px-2 bg-white">
-              <a
-                href="{{ url_for('doctor.dashboard') }}"
-                class="group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-900 bg-gray-100 focus:outline-none focus:bg-gray-200 transition ease-in-out duration-150"
-              >
-                <i
-                  data-lucide="layout-dashboard"
-                  class="mr-3 h-6 w-6 text-gray-500 group-hover:text-gray-600 transition ease-in-out duration-150"
-                ></i>
-                Dashboard
-              </a>
-              <a
-                href="#"
-                class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:text-gray-900 focus:bg-gray-100 transition ease-in-out duration-150"
-              >
-                <i
-                  data-lucide="calendar"
-                  class="mr-3 h-6 w-6 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
-                ></i>
-                Appointments
-              </a>
-              <a
-                href="#"
-                class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:text-gray-900 focus:bg-gray-100 transition ease-in-out duration-150"
-              >
-                <i
-                  data-lucide="users"
-                  class="mr-3 h-6 w-6 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
-                ></i>
-                Patients
-              </a>
-              <a
-                href="#"
-                class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:text-gray-900 focus:bg-gray-100 transition ease-in-out duration-150"
-              >
-                <i
-                  data-lucide="file-text"
-                  class="mr-3 h-6 w-6 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
-                ></i>
-                Medical Records
-              </a>
-              <a
-                href="#"
-                class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:text-gray-900 focus:bg-gray-100 transition ease-in-out duration-150"
-              >
-                <i
-                  data-lucide="settings"
-                  class="mr-3 h-6 w-6 text-gray-400 group-hover:text-gray-500 transition ease-in-out duration-150"
-                ></i>
-                Settings
-              </a>
-            </nav>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Content -->
-      <main class="flex-1 overflow-y-auto focus:outline-none">
-        {% block content %}{% endblock %}
-      </main>
     </div>
+  </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Initialize Lucide icons
-        lucide.createIcons();
-      });
-    </script>
-  </body>
-</html>
+  <!-- Mobile header -->
+  <div
+    class="md:hidden bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between sticky top-0 z-10"
+  >
+    <h1 class="text-xl font-semibold text-cyan-700">Doctor Portal</h1>
+    <button
+      type="button"
+      onclick="toggleSidebar()"
+      class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-500"
+    >
+      <svg
+        class="h-6 w-6"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile sidebar -->
+  <div id="mobile-sidebar" class="fixed inset-0 flex z-40 md:hidden hidden">
+    <div
+      class="fixed inset-0 bg-gray-600 bg-opacity-75"
+      onclick="toggleSidebar()"
+    ></div>
+    <div class="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+      <div class="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
+        <div class="flex items-center flex-shrink-0 px-4">
+          <h1 class="text-xl font-semibold text-cyan-700">Doctor Portal</h1>
+        </div>
+        <nav class="mt-5 px-2 space-y-1">
+          <a
+            href="{{ url_for('doctor.dashboard') }}"
+            class="{% if request.endpoint == 'doctor.dashboard' %}bg-cyan-50 text-cyan-700{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %} group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          >
+            <svg
+              class="{% if request.endpoint == 'doctor.dashboard' %}text-cyan-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %} mr-3 flex-shrink-0 h-6 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
+            </svg>
+            Dashboard
+          </a>
+
+          <a
+            href="{{ url_for('doctor.profile') }}"
+            class="{% if request.endpoint == 'doctor.profile' %}bg-cyan-50 text-cyan-700{% else %}text-gray-700 hover:bg-gray-50 hover:text-gray-900{% endif %} group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          >
+            <svg
+              class="{% if request.endpoint == 'doctor.profile' %}text-cyan-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %} mr-3 flex-shrink-0 h-6 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            My Profile
+          </a>
+
+          <a
+            href="#"
+            class="text-gray-700 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          >
+            <svg
+              class="text-gray-400 group-hover:text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            Availability
+          </a>
+
+          <a
+            href="#"
+            class="text-gray-700 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          >
+            <svg
+              class="text-gray-400 group-hover:text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Appointments
+          </a>
+
+          <a
+            href="{{ url_for('doctor.patient_search') }}"
+            class="text-gray-700 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          >
+            <svg
+              class="text-gray-400 group-hover:text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            Patient Records
+          </a>
+
+          <a
+            href="{{ url_for('auth.profile') }}"
+            class="text-gray-700 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-base font-medium rounded-md"
+          >
+            <svg
+              class="text-gray-400 group-hover:text-gray-500 mr-3 flex-shrink-0 h-6 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            Account Settings
+          </a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col w-0 flex-1 overflow-hidden">
+    <!-- Main content area -->
+    <main
+      class="flex-1 relative z-0 overflow-y-auto focus:outline-none pt-2 md:pt-0"
+    >
+      <!-- Breadcrumb component -->
+      <div class="px-4 md:px-8 py-4 bg-white shadow-sm">
+        <div class="flex items-center">
+          <h1 class="text-2xl font-semibold text-gray-800">
+            {% block page_title %}Dashboard{% endblock %}
+          </h1>
+        </div>
+        <div class="flex items-center space-x-2 text-sm text-gray-500 mt-1">
+          <a
+            href="{{ url_for('doctor.dashboard') }}"
+            class="hover:text-cyan-600"
+            >Doctor</a
+          >
+          <span>›</span>
+          {% block breadcrumb %}
+          <span class="text-gray-700">Dashboard</span>
+          {% endblock %}
+        </div>
+      </div>
+
+      <!-- Page content -->
+      <div class="px-4 md:px-8 py-6">
+        {% block doctor_content %} {% endblock %}
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById("mobile-sidebar");
+    sidebar.classList.toggle("hidden");
+  }
+</script>
+{% endblock %}

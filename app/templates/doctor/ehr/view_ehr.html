@@ -1,0 +1,649 @@
+{% extends "doctor/layout.html" %} {% block title %}EHR - {{ patient.full_name
+}}{% endblock %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="flex items-center mb-6">
+    <a
+      href="{{ url_for('doctor.patient_search') }}"
+      class="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-1"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Back to Search
+    </a>
+    <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+      <ol class="list-none p-0 inline-flex">
+        <li class="flex items-center">
+          <a
+            href="{{ url_for('doctor.dashboard') }}"
+            class="hover:text-gray-900"
+            >Dashboard</a
+          >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 mx-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </li>
+        <li class="flex items-center">
+          <a
+            href="{{ url_for('doctor.patient_search') }}"
+            class="hover:text-gray-900"
+            >Patient Search</a
+          >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 mx-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </li>
+        <li class="text-gray-900 font-medium">EHR: {{ patient.full_name }}</li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800">
+            {{ patient.full_name }}
+          </h1>
+          <div class="flex items-center mt-2 text-gray-600">
+            <div class="mr-6">
+              <span class="font-medium">ID:</span> {{ patient.id }}
+            </div>
+            <div class="mr-6">
+              <span class="font-medium">DOB:</span> {{
+              patient.date_of_birth.strftime('%Y-%m-%d') if
+              patient.date_of_birth else 'N/A' }}
+            </div>
+            <div>
+              <span class="font-medium">Contact:</span> {{
+              patient.contact_number or 'N/A' }}
+            </div>
+          </div>
+        </div>
+        <div class="flex">
+          <button
+            onclick="window.print()"
+            class="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Print
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if not has_ehr %}
+  <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-yellow-400"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-yellow-700">
+          No EHR data found for this patient. An EHR record needs to be created.
+        </p>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- Tabs -->
+  <div class="mb-8">
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+        <button
+          onclick="showTab('summary')"
+          class="tab-btn active whitespace-nowrap py-4 px-1 border-b-2 border-indigo-500 font-medium text-sm text-indigo-600"
+          aria-current="page"
+        >
+          Summary
+        </button>
+        <button
+          onclick="showTab('visits')"
+          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        >
+          Visits History
+        </button>
+        <button
+          onclick="showTab('allergies')"
+          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        >
+          Allergies
+        </button>
+        <button
+          onclick="showTab('immunizations')"
+          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        >
+          Immunizations
+        </button>
+        <button
+          onclick="showTab('test-results')"
+          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        >
+          Test Results
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <div>
+    <!-- Summary Tab -->
+    <div id="summary" class="tab-content">
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+          Patient Summary
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-medium text-gray-700 mb-2">
+              Recent Diagnoses
+            </h3>
+            {% set diagnoses_found = false %} {% for visit_info in visits[:3] %}
+            {% for diagnosis in visit_info.diagnoses %}
+            <div class="mb-3 last:mb-0">
+              <p class="font-medium">{{ diagnosis.diagnosis_description }}</p>
+              <p class="text-sm text-gray-500">
+                Code: {{ diagnosis.diagnosis_code }}
+              </p>
+              <p class="text-sm text-gray-500">
+                Date: {{ diagnosis.diagnosed_at.strftime('%Y-%m-%d') if
+                diagnosis.diagnosed_at else 'N/A' }}
+              </p>
+            </div>
+            {% set diagnoses_found = true %} {% endfor %} {% endfor %} {% if not
+            diagnoses_found %}
+            <p class="text-gray-500 italic">No recent diagnoses</p>
+            {% endif %}
+          </div>
+          <div>
+            <h3 class="text-lg font-medium text-gray-700 mb-2">
+              Current Medications
+            </h3>
+            {% set medications_found = false %} {% for visit_info in visits %}
+            {% for medication in visit_info.medications %}
+            <div class="mb-3 last:mb-0">
+              <p class="font-medium">{{ medication.medication_name }}</p>
+              <p class="text-sm text-gray-500">
+                Dosage: {{ medication.dosage }}
+              </p>
+              <p class="text-sm text-gray-500">
+                Frequency: {{ medication.frequency }}
+              </p>
+            </div>
+            {% set medications_found = true %} {% endfor %} {% endfor %} {% if
+            not medications_found %}
+            <p class="text-gray-500 italic">No current medications</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Recent Visits</h2>
+        {% if visits %} {% for visit_info in visits[:3] %}
+        <div
+          class="mb-6 last:mb-0 pb-6 last:pb-0 border-b last:border-b-0 border-gray-200"
+        >
+          <div class="flex justify-between mb-2">
+            <h3 class="text-lg font-medium text-gray-700">
+              {{ visit_info.visit.visit_type }} - {{
+              visit_info.visit.date.strftime('%Y-%m-%d') if
+              visit_info.visit.date else 'N/A' }}
+            </h3>
+            <a
+              href="{{ url_for('doctor.view_visit_details', patient_id=patient.id, visit_id=visit_info.visit.id) }}"
+              class="text-indigo-600 hover:text-indigo-900 text-sm"
+              >View Details</a
+            >
+          </div>
+          <p class="text-gray-600 mb-3">
+            Chief Complaint: {{ visit_info.visit.chief_complaint or 'N/A' }}
+          </p>
+
+          {% if visit_info.notes %}
+          <div class="mb-3">
+            <h4 class="text-sm font-semibold text-gray-700 mb-1">
+              Provider Notes:
+            </h4>
+            <div class="pl-3 border-l-2 border-gray-200">
+              {% for note in visit_info.notes[:1] %}
+              <p class="text-sm text-gray-600">
+                {{ note.note_text|truncate(150) }}
+              </p>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %} {% else %}
+        <p class="text-gray-500 italic">No visit history available</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Visits History Tab -->
+    <div id="visits" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Visit History</h2>
+
+        {% if visits %}
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Date
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Visit Type
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Chief Complaint
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for visit_info in visits %}
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ visit_info.visit.date.strftime('%Y-%m-%d') if
+                  visit_info.visit.date else 'N/A' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ visit_info.visit.visit_type }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ visit_info.visit.chief_complaint or 'N/A' }}
+                </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                >
+                  <a
+                    href="{{ url_for('doctor.view_visit_details', patient_id=patient.id, visit_id=visit_info.visit.id) }}"
+                    class="text-indigo-600 hover:text-indigo-900"
+                  >
+                    View Details
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500 italic">No visit history available</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Allergies Tab -->
+    <div id="allergies" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800">Allergies</h2>
+          <button
+            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Add Allergy
+          </button>
+        </div>
+
+        {% if allergies %}
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Allergen
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Reaction
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Severity
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Noted Date
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for allergy in allergies %}
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ allergy.allergen }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ allergy.reaction or 'N/A' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  {% if allergy.severity %} {% if allergy.severity == 'Mild' %}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                  >
+                    {{ allergy.severity }}
+                  </span>
+                  {% elif allergy.severity == 'Moderate' %}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                  >
+                    {{ allergy.severity }}
+                  </span>
+                  {% elif allergy.severity == 'Severe' %}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                  >
+                    {{ allergy.severity }}
+                  </span>
+                  {% elif allergy.severity == 'Life-threatening' %}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                  >
+                    {{ allergy.severity }}
+                  </span>
+                  {% else %}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
+                  >
+                    {{ allergy.severity }}
+                  </span>
+                  {% endif %} {% else %}
+                  <span class="text-gray-500">N/A</span>
+                  {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ allergy.noted_at.strftime('%Y-%m-%d') if allergy.noted_at
+                  else 'N/A' }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="py-4 text-center text-gray-500">
+          <p>No allergies recorded for this patient.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Immunizations Tab -->
+    <div id="immunizations" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800">Immunizations</h2>
+          <button
+            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Add Immunization
+          </button>
+        </div>
+
+        {% if immunizations %}
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Vaccine
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Date Administered
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Administered By
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for immunization in immunizations %}
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ immunization.vaccine }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ immunization.date_administered.strftime('%Y-%m-%d') if
+                  immunization.date_administered else 'N/A' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ immunization.administered_by or 'N/A' }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="py-4 text-center text-gray-500">
+          <p>No immunizations recorded for this patient.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Test Results Tab -->
+    <div id="test-results" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800">Test Results</h2>
+          <button
+            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Add Test Result
+          </button>
+        </div>
+
+        {% if test_results %}
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Test Type
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Date
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Result
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Uploaded By
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for test_result in test_results %}
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ test_result.test_type }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ test_result.test_date.strftime('%Y-%m-%d') if
+                  test_result.test_date else 'N/A' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {% if test_result.result_data %}
+                  <span class="font-medium">Result Available</span>
+                  {% else %}
+                  <span class="text-gray-400">N/A</span>
+                  {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ test_result.uploaded_by or 'N/A' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  {% if test_result.file_path %}
+                  <a
+                    href="{{ test_result.file_path }}"
+                    class="text-indigo-600 hover:text-indigo-900 mr-3"
+                    target="_blank"
+                  >
+                    View File
+                  </a>
+                  {% endif %}
+                  <button class="text-indigo-600 hover:text-indigo-900">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="py-4 text-center text-gray-500">
+          <p>No test results recorded for this patient.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  function showTab(tabId) {
+    // Hide all tab contents
+    document.querySelectorAll(".tab-content").forEach((tab) => {
+      tab.classList.add("hidden");
+    });
+
+    // Remove active class from all tab buttons
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.classList.remove("active");
+      btn.classList.remove("border-indigo-500");
+      btn.classList.remove("text-indigo-600");
+      btn.classList.add("border-transparent");
+      btn.classList.add("text-gray-500");
+    });
+
+    // Show the selected tab content
+    document.getElementById(tabId).classList.remove("hidden");
+
+    // Add active class to the clicked tab button
+    event.currentTarget.classList.add("active");
+    event.currentTarget.classList.remove("border-transparent");
+    event.currentTarget.classList.remove("text-gray-500");
+    event.currentTarget.classList.add("border-indigo-500");
+    event.currentTarget.classList.add("text-indigo-600");
+  }
+</script>
+{% endblock %}

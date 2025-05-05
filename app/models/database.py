@@ -13,6 +13,16 @@ def parse_iso_datetime(date_string: Optional[str]) -> Optional[datetime]:
             return None
     return None
 
+def parse_iso_date(date_string: Optional[str]) -> Optional[date]:
+    """Helper function to parse ISO date strings safely."""
+    if date_string:
+        try:
+            # Parse as datetime first, then get the date part
+            return isoparse(date_string).date()
+        except (ValueError, TypeError):
+            return None
+    return None
+
 
 class UserRole(str, Enum):
     """User roles in the system."""
@@ -352,14 +362,14 @@ class Patient:
             id=data.get('id'),
             user_id=data.get('user_id'),
             full_name=data.get('full_name'),
-            date_of_birth=data.get('date_of_birth'),
+            date_of_birth=parse_iso_date(data.get('date_of_birth')),
             gender=Gender(data.get('gender')) if data.get('gender') else None,
             contact_number=data.get('contact_number'),
             address=data.get('address'),
             emergency_contact_name=data.get('emergency_contact_name'),
             emergency_contact_number=data.get('emergency_contact_number'),
-            created_at=data.get('created_at'),
-            updated_at=data.get('updated_at')
+            created_at=parse_iso_datetime(data.get('created_at')),
+            updated_at=parse_iso_datetime(data.get('updated_at'))
         )
 
     def to_dict(self) -> Dict[str, Any]:

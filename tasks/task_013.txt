@@ -1,6 +1,6 @@
 # Task ID: 13
 # Title: Implement Doctor EHR Search and View
-# Status: pending
+# Status: done
 # Dependencies: 7, 11
 # Priority: high
 # Description: Create the interface for doctors to search for patients by ID and view their EHR.
@@ -26,3 +26,29 @@
 6. Verify detailed view for entries
 7. Test test result viewing
 8. Verify print functionality works
+
+# Subtasks:
+## 1. Patient Search and EHR Retrieval Module [done]
+### Dependencies: None
+### Description: Develop the functionality to search for patients using various criteria (name, ID, etc.) and retrieve their complete Electronic Health Record (EHR).
+### Details:
+Implement search functionality with fuzzy matching. Ensure secure access and retrieval of patient data based on user roles and permissions.
+
+## 2. Diagnosis and Medication Management Forms [done]
+### Dependencies: 13.1
+### Description: Create forms for entering diagnoses, prescribing medications, and managing medication lists. Include drug interaction checks and allergy alerts.
+### Details:
+Integrate with drug databases for accurate medication information. Implement validation rules to prevent errors in dosage and frequency.
+
+## 3. Provider Notes and Clinical Data Entry [done]
+### Dependencies: 13.1, 13.2
+### Description: Design and implement a system for providers to enter clinical notes, observations, and other relevant patient data. Support structured and unstructured data entry.
+### Details:
+Implement templates for common note types. Allow for free-text entry with support for voice-to-text. Ensure data is stored in a structured format for reporting and analysis.
+
+## 4. Audit Logging and Validation System [done]
+### Dependencies: 13.1, 13.2, 13.3
+### Description: Implement a comprehensive audit logging system to track all user actions and data modifications. Develop validation rules to ensure data integrity and compliance with regulations.
+### Details:
+Log all access attempts, data changes, and system events. Implement validation rules for data entry fields. Generate reports for auditing purposes.
+

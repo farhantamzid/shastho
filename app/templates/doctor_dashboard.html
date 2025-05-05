@@ -1,2 +1,7 @@
 {% extends "dashboard.html" %} {% block title %}Doctor Dashboard - Shastho{%
 endblock %}
+
+<script>
+  // Redirect to the new doctor dashboard path
+  window.location.href = "{{ url_for('doctor.dashboard') }}";
+</script>

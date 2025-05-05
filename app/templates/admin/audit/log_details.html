@@ -1,0 +1,193 @@
+{% extends 'admin/layout.html' %} {% block title %}Audit Log Details{% endblock
+%} {% block content %}
+<div class="container max-w-6xl mx-auto px-4 py-8">
+  <div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-gray-900">Audit Log Details</h1>
+    <a
+      href="{{ url_for('audit.view_logs') }}"
+      class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="-ml-1 mr-2 h-5 w-5"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Back to Logs
+    </a>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">Audit Log</h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">ID: {{ log.id }}</p>
+    </div>
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+        <div class="sm:col-span-1">
+          <dt class="text-sm font-medium text-gray-500">Timestamp</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+          </dd>
+        </div>
+        <div class="sm:col-span-1">
+          <dt class="text-sm font-medium text-gray-500">IP Address</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            {{ log.ip_address or 'Not recorded' }}
+          </dd>
+        </div>
+        <div class="sm:col-span-1">
+          <dt class="text-sm font-medium text-gray-500">Action</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            {% if log.action %}
+            <span
+              class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {% if log.action.value == 'create' %}bg-green-100 text-green-800 {% elif log.action.value == 'read' %}bg-blue-100 text-blue-800 {% elif log.action.value == 'update' %}bg-yellow-100 text-yellow-800 {% elif log.action.value == 'delete' %}bg-red-100 text-red-800 {% elif log.action.value == 'login' %}bg-purple-100 text-purple-800 {% elif log.action.value == 'logout' %}bg-gray-100 text-gray-800 {% elif log.action.value == 'failed_login' %}bg-pink-100 text-pink-800 {% else %}bg-gray-100 text-gray-800{% endif %}"
+            >
+              {{ log.action.value }}
+            </span>
+            {% else %} Not specified {% endif %}
+          </dd>
+        </div>
+        <div class="sm:col-span-1">
+          <dt class="text-sm font-medium text-gray-500">Status</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            {% if log.success %}
+            <span
+              class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+              >Success</span
+            >
+            {% else %}
+            <span
+              class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+              >Failed</span
+            >
+            {% endif %}
+          </dd>
+        </div>
+        <div class="sm:col-span-2">
+          <dt class="text-sm font-medium text-gray-500">User</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            {% if user %}
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-10 w-10">
+                <svg
+                  class="h-10 w-10 rounded-full bg-gray-200 text-gray-500"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-gray-900">
+                  {{ user.username }}
+                </div>
+                <div class="text-sm text-gray-500">ID: {{ user.id }}</div>
+                <div class="text-sm text-gray-500">Role: {{ user.role }}</div>
+              </div>
+            </div>
+            {% elif log.user_id %} User ID: {{ log.user_id }} (User not found)
+            {% else %} Not associated with a user {% endif %}
+          </dd>
+        </div>
+        <div class="sm:col-span-2">
+          <dt class="text-sm font-medium text-gray-500">Resource</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            {% if log.resource_type %}
+            <div>
+              <span class="font-medium">Type:</span> {{ log.resource_type.value
+              }}
+            </div>
+            <div class="mt-1">
+              <span class="font-medium">ID:</span> {{ log.resource_id or 'Not
+              specified' }}
+            </div>
+            {% if resource %}
+            <div class="mt-2 p-3 bg-gray-50 rounded-md">
+              <h4 class="text-sm font-medium text-gray-700 mb-2">
+                Resource Details
+              </h4>
+              <div class="text-sm">
+                {% for key, value in resource.to_dict().items() if key !=
+                'password' %}
+                <div class="py-1">
+                  <span class="font-medium">{{ key }}:</span> {{ value if value
+                  is not none else 'None' }}
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %} {% else %} Not specified {% endif %}
+          </dd>
+        </div>
+
+        {% if log.user_agent %}
+        <div class="sm:col-span-2">
+          <dt class="text-sm font-medium text-gray-500">User Agent</dt>
+          <dd class="mt-1 text-sm text-gray-900 overflow-auto">
+            {{ log.user_agent }}
+          </dd>
+        </div>
+        {% endif %} {% if log.details and log.details|length > 0 %}
+        <div class="sm:col-span-2">
+          <dt class="text-sm font-medium text-gray-500">Details</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <div class="bg-gray-50 rounded-md p-4 overflow-auto max-h-80">
+              <pre class="text-xs text-gray-800">
+{{ log.details|tojson(indent=2) }}</pre
+              >
+            </div>
+          </dd>
+        </div>
+        {% endif %} {% if log.changes and log.changes|length > 0 %}
+        <div class="sm:col-span-2">
+          <dt class="text-sm font-medium text-gray-500">Changes</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <div class="overflow-hidden bg-gray-50 rounded-md">
+              {% if log.changes.changed_fields|default([])|length > 0 %}
+              <div class="px-4 py-2 border-b border-gray-200">
+                <p class="text-sm font-medium text-gray-700">Changed Fields:</p>
+                <ul class="mt-1 list-disc list-inside text-sm text-gray-600">
+                  {% for field in log.changes.changed_fields %}
+                  <li>{{ field }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% endif %}
+
+              <div
+                class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-200"
+              >
+                {% if log.changes.before|default({}) %}
+                <div class="p-4">
+                  <p class="text-sm font-medium text-gray-700 mb-2">Before:</p>
+                  <pre class="text-xs text-gray-800 overflow-auto max-h-80">
+{{ log.changes.before|tojson(indent=2) }}</pre
+                  >
+                </div>
+                {% endif %} {% if log.changes.after|default({}) %}
+                <div class="p-4">
+                  <p class="text-sm font-medium text-gray-700 mb-2">After:</p>
+                  <pre class="text-xs text-gray-800 overflow-auto max-h-80">
+{{ log.changes.after|tojson(indent=2) }}</pre
+                  >
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </dd>
+        </div>
+        {% endif %}
+      </dl>
+    </div>
+  </div>
+</div>
+{% endblock %}

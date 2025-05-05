@@ -1,0 +1,189 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Audit Logs{% endblock %}
+
+{% block content %}
+<div class="container max-w-7xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-900 mb-8">Audit Logs</h1>
+
+  <!-- Filters Section -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Filters</h2>
+    <form action="{{ url_for('audit.view_logs') }}" method="GET" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Action Type Filter -->
+        <div>
+          <label for="action_type" class="block text-sm font-medium text-gray-700">Action Type</label>
+          <select id="action_type" name="action_type" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+            <option value="">All Actions</option>
+            {% for action in action_types %}
+            <option value="{{ action.value }}" {% if filters.action_type == action.value %}selected{% endif %}>{{ action.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Resource Type Filter -->
+        <div>
+          <label for="resource_type" class="block text-sm font-medium text-gray-700">Resource Type</label>
+          <select id="resource_type" name="resource_type" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+            <option value="">All Resources</option>
+            {% for resource in resource_types %}
+            <option value="{{ resource.value }}" {% if filters.resource_type == resource.value %}selected{% endif %}>{{ resource.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- User Filter -->
+        <div>
+          <label for="user_id" class="block text-sm font-medium text-gray-700">User</label>
+          <select id="user_id" name="user_id" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+            <option value="">All Users</option>
+            {% for user in users %}
+            <option value="{{ user.id }}" {% if filters.user_id == user.id %}selected{% endif %}>{{ user.username }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Resource ID Filter -->
+        <div>
+          <label for="resource_id" class="block text-sm font-medium text-gray-700">Resource ID</label>
+          <input type="text" id="resource_id" name="resource_id" value="{{ filters.resource_id or '' }}" placeholder="Enter resource ID" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+        </div>
+
+        <!-- Date Range Filter -->
+        <div>
+          <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
+          <input type="date" id="start_date" name="start_date" value="{{ filters.start_date }}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+        </div>
+
+        <div>
+          <label for="end_date" class="block text-sm font-medium text-gray-700">End Date</label>
+          <input type="date" id="end_date" name="end_date" value="{{ filters.end_date }}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-4">
+        <div class="flex space-x-2">
+          <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Apply Filters
+          </button>
+          <a href="{{ url_for('audit.view_logs') }}" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Reset Filters
+          </a>
+        </div>
+        <div class="flex space-x-2">
+          <a href="{{ url_for('audit.reports.activity') }}" class="inline-flex items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm2 3a1 1 0 011-1h6a1 1 0 110 2H6a1 1 0 01-1-1zm0 3a1 1 0 011-1h6a1 1 0 110 2H6a1 1 0 01-1-1zm7 3a1 1 0 01-1-1h-5a1 1 0 110-2h5a1 1 0 011 1v4a1 1 0 11-2 0v-4z" clip-rule="evenodd" />
+            </svg>
+            Reports
+          </a>
+          <a href="{{ url_for('audit.api_logs') }}" class="inline-flex items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+            </svg>
+            API
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results Section -->
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-800">Audit Log Entries</h2>
+      <p class="text-sm text-gray-600 mt-1">Showing {{ logs|length }} results</p>
+    </div>
+
+    {% if logs %}
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resource</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for log in logs %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              {% if log.user_id %}{{ log.user_id }}{% else %}-{% endif %}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {% if log.action %}
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                {% if log.action.value == 'create' %}bg-green-100 text-green-800
+                {% elif log.action.value == 'read' %}bg-blue-100 text-blue-800
+                {% elif log.action.value == 'update' %}bg-yellow-100 text-yellow-800
+                {% elif log.action.value == 'delete' %}bg-red-100 text-red-800
+                {% elif log.action.value == 'login' %}bg-purple-100 text-purple-800
+                {% elif log.action.value == 'logout' %}bg-gray-100 text-gray-800
+                {% elif log.action.value == 'failed_login' %}bg-pink-100 text-pink-800
+                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                {{ log.action.value }}
+              </span>
+              {% else %}-{% endif %}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {% if log.resource_type %}
+              <span class="text-xs font-medium text-gray-700">{{ log.resource_type.value }}</span>
+              {% if log.resource_id %}<br><span class="text-xs text-gray-500">{{ log.resource_id }}</span>{% endif %}
+              {% else %}-{% endif %}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {% if log.success %}
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Success</span>
+              {% else %}
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Failed</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ log.ip_address or '-' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <a href="{{ url_for('audit.log_details', log_id=log.id) }}" class="text-indigo-600 hover:text-indigo-900">Details</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No audit logs found</h3>
+      <p class="mt-1 text-sm text-gray-500">Try changing your filters or check back later.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners for filter changes if needed
+    const filterForm = document.querySelector('form');
+    const actionTypeSelect = document.getElementById('action_type');
+    const resourceTypeSelect = document.getElementById('resource_type');
+    const userIdSelect = document.getElementById('user_id');
+
+    // Optional: Add auto-submit on filter change
+    // [actionTypeSelect, resourceTypeSelect, userIdSelect].forEach(element => {
+    //   element.addEventListener('change', () => {
+    //     filterForm.submit();
+    //   });
+    // });
+  });
+</script>
+{% endblock %}

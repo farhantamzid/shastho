@@ -251,7 +251,7 @@
       "id": 7,
       "title": "Implement Doctor Profile",
       "description": "Create the doctor profile setup and management functionality.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         6
       ],
@@ -265,7 +265,7 @@
           "description": "Create the basic layout and structure for the doctor dashboard, including navigation elements and placeholders for profile information and other relevant sections.",
           "dependencies": [],
           "details": "Develop a responsive dashboard template using HTML, CSS, and JavaScript. Ensure it is accessible and user-friendly.",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 3,
@@ -275,14 +275,14 @@
             "7.5"
           ],
           "details": "Calculate profile completeness based on required fields. Display a progress bar or similar indicator. Send notifications via email or in-app messages.",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
           "title": "Develop Doctor Profile Page with Fields and Update Functionality",
           "description": "Implement the doctor profile page with fields for personal information, contact details, professional details, hospital and department selection. Include functionality to update these fields.",
           "details": "Create input fields for personal information (name, contact), professional details (specialization, credentials), and hospital/department selection via dropdown menus. Implement data binding to existing user data, API endpoints for fetching hospital and department options, and develop an update mechanism with appropriate error handling and validation.",
-          "status": "pending",
+          "status": "done",
           "dependencies": [
             1
           ],
@@ -293,7 +293,7 @@
           "title": "Implement Field Validation for Profile Data",
           "description": "Add comprehensive validation for all doctor profile fields to ensure data integrity and proper error handling.",
           "details": "Implement client-side validation using JavaScript/Flask forms for immediate feedback. Add server-side validation for all fields including required fields, format validation (email, phone), and data integrity checks. Create clear error messages for validation failures. Implement proper handling of validation errors with feedback to the user.",
-          "status": "pending",
+          "status": "done",
           "dependencies": [
             4
           ],
@@ -422,8 +422,50 @@
         7,
         11
       ],
-      "status": "pending",
-      "subtasks": []
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Patient Search and EHR Retrieval Module",
+          "description": "Develop the functionality to search for patients using various criteria (name, ID, etc.) and retrieve their complete Electronic Health Record (EHR).",
+          "dependencies": [],
+          "details": "Implement search functionality with fuzzy matching. Ensure secure access and retrieval of patient data based on user roles and permissions.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Diagnosis and Medication Management Forms",
+          "description": "Create forms for entering diagnoses, prescribing medications, and managing medication lists. Include drug interaction checks and allergy alerts.",
+          "dependencies": [
+            1
+          ],
+          "details": "Integrate with drug databases for accurate medication information. Implement validation rules to prevent errors in dosage and frequency.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Provider Notes and Clinical Data Entry",
+          "description": "Design and implement a system for providers to enter clinical notes, observations, and other relevant patient data. Support structured and unstructured data entry.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement templates for common note types. Allow for free-text entry with support for voice-to-text. Ensure data is stored in a structured format for reporting and analysis.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Audit Logging and Validation System",
+          "description": "Implement a comprehensive audit logging system to track all user actions and data modifications. Develop validation rules to ensure data integrity and compliance with regulations.",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Log all access attempts, data changes, and system events. Implement validation rules for data entry fields. Generate reports for auditing purposes.",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": 14,

@@ -140,7 +140,7 @@ class Database:
 
         return table_map[model_class]
 
-    def create(self, model: T) -> T:
+    def create(self, model: T) -> Optional[T]:
         """Create a new record in the database."""
         try:
             table_name = self._get_table_name(model.__class__)
@@ -177,7 +177,7 @@ class Database:
                 print(f"Response error: {response.error}")
                 if hasattr(response.error, 'details'):
                     print(f"Error details: {response.error.details}")
-                return model  # Return original model on error
+                return None
 
             # Process response data
             if hasattr(response, 'data') and response.data and len(response.data) > 0:
@@ -198,15 +198,15 @@ class Database:
                         print(f"Setting ID on original model: {model.id}")
                         return model
 
-            print("No data in response, returning original model")
-            return model
+            print("No data in response, returning None to indicate potential failure")
+            return None
 
         except Exception as e:
             print(f"Exception in create: {str(e)}")
             print(f"Exception type: {type(e)}")
             import traceback
             print(f"Traceback: {traceback.format_exc()}")
-            return model
+            return None
 
     def get_by_id(self, model_class: Type[T], id: Union[str, UUID]) -> Optional[T]:
         """Get a record by ID."""

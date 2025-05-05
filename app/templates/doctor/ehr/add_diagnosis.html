@@ -1,0 +1,200 @@
+{% extends "doctor/layout.html" %} {% block title %}Add Diagnosis{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="flex items-center mb-6">
+    <a
+      href="{{ url_for('doctor.view_visit_details', patient_id=patient.id, visit_id=visit_id) }}"
+      class="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-1"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Back to Visit
+    </a>
+    <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+      <ol class="list-none p-0 inline-flex">
+        <li class="flex items-center">
+          <a
+            href="{{ url_for('doctor.dashboard') }}"
+            class="hover:text-gray-900"
+            >Dashboard</a
+          >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 mx-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </li>
+        <li class="flex items-center">
+          <a
+            href="{{ url_for('doctor.view_ehr', patient_id=patient.id) }}"
+            class="hover:text-gray-900"
+            >{{ patient.full_name }}</a
+          >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 mx-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </li>
+        <li class="flex items-center">
+          <a
+            href="{{ url_for('doctor.view_visit_details', patient_id=patient.id, visit_id=visit_id) }}"
+            class="hover:text-gray-900"
+            >Visit Details</a
+          >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 mx-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </li>
+        <li class="text-gray-900 font-medium">Add Diagnosis</li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+    <div class="p-6 border-b border-gray-200">
+      <h1 class="text-2xl font-bold text-gray-800">
+        Add Diagnosis for {{ patient.full_name }}
+      </h1>
+      <p class="text-gray-600 mt-1">Visit Date: {{ visit_date }}</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6">
+    <form
+      method="POST"
+      action="{{ url_for('doctor.add_diagnosis', patient_id=patient.id, visit_id=visit_id) }}"
+    >
+      {{ form.csrf_token }} {{ form.visit_id }}
+
+      <div class="space-y-6">
+        <div>
+          <label
+            for="diagnosis_code"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >{{ form.diagnosis_code.label }}</label
+          >
+          {{ form.diagnosis_code(class="w-full px-3 py-2 border border-gray-300
+          rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
+          focus:border-indigo-500 sm:text-sm", placeholder="e.g., J45.909") }}
+          {% if form.diagnosis_code.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.diagnosis_code.errors %} {{ error }} {% endfor
+            %}
+          </div>
+          {% endif %}
+          <p class="text-gray-500 text-xs mt-1">
+            Enter a valid ICD-10 code for this diagnosis
+          </p>
+        </div>
+
+        <div>
+          <label
+            for="diagnosis_description"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >{{ form.diagnosis_description.label }}</label
+          >
+          {{ form.diagnosis_description(class="w-full px-3 py-2 border
+          border-gray-300 rounded-md shadow-sm focus:outline-none
+          focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", rows=3,
+          placeholder="Detailed description of the diagnosis") }} {% if
+          form.diagnosis_description.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.diagnosis_description.errors %} {{ error }} {%
+            endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="diagnosed_at"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >{{ form.diagnosed_at.label }}</label
+          >
+          {{ form.diagnosed_at(class="w-full px-3 py-2 border border-gray-300
+          rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
+          focus:border-indigo-500 sm:text-sm", type="date") }} {% if
+          form.diagnosed_at.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.diagnosed_at.errors %} {{ error }} {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label
+            for="additional_notes"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >{{ form.additional_notes.label }}</label
+          >
+          {{ form.additional_notes(class="w-full px-3 py-2 border
+          border-gray-300 rounded-md shadow-sm focus:outline-none
+          focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", rows=3,
+          placeholder="Any additional notes about the diagnosis (optional)") }}
+          {% if form.additional_notes.errors %}
+          <div class="text-red-500 text-sm mt-1">
+            {% for error in form.additional_notes.errors %} {{ error }} {%
+            endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="flex justify-end pt-5">
+          <a
+            href="{{ url_for('doctor.view_visit_details', patient_id=patient.id, visit_id=visit_id) }}"
+            class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3"
+          >
+            Cancel
+          </a>
+          <button
+            type="submit"
+            class="bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Save Diagnosis
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
