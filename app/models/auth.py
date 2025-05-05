@@ -172,15 +172,32 @@ def reset_password_with_token(token, new_password):
 
 def find_users_by_role_and_status(role, status):
     """Find users with a specific role and status."""
-    # Convert role to UserRole enum if it's a string
+    role_value = None
+    # Convert role to UserRole enum if it's a string, then get its value
     if isinstance(role, str):
         try:
-            role = UserRole(role)
+            role_value = UserRole(role).value
         except ValueError:
+            print(f"Invalid role string provided: {role}")
             return []
+    elif isinstance(role, UserRole):
+        role_value = role.value
+    else:
+        print(f"Invalid role type provided: {type(role)}")
+        return []
 
-    # Query users with the specified role and status
-    users = db.query(User, role=role, status=status)
+    # Get the value of the status enum
+    status_value = None
+    if isinstance(status, UserStatus):
+        status_value = status.value
+    else:
+        print(f"Invalid status type provided: {type(status)}")
+        return []
+
+    # Query users using the string values for role and status
+    print(f"Querying Users with role='{role_value}' and status='{status_value}'")
+    users = db.query(User, role=role_value, status=status_value)
+    print(f"db.query returned {len(users)} users.")
     return users
 
 def update_user_status(user_id, new_status):

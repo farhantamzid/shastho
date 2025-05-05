@@ -391,7 +391,6 @@ class Doctor:
         contact_number: str = None,
         hospital_id: UUID = None,
         department_id: UUID = None,
-        first_login_complete: bool = False,
         created_at: datetime = None,
         updated_at: datetime = None
     ):
@@ -403,7 +402,6 @@ class Doctor:
         self.contact_number = contact_number
         self.hospital_id = hospital_id
         self.department_id = department_id
-        self.first_login_complete = first_login_complete
         self.created_at = created_at or datetime.now()
         self.updated_at = updated_at or datetime.now()
 
@@ -419,7 +417,6 @@ class Doctor:
             contact_number=data.get('contact_number'),
             hospital_id=data.get('hospital_id'),
             department_id=data.get('department_id'),
-            first_login_complete=data.get('first_login_complete', False),
             created_at=parse_iso_datetime(data.get('created_at')),
             updated_at=parse_iso_datetime(data.get('updated_at'))
         )
@@ -435,7 +432,6 @@ class Doctor:
             'contact_number': self.contact_number,
             'hospital_id': str(self.hospital_id) if self.hospital_id else None,
             'department_id': str(self.department_id) if self.department_id else None,
-            'first_login_complete': self.first_login_complete,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

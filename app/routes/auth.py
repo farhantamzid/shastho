@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SelectField, DateField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
-from app.models.database import UserRole, UserStatus, Gender, Language, Hospital, Department
+from app.models.database import UserRole, UserStatus, Gender, Language, Hospital, Department, HospitalDepartment
 from app.models.auth import (
     create_user, validate_credentials, find_user_by_id, find_user_by_username,
     create_password_reset_token, verify_reset_token, reset_password_with_token,
@@ -12,7 +12,7 @@ from app.models.auth import (
     terminate_session, terminate_all_sessions, update_session_activity
 )
 from functools import wraps
-from uuid import uuid4
+from uuid import uuid4, UUID
 import os
 import secrets
 from datetime import datetime
@@ -184,29 +184,6 @@ def login():
 
             flash('Login successful!', 'success')
 
-            # Check if this is a first-time login for a doctor who was just approved
-            # This would typically be checked by a flag in the database, but for this implementation
-            # we'll check if the user role is doctor and if they need to set up their account
-            if user.role == UserRole.DOCTOR:
-                # Check if this doctor has just been approved and needs to set up their account
-                # For example, if they haven't set a profile picture or haven't completed their profile
-                from app.models.database import Doctor
-                from app.utils.db import db
-
-                doctor = db.query(Doctor, user_id=user.id)
-
-                if doctor and not doctor[0].first_login_complete:
-                    # Set a flag in session to know this is first login
-                    session['first_time_login'] = True
-                    # Redirect to password reset to ensure they set a strong password
-                    token = create_password_reset_token(user.id)
-                    if token:
-                        # Mark first login as complete
-                        doctor[0].first_login_complete = True
-                        db.update(doctor[0])
-                        # Force password reset for security
-                        return redirect(url_for('auth.reset_password', token=token, first_login=True))
-
             # Redirect based on role
             next_page = request.args.get('next')
             if next_page:
@@ -375,11 +352,26 @@ def register_doctor():
 
         # Handle AJAX request to get departments for a hospital
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.args.get('hospital_id'):
-            hospital_id = request.args.get('hospital_id')
-            print(f"AJAX request received for hospital_id: {hospital_id}")
+            hospital_id_str = request.args.get('hospital_id')
+            print(f"AJAX request received for hospital_id: {hospital_id_str}")
             try:
-                # Query departments using the correct hospital_id parameter
-                departments = db.query(Department, hospital_id=hospital_id)
+                # Convert hospital_id string to UUID
+                hospital_id = UUID(hospital_id_str)
+
+                # 1. Find relationships for this hospital
+                hospital_department_rels = db.query(HospitalDepartment, hospital_id=hospital_id)
+                department_ids = [rel.department_id for rel in hospital_department_rels]
+
+                print(f"Found {len(department_ids)} department relationships for hospital {hospital_id}")
+
+                # 2. Fetch actual departments based on found IDs using get_by_id
+                departments = []
+                if department_ids:
+                    for dept_id in department_ids:
+                        dept = db.get_by_id(Department, dept_id)
+                        if dept:
+                            departments.append(dept)
+
 
                 # Debug information
                 print(f"Found {len(departments)} departments for hospital {hospital_id}")
@@ -389,14 +381,37 @@ def register_doctor():
                 # Format departments for JSON response
                 result = [{'id': str(dept.id), 'name': dept.name} for dept in departments]
                 return jsonify(result)
+            except ValueError:
+                print(f"Invalid hospital_id format received: {hospital_id_str}")
+                return jsonify({"error": "Invalid hospital ID format"}), 400
             except Exception as e:
-                print(f"Error fetching departments for hospital {hospital_id}: {str(e)}")
+                print(f"Error fetching departments for hospital {hospital_id_str}: {str(e)}")
                 return jsonify({"error": str(e)}), 500
 
         # If this is a POST request and hospital_id is provided, load departments for form validation
         if request.method == 'POST' and form.hospital_id.data:
-            departments = db.query(Department, hospital_id=form.hospital_id.data)
-            form.department_id.choices = [('', 'Select Department')] + [(str(d.id), d.name) for d in departments]
+            try:
+                hospital_id = UUID(form.hospital_id.data)
+                hospital_department_rels = db.query(HospitalDepartment, hospital_id=hospital_id)
+                department_ids = [rel.department_id for rel in hospital_department_rels]
+
+                # Fetch departments individually for POST validation choices
+                departments = []
+                if department_ids:
+                    for dept_id in department_ids:
+                        dept = db.get_by_id(Department, dept_id)
+                        if dept:
+                            departments.append(dept)
+
+                form.department_id.choices = [('', 'Select Department')] + [(str(d.id), d.name) for d in departments]
+            except ValueError:
+                 print(f"Invalid hospital_id in POST data: {form.hospital_id.data}")
+                 # Keep default choices or set to error state
+                 form.department_id.choices = [('', 'Select Hospital First')]
+            except Exception as e:
+                 print(f"Error loading departments during POST for hospital {form.hospital_id.data}: {str(e)}")
+                 form.department_id.choices = [('', 'Error loading departments')]
+
     except Exception as e:
         # Handle any exceptions gracefully
         form.hospital_id.choices = [('', 'Error loading hospitals')]
@@ -504,9 +519,12 @@ def register_hospital_admin():
         # Initialize hospital choices
         hospitals = db.get_all(Hospital)
         form.hospital_id.choices = [('', 'Select Hospital')] + [(str(h.id), h.name) for h in hospitals]
+        # Also initialize department choices (even if not used for admin, to prevent error)
+        form.department_id.choices = [('', 'Select Department')] # Default empty choice
     except Exception as e:
         # Handle any exceptions gracefully
         form.hospital_id.choices = [('', 'Error loading hospitals')]
+        form.department_id.choices = [('', 'Error loading departments')] # Fallback for department
         print(f"Error loading hospitals: {str(e)}")
 
     if form.validate_on_submit():
@@ -563,7 +581,8 @@ def register_hospital_admin():
                 # Save hospital admin to database
                 saved_admin = db.save(hospital_admin)
 
-                if saved_admin:
+                # Check if the save operation returned a model with an ID
+                if saved_admin and saved_admin.id:
                     # We don't immediately log in hospital admins - they require approval
                     flash('Registration successful! Your Hospital Administrator account requires approval. You will be notified when your account is activated.', 'success')
                     return redirect(url_for('auth.login'))

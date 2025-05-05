@@ -29,6 +29,10 @@ class DepartmentForm(FlaskForm):
     name = StringField('Department Name', validators=[DataRequired(), Length(min=2, max=100)])
     hospital_id = SelectField('Hospital', validators=[DataRequired()], coerce=str)
 
+# Define a simple dummy form for CSRF token generation in modals
+class DummyForm(FlaskForm):
+    pass
+
 @admin_bp.route('/')
 @role_required(['admin'])
 def dashboard():
@@ -549,6 +553,12 @@ def pending_doctors():
 
     pending_doctor_users = find_users_by_role_and_status('doctor', UserStatus.INACTIVE)
 
+    # --- DEBUGGING --- #
+    print(f"\nDEBUG: Found {len(pending_doctor_users)} users with role='doctor' and status='inactive'")
+    for u in pending_doctor_users:
+        print(f"  - User ID: {u.id}, Username: {u.username}, Status: {u.status}")
+    # --- END DEBUGGING --- #
+
     # Get the complete doctor info for each user
     from app.models.database import Doctor
     from app.utils.db import db
@@ -590,10 +600,14 @@ def pending_doctors():
             else:
                 pending_doctors.append(doctor_info)
 
+    # Create an instance of the dummy form
+    dummy_form = DummyForm()
+
     return render_template('admin/pending_doctors.html',
                            pending_doctors=pending_doctors,
                            search_query=search_query,
-                           count=len(pending_doctors))
+                           count=len(pending_doctors),
+                           dummy_form=dummy_form)
 
 @admin_bp.route('/pending-doctors/<user_id>/approve', methods=['POST'])
 @role_required(['admin'])
