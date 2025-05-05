@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.utils.auth import login_required, role_required
 from app.models.database import UserRole, Patient
 from app.utils.db import Database
-from app.utils.audit import audit_decorator, AuditResourceType, AuditActionType
+# from app.utils.audit import audit_decorator, AuditResourceType, AuditActionType # Removed audit import
 from app.utils.validation import patient_validation_rules, ValidationResult
 
 patient_bp = Blueprint('patient', __name__, url_prefix='/patient')
