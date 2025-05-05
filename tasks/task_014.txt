@@ -1,0 +1,32 @@
+# Task ID: 14
+# Title: Implement Doctor EHR Update Functionality
+# Status: pending
+# Dependencies: 13
+# Priority: high
+# Description: Create the interface and backend for doctors to update patient EHR information.
+# Details:
+1. Create edit interfaces for each EHR section:
+   - Diagnoses (add/edit diagnosis codes and descriptions)
+   - Medications (add/edit medications, dosage, frequency)
+   - Allergies (add/edit allergens, reactions, severity)
+   - Procedures (add/edit procedure codes and descriptions)
+   - Vitals (add/edit temperature, pulse, blood pressure, etc.)
+   - Immunizations (add/edit vaccines and dates)
+   - Provider Notes (add/edit clinical notes)
+2. Implement form validation for all fields
+3. Create database update operations
+4. Implement audit logging for EHR changes
+5. Add confirmation dialogs for updates
+6. Create success/error notifications
+7. Implement auto-save functionality where appropriate
+8. Add form reset/cancel functionality
+
+# Test Strategy:
+1. Test adding new entries to each EHR section
+2. Verify editing existing entries works correctly
+3. Test form validation for all fields
+4. Verify database updates are performed correctly
+5. Test audit logging captures all changes
+6. Verify confirmation dialogs work
+7. Test auto-save functionality
+8. Verify form reset/cancel works correctly

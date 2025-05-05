@@ -1,0 +1,26 @@
+# Task ID: 18
+# Title: Implement Patient Appointment Management
+# Status: pending
+# Dependencies: 10
+# Priority: medium
+# Description: Create the interface for patients to reschedule or cancel their appointments.
+# Details:
+1. Enhance patient appointment listing with action buttons (Reschedule, Cancel)
+2. Implement appointment cancellation with confirmation
+3. Create rescheduling interface with available slot selection
+4. Implement validation to ensure rescheduling is only for future appointments
+5. Create database operations for status updates
+6. Implement notification system for appointment changes
+7. Add reason field for cancellations
+8. Create appointment history with status tracking
+9. Implement success/error notifications
+
+# Test Strategy:
+1. Test appointment cancellation flow
+2. Verify confirmation dialog works
+3. Test rescheduling interface
+4. Verify available slots are calculated correctly
+5. Test validation for future appointments only
+6. Verify database updates for status changes
+7. Test notification system
+8. Verify appointment history tracking

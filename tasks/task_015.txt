@@ -1,0 +1,32 @@
+# Task ID: 15
+# Title: Implement Prescription Management
+# Status: pending
+# Dependencies: 14
+# Priority: medium
+# Description: Create the interface for doctors to add and manage prescriptions for patients.
+# Details:
+1. Create prescription form with fields:
+   - Medication name
+   - Dosage
+   - Frequency
+   - Duration
+   - Special instructions
+2. Implement form validation
+3. Create database operations for prescription creation
+4. Implement prescription listing for a patient
+5. Create prescription detail view
+6. Add prescription editing functionality
+7. Implement prescription printing
+8. Create prescription history view
+9. Add medication interaction checking (placeholder for future implementation)
+10. Implement success/error notifications
+
+# Test Strategy:
+1. Test prescription creation with valid data
+2. Verify form validation works
+3. Test prescription listing for patients
+4. Verify prescription detail view displays correctly
+5. Test prescription editing
+6. Verify prescription printing works
+7. Test prescription history view
+8. Verify success/error notifications

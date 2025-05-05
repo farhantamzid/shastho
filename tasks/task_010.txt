@@ -1,0 +1,28 @@
+# Task ID: 10
+# Title: Implement Appointment Viewing for Patients and Doctors
+# Status: pending
+# Dependencies: 9
+# Priority: medium
+# Description: Create interfaces for patients to view their booked appointments and for doctors to view their appointment schedule.
+# Details:
+1. Create patient appointment listing page
+2. Implement filtering by status (upcoming, past, cancelled)
+3. Create detailed appointment view with all information
+4. Implement doctor schedule view by day/week/month
+5. Create appointment details view for doctors
+6. Add patient information display for doctor's view
+7. Implement calendar view for doctor schedule
+8. Create list view alternative for appointments
+9. Add pagination for appointment listings
+10. Implement date navigation for schedule views
+11. Create print functionality for schedules
+
+# Test Strategy:
+1. Test patient appointment listing with filters
+2. Verify appointment details display correctly
+3. Test doctor schedule views (day/week/month)
+4. Verify patient information is displayed correctly for doctors
+5. Test calendar and list view toggles
+6. Verify pagination works with large datasets
+7. Test date navigation in schedule views
+8. Verify print functionality

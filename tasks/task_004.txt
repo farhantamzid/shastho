@@ -1,0 +1,78 @@
+# Task ID: 4
+# Title: Implement Patient Registration
+# Status: done
+# Dependencies: 3
+# Priority: high
+# Description: Create the patient self-registration flow including form, validation, and account creation.
+# Details:
+1. Create patient registration form with fields:
+   - Username/Email
+   - Password (with confirmation)
+   - Full Name
+   - Date of Birth
+   - Gender
+   - Contact Number
+   - Address
+   - Emergency Contact Name
+   - Emergency Contact Number
+2. Implement client-side form validation using HTML5 and JavaScript
+3. Create server-side validation for all fields
+4. Implement user creation in the database with role='patient' and status='active'
+5. Create patient record linked to user account
+6. Implement success/error handling and appropriate redirects
+7. Create email/username uniqueness check
+8. Add password strength requirements
+9. Create registration success page
+
+# Test Strategy:
+1. Test form submission with valid data
+2. Test form validation for all required fields
+3. Test email/username uniqueness validation
+4. Verify password strength requirements
+5. Test successful account creation in database
+6. Verify patient record is created and linked to user account
+7. Test error handling for invalid submissions
+
+# Subtasks:
+## 1. Create patient registration form [done]
+### Dependencies: None
+### Description: Modify the existing registration form to include all required patient fields
+### Details:
+
+
+## 2. Implement client-side validation [done]
+### Dependencies: None
+### Description: Add client-side form validation for all patient fields using HTML5 and JavaScript
+### Details:
+
+
+## 3. Create server-side validation [done]
+### Dependencies: None
+### Description: Implement server-side validation for all patient registration fields in the auth route
+### Details:
+
+
+## 4. Implement user creation with patient role [done]
+### Dependencies: None
+### Description: Modify user creation logic to handle patient registration and set role='patient'
+### Details:
+
+
+## 5. Create patient record with user data [done]
+### Dependencies: None
+### Description: Create Patient model instance linked to the User account after successful registration
+### Details:
+
+
+## 6. Implement success/error handling and redirects [done]
+### Dependencies: None
+### Description: Add proper success and error messages with appropriate redirects after registration
+### Details:
+
+
+## 7. Create registration success page [done]
+### Dependencies: None
+### Description: Design and implement a registration success page for patients
+### Details:
+
+

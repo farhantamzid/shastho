@@ -1,0 +1,112 @@
+# Task ID: 11
+# Title: Design and Implement EHR Data Models
+# Status: done
+# Dependencies: 2
+# Priority: high
+# Description: Create the database schema and models for the Electronic Health Record (EHR) system.
+# Details:
+1. Design and implement the following EHR-related tables in Supabase:
+   - `EHR`: id, patient_id (FK), created_at, updated_at
+   - `EHR_Visits`: id, ehr_id (FK), date, time, visit_type, provider_id (FK), chief_complaint
+   - `EHR_Diagnoses`: id, visit_id (FK), diagnosis_code, diagnosis_description, diagnosed_by (FK), diagnosed_at
+   - `EHR_Medications`: id, visit_id (FK), medication_name, dosage, frequency, start_date, end_date, prescribed_by (FK), prescribed_at
+   - `EHR_Allergies`: id, ehr_id (FK), allergen, reaction, severity, noted_at, noted_by (FK)
+   - `EHR_Procedures`: id, visit_id (FK), procedure_code, procedure_description, performed_by (FK), performed_at
+   - `EHR_Vitals`: id, visit_id (FK), temperature, pulse, blood_pressure, respiratory_rate, recorded_at, recorded_by (FK)
+   - `EHR_Immunizations`: id, ehr_id (FK), vaccine, date_administered, administered_by (FK)
+   - `EHR_TestResults`: id, ehr_id (FK), test_type, test_date, result_data, file_path, uploaded_by (FK), uploaded_at
+   - `EHR_ProviderNotes`: id, visit_id (FK), note_text, created_by (FK), created_at
+   - `Prescriptions`: id, visit_id (FK), medication_name, dosage, frequency, instructions, prescribed_by (FK), prescribed_at
+2. Create appropriate indexes for performance
+3. Set up foreign key constraints
+4. Create database migration scripts
+5. Implement database models in Python that correspond to these tables
+
+# Test Strategy:
+1. Verify all tables are created correctly in Supabase
+2. Test foreign key constraints
+3. Create test data for each EHR-related table
+4. Verify Python models can interact with the database correctly
+5. Test basic CRUD operations for each EHR model
+6. Verify relationships between tables work correctly
+
+# Subtasks:
+## 1. Create EHR Database Schema Migrations [done]
+### Dependencies: None
+### Description: Create migration scripts for all EHR-related tables in Supabase
+### Details:
+Create the migration scripts to establish the database schema for the EHR system, including all tables, indexes, and constraints as outlined in the task. The migration should include:
+1. EHR table and essential relationships
+2. EHR_Visits table with appropriate foreign keys
+3. EHR_Diagnoses with diagnosis information
+4. EHR_Medications for prescription records
+5. EHR_Allergies for patient allergy information
+6. EHR_Procedures for medical procedures
+7. EHR_Vitals for patient vital sign records
+8. EHR_Immunizations for vaccination records
+9. EHR_TestResults for lab and other test results
+10. EHR_ProviderNotes for clinical documentation
+11. Prescriptions table for prescription management
+
+## 2. Implement Python EHR Models [done]
+### Dependencies: 11.1
+### Description: Create Python model classes for all EHR-related entities
+### Details:
+Develop Python model classes for all EHR-related entities that correspond to the database tables. Each model should include:
+1. Appropriate properties/fields matching database columns
+2. Class initialization method with proper typing
+3. to_dict() method for serialization
+4. from_dict() class method for deserialization
+5. Any necessary validation logic
+
+Models to implement:
+- EHR
+- EHR_Visit
+- EHR_Diagnosis
+- EHR_Medication
+- EHR_Allergy
+- EHR_Procedure
+- EHR_Vital
+- EHR_Immunization
+- EHR_TestResult
+- EHR_ProviderNote
+- Prescription
+
+## 3. Update Database Utility Class [done]
+### Dependencies: 11.2
+### Description: Update the Database class to handle the new EHR models
+### Details:
+Update the Database utility class in app/utils/db.py to support CRUD operations for the new EHR models:
+
+1. Add the new EHR models to the _get_table_name method mapping
+2. Implement any specialized query methods for EHR data retrieval, such as:
+   - get_ehr_by_patient_id
+   - get_visits_by_ehr_id
+   - get_diagnoses_by_visit_id
+   - get_medications_by_visit_id
+   - get_allergies_by_ehr_id
+   - get_procedures_by_visit_id
+   - get_vitals_by_visit_id
+   - get_immunizations_by_ehr_id
+   - get_test_results_by_ehr_id
+   - get_provider_notes_by_visit_id
+   - get_prescriptions_by_visit_id
+
+Ensure all methods are properly typed and documented with docstrings.
+
+## 4. Create Test Data and Verification [done]
+### Dependencies: 11.3
+### Description: Create test data and implement verification for EHR models
+### Details:
+Create test data to verify the correct implementation of the EHR models and database operations:
+
+1. Create test data for each EHR-related table
+2. Implement tests to verify:
+   - Foreign key constraints work correctly
+   - Basic CRUD operations function properly for each model
+   - Relationships between tables are established correctly
+   - Indexes are created and performing correctly
+   - Query performance is acceptable
+
+Document all tests and their results, including any performance metrics or issues encountered.
+

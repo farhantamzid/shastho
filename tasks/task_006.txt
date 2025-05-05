@@ -1,0 +1,77 @@
+# Task ID: 6
+# Title: Implement Doctor Application and Approval Workflow
+# Status: done
+# Dependencies: 3, 5
+# Priority: medium
+# Description: Create the doctor application form and the System Admin approval workflow for doctor accounts.
+# Details:
+1. Create doctor application form with fields:
+   - Email
+   - Password
+   - Full Name
+   - Specialization
+   - Credentials/Qualifications
+   - Contact Number
+   - Hospital (select from existing)
+   - Department (filtered by selected hospital)
+2. Implement form validation
+3. Create database entry with role='doctor' and status='pending'
+4. Create System Admin interface to view pending doctor applications
+5. Implement approval/rejection functionality
+6. Doctor accounts remain on hold until admin approval.
+7. Create doctor account activation process upon admin approval.
+8. Add notes/comments field for admin during approval process
+9. Implement listing of all doctor applications with status filters
+
+# Test Strategy:
+1. Test doctor application submission
+2. Verify pending applications appear in admin portal
+3. Test approval process activates doctor account
+4. Test rejection process
+5. Verify doctor listing with different status filters
+6. Test form validation for all required fields
+7. Verify doctors can set their own passwords during registration
+
+# Subtasks:
+## 1. Design Doctor Application Form [done]
+### Dependencies: None
+### Description: Create the UI and data structure for the doctor application form, including fields for personal information, qualifications, and contact details.
+### Details:
+Define all necessary fields, input types, and validation rules for the application form.
+
+## 2. Implement Application Submission [done]
+### Dependencies: 6.1
+### Description: Develop the backend logic to handle the submission of the application form data and store it in the database.
+### Details:
+Implement data validation, sanitization, and secure storage of application data.
+
+## 3. Implement Doctor Account Creation [done]
+### Dependencies: 6.2
+### Description: Develop the functionality for doctors to create accounts with their own passwords upon application submission.
+### Details:
+Implement secure password hashing and store account information in the database with a 'pending' status.
+
+## 4. Design Admin Review Interface [done]
+### Dependencies: None
+### Description: Create the UI for administrators to review submitted doctor applications.
+### Details:
+Include features for viewing application details, approving, or rejecting applications.
+
+## 5. Implement Application Retrieval for Admin [done]
+### Dependencies: 6.4
+### Description: Develop the backend logic to retrieve pending doctor applications and display them in the admin review interface.
+### Details:
+Implement filtering and sorting options for efficient application review.
+
+## 6. Implement Approval/Rejection Logic [done]
+### Dependencies: 6.5
+### Description: Develop the backend logic to handle the approval or rejection of doctor applications by administrators.
+### Details:
+Update the doctor's account status in the database based on the admin's decision.
+
+## 8. Implement First-Time Login Experience [done]
+### Dependencies: 6.6
+### Description: Design and implement the first-time login experience for approved doctors, including password reset if needed.
+### Details:
+Guide approved doctors through the initial setup process after their account is activated.
+

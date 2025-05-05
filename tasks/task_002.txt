@@ -1,0 +1,26 @@
+# Task ID: 2
+# Title: Design and Implement Database Schema
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create the database schema for all core entities including Users, Patients, Doctors, Hospitals, Departments, and their relationships.
+# Details:
+1. Design and implement the following tables in Supabase:
+   - `Users`: id, username, password_hash, role, status, created_at, updated_at
+   - `Patients`: id, user_id (FK), full_name, date_of_birth, gender, contact_number, address, emergency_contact_name, emergency_contact_number
+   - `Doctors`: id, user_id (FK), full_name, specialization, credentials, hospital_id (FK), department_id (FK), contact_number
+   - `Hospitals`: id, name, location, address, contact_number
+   - `Departments`: id, name, hospital_id (FK)
+   - `DoctorAvailabilitySlots`: id, doctor_id (FK), day_of_week, start_time, end_time, is_available
+   - `Appointments`: id, patient_id (FK), doctor_id (FK), hospital_id (FK), department_id (FK), date, time_slot, status, created_at
+2. Create appropriate indexes for performance
+3. Set up foreign key constraints
+4. Create database migration scripts
+5. Implement database models in Python that correspond to these tables
+
+# Test Strategy:
+1. Verify all tables are created correctly in Supabase
+2. Test foreign key constraints
+3. Create test data for each table
+4. Verify Python models can interact with the database correctly
+5. Test basic CRUD operations for each model

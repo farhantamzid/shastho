@@ -1,0 +1,30 @@
+# Task ID: 19
+# Title: Implement Feedback and Review System
+# Status: pending
+# Dependencies: 10
+# Priority: low
+# Description: Create the system for patients to submit feedback for doctors, hospitals, or appointments.
+# Details:
+1. Design and implement Feedback database model
+2. Create feedback submission form with fields:
+   - Target type (Doctor, Hospital, Appointment)
+   - Target selection (based on type)
+   - Rating (1-5 stars)
+   - Comments
+3. Implement form validation
+4. Create database operations for feedback submission
+5. Implement Hospital Admin feedback viewing interface
+6. Create filtering and sorting for feedback listings
+7. Implement feedback statistics/summary view
+8. Add feedback history for patients
+9. Create success/error notifications
+
+# Test Strategy:
+1. Test feedback submission for different target types
+2. Verify form validation works
+3. Test feedback storage in database
+4. Verify Hospital Admin feedback viewing
+5. Test filtering and sorting
+6. Verify statistics/summary calculations
+7. Test feedback history for patients
+8. Verify success/error notifications

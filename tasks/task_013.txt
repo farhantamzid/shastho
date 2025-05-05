@@ -1,0 +1,28 @@
+# Task ID: 13
+# Title: Implement Doctor EHR Search and View
+# Status: pending
+# Dependencies: 7, 11
+# Priority: high
+# Description: Create the interface for doctors to search for patients by ID and view their EHR.
+# Details:
+1. Create patient search interface for doctors
+2. Implement patient ID search functionality
+3. Create patient EHR overview for doctors
+4. Implement tabbed interface similar to patient view but with edit capabilities
+5. Create patient history summary view
+6. Implement chronological display of patient visits
+7. Add filtering capabilities for EHR sections
+8. Create detailed view for individual entries
+9. Implement test result viewing
+10. Add print functionality for EHR sections
+11. Create breadcrumb navigation
+
+# Test Strategy:
+1. Test patient search by ID
+2. Verify EHR overview displays correctly
+3. Test navigation between different EHR sections
+4. Verify chronological display of visits
+5. Test filtering in each section
+6. Verify detailed view for entries
+7. Test test result viewing
+8. Verify print functionality works

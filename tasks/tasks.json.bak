@@ -1,0 +1,833 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup Project Structure and Environment",
+      "description": "Set up the basic structure for a Flask application with Tailwind CSS integration and Supabase connection within the existing Git repository, following design patterns from frontendExamples/.",
+      "status": "done",
+      "dependencies": [
+        "26"
+      ],
+      "priority": "high",
+      "details": "1. Use the existing Git repository structure\n2. Set up virtual environment for Python\n3. Install Flask and required packages (flask, python-dotenv, supabase, psycopg2-binary)\n4. Configure Tailwind CSS with the project\n   - Review frontendExamples/ to identify design conventions\n   - Set up Tailwind configuration to match design patterns\n   - Create reusable Tailwind CSS patterns/classes based on examples\n5. Create or update basic folder structure:\n   - `/app` - Main application code\n   - `/app/static` - Static files (CSS, JS)\n   - `/app/templates` - HTML templates\n   - `/app/models` - Database models\n   - `/app/routes` - API routes\n   - `/app/services` - Business logic\n   - `/app/utils` - Utility functions\n   - `/app/components` - Reusable UI components following frontendExamples/ patterns\n6. Create configuration files (.env, .gitignore, requirements.txt)\n7. Setup basic Flask application entry point (app.py)\n8. Configure Supabase connection\n9. Create a simple home page to verify setup\n   - Implement using design conventions from frontendExamples/\n   - Include examples of reusable components/patterns\n10. Document design patterns extracted from frontendExamples/ for team reference",
+      "testStrategy": "1. Verify all dependencies install correctly\n2. Ensure Flask server starts without errors\n3. Confirm Tailwind CSS compiles correctly and matches design conventions\n4. Test Supabase connection\n5. Verify the home page renders correctly and follows design patterns\n6. Validate that reusable Tailwind CSS patterns/classes work as expected\n7. Compare implemented components with frontendExamples/ to ensure consistency",
+      "subtasks": []
+    },
+    {
+      "id": 2,
+      "title": "Design and Implement Database Schema",
+      "description": "Create the database schema for all core entities including Users, Patients, Doctors, Hospitals, Departments, and their relationships.",
+      "details": "1. Design and implement the following tables in Supabase:\n   - `Users`: id, username, password_hash, role, status, created_at, updated_at\n   - `Patients`: id, user_id (FK), full_name, date_of_birth, gender, contact_number, address, emergency_contact_name, emergency_contact_number\n   - `Doctors`: id, user_id (FK), full_name, specialization, credentials, hospital_id (FK), department_id (FK), contact_number\n   - `Hospitals`: id, name, location, address, contact_number\n   - `Departments`: id, name, hospital_id (FK)\n   - `DoctorAvailabilitySlots`: id, doctor_id (FK), day_of_week, start_time, end_time, is_available\n   - `Appointments`: id, patient_id (FK), doctor_id (FK), hospital_id (FK), department_id (FK), date, time_slot, status, created_at\n2. Create appropriate indexes for performance\n3. Set up foreign key constraints\n4. Create database migration scripts\n5. Implement database models in Python that correspond to these tables",
+      "testStrategy": "1. Verify all tables are created correctly in Supabase\n2. Test foreign key constraints\n3. Create test data for each table\n4. Verify Python models can interact with the database correctly\n5. Test basic CRUD operations for each model",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 3,
+      "title": "Implement User Authentication System",
+      "description": "Create a simple database-based authentication system for user login, logout, and session management, ensuring frontend components follow design patterns from frontendExamples/.",
+      "status": "done",
+      "dependencies": [
+        2
+      ],
+      "priority": "high",
+      "details": "1. Create User model with password hashing using bcrypt\n2. Implement login route that validates credentials against database\n3. Create session management using Flask-Session\n4. Implement logout functionality\n5. Create middleware for role-based access control\n6. Implement decorators for route protection based on user roles\n7. Create utility functions for password generation (for admin-created accounts)\n8. Set up password hashing and verification functions\n9. Create login form template with username/password fields following design patterns in frontendExamples/\n10. Implement CSRF protection\n11. Create error handling for authentication failures\n12. Ensure registration form follows design conventions in frontendExamples/\n13. Apply consistent styling to authentication components matching frontendExamples/ design patterns\n14. Implement responsive design for authentication forms as shown in frontendExamples/",
+      "testStrategy": "1. Test user creation with password hashing\n2. Verify login with correct and incorrect credentials\n3. Test session creation and persistence\n4. Verify logout functionality clears session\n5. Test role-based access control for different user types\n6. Verify CSRF protection works correctly\n7. Test password generation utility\n8. Verify frontend authentication components match design patterns from frontendExamples/\n9. Test responsive behavior of authentication forms on different screen sizes\n10. Validate that error messages display according to design conventions",
+      "subtasks": []
+    },
+    {
+      "id": 4,
+      "title": "Implement Patient Registration",
+      "description": "Create the patient self-registration flow including form, validation, and account creation.",
+      "details": "1. Create patient registration form with fields:\n   - Username/Email\n   - Password (with confirmation)\n   - Full Name\n   - Date of Birth\n   - Gender\n   - Contact Number\n   - Address\n   - Emergency Contact Name\n   - Emergency Contact Number\n2. Implement client-side form validation using HTML5 and JavaScript\n3. Create server-side validation for all fields\n4. Implement user creation in the database with role='patient' and status='active'\n5. Create patient record linked to user account\n6. Implement success/error handling and appropriate redirects\n7. Create email/username uniqueness check\n8. Add password strength requirements\n9. Create registration success page",
+      "testStrategy": "1. Test form submission with valid data\n2. Test form validation for all required fields\n3. Test email/username uniqueness validation\n4. Verify password strength requirements\n5. Test successful account creation in database\n6. Verify patient record is created and linked to user account\n7. Test error handling for invalid submissions",
+      "priority": "high",
+      "dependencies": [
+        3
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create patient registration form",
+          "description": "Modify the existing registration form to include all required patient fields",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 4
+        },
+        {
+          "id": 2,
+          "title": "Implement client-side validation",
+          "description": "Add client-side form validation for all patient fields using HTML5 and JavaScript",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 4
+        },
+        {
+          "id": 3,
+          "title": "Create server-side validation",
+          "description": "Implement server-side validation for all patient registration fields in the auth route",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 4
+        },
+        {
+          "id": 4,
+          "title": "Implement user creation with patient role",
+          "description": "Modify user creation logic to handle patient registration and set role='patient'",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 4
+        },
+        {
+          "id": 5,
+          "title": "Create patient record with user data",
+          "description": "Create Patient model instance linked to the User account after successful registration",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 4
+        },
+        {
+          "id": 6,
+          "title": "Implement success/error handling and redirects",
+          "description": "Add proper success and error messages with appropriate redirects after registration",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 4
+        },
+        {
+          "id": 7,
+          "title": "Create registration success page",
+          "description": "Design and implement a registration success page for patients",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 4
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Implement System Admin Portal - Hospital Management",
+      "description": "Create the System Admin interface for managing hospitals and departments in the system.",
+      "details": "1. Create System Admin dashboard template\n2. Implement hospital listing page with search and filter options\n3. Create hospital creation form with fields (name, location, address, contact)\n4. Implement hospital edit functionality\n5. Create department management interface (create, edit, delete)\n6. Implement department-hospital relationship management\n7. Add data validation for all forms\n8. Create success/error notifications\n9. Implement pagination for hospital and department listings\n10. Add confirmation dialogs for delete operations\n11. Create breadcrumb navigation for admin portal",
+      "testStrategy": "1. Test hospital creation with valid data\n2. Test hospital editing functionality\n3. Verify hospital listing with search and filters\n4. Test department creation and association with hospitals\n5. Test department editing and deletion\n6. Verify validation works for all form fields\n7. Test pagination with large datasets\n8. Verify breadcrumb navigation works correctly",
+      "priority": "medium",
+      "dependencies": [
+        3
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create System Admin Dashboard Template",
+          "description": "Implement the base dashboard template for the System Admin portal with navigation and layout",
+          "details": "1. Create admin dashboard layout template with sidebar navigation\n2. Design page header with title and breadcrumb area\n3. Implement navigation menu with links to hospital and department management\n4. Add dashboard overview section with summary statistics\n5. Ensure responsive design for all device sizes\n6. Create consistent styling following the project's design patterns",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 5
+        },
+        {
+          "id": 2,
+          "title": "Implement Hospital Management Interface",
+          "description": "Create interfaces for listing, creating, and editing hospital records",
+          "details": "1. Implement hospital listing page showing all hospitals in a table\n2. Add search functionality by hospital name and location\n3. Create filters for sorting and filtering hospitals\n4. Design hospital creation form with fields:\n   - Name\n   - Location\n   - Address\n   - Contact Number\n5. Implement form validation for all hospital fields\n6. Create hospital edit functionality that pre-populates form with existing data\n7. Add hospital deletion with confirmation dialog\n8. Implement pagination for hospital listings\n9. Add success/error notifications for all hospital operations",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 5
+        },
+        {
+          "id": 3,
+          "title": "Implement Department Management Interface",
+          "description": "Create interfaces for listing, creating, and editing department records and their hospital associations",
+          "details": "1. Implement department listing page showing all departments in a table\n2. Include hospital association in department listing\n3. Add search and filter functionality for departments\n4. Design department creation form with fields:\n   - Name\n   - Hospital (dropdown selection)\n5. Implement form validation for all department fields\n6. Create department edit functionality that pre-populates form with existing data\n7. Add department deletion with confirmation dialog\n8. Implement pagination for department listings\n9. Add success/error notifications for all department operations\n10. Create hospital-department relationship management interface\n11. Implement validation to prevent orphaned departments (departments without hospitals)",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 5
+        },
+        {
+          "id": 4,
+          "title": "Implement Common UI Components and Navigation",
+          "description": "Create reusable UI components, notifications, and navigation elements for the admin portal",
+          "details": "1. Create breadcrumb navigation component for admin portal\n2. Implement reusable confirmation dialog component for delete operations\n3. Design standardized success/error notification system\n4. Create pagination component for data tables\n5. Implement search component that can be reused across admin interfaces\n6. Add filter components for data tables\n7. Ensure all components are responsive and follow the project's design patterns\n8. Implement form validation helpers and error display\n9. Create loading indicators for asynchronous operations",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 5
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Implement Doctor Application and Approval Workflow",
+      "description": "Create the doctor application form and the System Admin approval workflow for doctor accounts.",
+      "status": "done",
+      "dependencies": [
+        3,
+        5
+      ],
+      "priority": "medium",
+      "details": "1. Create doctor application form with fields:\n   - Email\n   - Password\n   - Full Name\n   - Specialization\n   - Credentials/Qualifications\n   - Contact Number\n   - Hospital (select from existing)\n   - Department (filtered by selected hospital)\n2. Implement form validation\n3. Create database entry with role='doctor' and status='pending'\n4. Create System Admin interface to view pending doctor applications\n5. Implement approval/rejection functionality\n6. Doctor accounts remain on hold until admin approval.\n7. Create doctor account activation process upon admin approval.\n8. Add notes/comments field for admin during approval process\n9. Implement listing of all doctor applications with status filters",
+      "testStrategy": "1. Test doctor application submission\n2. Verify pending applications appear in admin portal\n3. Test approval process activates doctor account\n4. Test rejection process\n5. Verify doctor listing with different status filters\n6. Test form validation for all required fields\n7. Verify doctors can set their own passwords during registration",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Design Doctor Application Form",
+          "description": "Create the UI and data structure for the doctor application form, including fields for personal information, qualifications, and contact details.",
+          "dependencies": [],
+          "details": "Define all necessary fields, input types, and validation rules for the application form.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Implement Application Submission",
+          "description": "Develop the backend logic to handle the submission of the application form data and store it in the database.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implement data validation, sanitization, and secure storage of application data.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Implement Doctor Account Creation",
+          "description": "Develop the functionality for doctors to create accounts with their own passwords upon application submission.",
+          "dependencies": [
+            2
+          ],
+          "details": "Implement secure password hashing and store account information in the database with a 'pending' status.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Design Admin Review Interface",
+          "description": "Create the UI for administrators to review submitted doctor applications.",
+          "dependencies": [],
+          "details": "Include features for viewing application details, approving, or rejecting applications.",
+          "status": "done"
+        },
+        {
+          "id": 5,
+          "title": "Implement Application Retrieval for Admin",
+          "description": "Develop the backend logic to retrieve pending doctor applications and display them in the admin review interface.",
+          "dependencies": [
+            4
+          ],
+          "details": "Implement filtering and sorting options for efficient application review.",
+          "status": "done"
+        },
+        {
+          "id": 6,
+          "title": "Implement Approval/Rejection Logic",
+          "description": "Develop the backend logic to handle the approval or rejection of doctor applications by administrators.",
+          "dependencies": [
+            5
+          ],
+          "details": "Update the doctor's account status in the database based on the admin's decision.",
+          "status": "done"
+        },
+        {
+          "id": 8,
+          "title": "Implement First-Time Login Experience",
+          "description": "Design and implement the first-time login experience for approved doctors, including password reset if needed.",
+          "dependencies": [
+            6
+          ],
+          "details": "Guide approved doctors through the initial setup process after their account is activated.",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Implement Doctor Profile",
+      "description": "Create the doctor profile setup and management functionality.",
+      "status": "pending",
+      "dependencies": [
+        6
+      ],
+      "priority": "medium",
+      "details": "1. Create doctor dashboard template\n2. Create doctor profile page with fields:\n   - Personal Information (Name, Contact)\n   - Professional Details (Specialization, Credentials)\n   - Hospital and Department selection\n3. Implement profile update functionality\n4. Add validation for all profile fields\n5. Create success/error notifications\n6. Add profile completeness indicator",
+      "testStrategy": "1. Verify profile update functionality\n2. Test hospital and department selection\n3. Verify validation for all profile fields\n4. Test profile completeness indicator",
+      "subtasks": []
+    },
+    {
+      "id": 8,
+      "title": "Implement Doctor Availability Management",
+      "description": "Create the interface for doctors to set their availability schedule and time slots.",
+      "details": "1. Design and implement the doctor availability management interface\n2. Create weekly schedule view with time slots\n3. Implement functionality to mark slots as available/unavailable\n4. Create recurring schedule templates\n5. Implement bulk actions (mark all, clear all)\n6. Add validation to prevent conflicting schedules\n7. Create database operations to store availability in DoctorAvailabilitySlots\n8. Implement date range selection for availability\n9. Add time slot duration configuration\n10. Create visual calendar view of availability\n11. Implement save/cancel functionality with confirmation",
+      "testStrategy": "1. Test marking individual slots as available/unavailable\n2. Verify bulk actions work correctly\n3. Test saving availability to database\n4. Verify conflict validation works\n5. Test recurring schedule creation\n6. Verify calendar view displays availability correctly\n7. Test date range selection\n8. Verify time slot duration configuration",
+      "priority": "medium",
+      "dependencies": [
+        7
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 9,
+      "title": "Implement Patient Appointment Booking Flow",
+      "description": "Create the patient interface for searching and booking appointments with doctors.",
+      "details": "1. Create appointment booking interface\n2. Implement hospital selection dropdown\n3. Create department selection (filtered by selected hospital)\n4. Implement doctor selection (filtered by selected department)\n5. Create date selection with calendar interface\n6. Implement available time slot display based on doctor availability\n7. Create appointment confirmation screen with details\n8. Implement appointment creation in database\n9. Add validation to prevent double-booking\n10. Create success/error notifications\n11. Implement appointment summary view after booking\n12. Add breadcrumb navigation for booking flow",
+      "testStrategy": "1. Test complete booking flow from hospital to confirmation\n2. Verify filtering works for departments and doctors\n3. Test available slot calculation based on doctor availability\n4. Verify appointment is created correctly in database\n5. Test double-booking prevention\n6. Verify success notifications and summary view\n7. Test breadcrumb navigation\n8. Verify calendar interface works correctly",
+      "priority": "high",
+      "dependencies": [
+        4,
+        8
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 10,
+      "title": "Implement Appointment Viewing for Patients and Doctors",
+      "description": "Create interfaces for patients to view their booked appointments and for doctors to view their appointment schedule.",
+      "details": "1. Create patient appointment listing page\n2. Implement filtering by status (upcoming, past, cancelled)\n3. Create detailed appointment view with all information\n4. Implement doctor schedule view by day/week/month\n5. Create appointment details view for doctors\n6. Add patient information display for doctor's view\n7. Implement calendar view for doctor schedule\n8. Create list view alternative for appointments\n9. Add pagination for appointment listings\n10. Implement date navigation for schedule views\n11. Create print functionality for schedules",
+      "testStrategy": "1. Test patient appointment listing with filters\n2. Verify appointment details display correctly\n3. Test doctor schedule views (day/week/month)\n4. Verify patient information is displayed correctly for doctors\n5. Test calendar and list view toggles\n6. Verify pagination works with large datasets\n7. Test date navigation in schedule views\n8. Verify print functionality",
+      "priority": "medium",
+      "dependencies": [
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 11,
+      "title": "Design and Implement EHR Data Models",
+      "description": "Create the database schema and models for the Electronic Health Record (EHR) system.",
+      "details": "1. Design and implement the following EHR-related tables in Supabase:\n   - `EHR`: id, patient_id (FK), created_at, updated_at\n   - `EHR_Visits`: id, ehr_id (FK), date, time, visit_type, provider_id (FK), chief_complaint\n   - `EHR_Diagnoses`: id, visit_id (FK), diagnosis_code, diagnosis_description, diagnosed_by (FK), diagnosed_at\n   - `EHR_Medications`: id, visit_id (FK), medication_name, dosage, frequency, start_date, end_date, prescribed_by (FK), prescribed_at\n   - `EHR_Allergies`: id, ehr_id (FK), allergen, reaction, severity, noted_at, noted_by (FK)\n   - `EHR_Procedures`: id, visit_id (FK), procedure_code, procedure_description, performed_by (FK), performed_at\n   - `EHR_Vitals`: id, visit_id (FK), temperature, pulse, blood_pressure, respiratory_rate, recorded_at, recorded_by (FK)\n   - `EHR_Immunizations`: id, ehr_id (FK), vaccine, date_administered, administered_by (FK)\n   - `EHR_TestResults`: id, ehr_id (FK), test_type, test_date, result_data, file_path, uploaded_by (FK), uploaded_at\n   - `EHR_ProviderNotes`: id, visit_id (FK), note_text, created_by (FK), created_at\n   - `Prescriptions`: id, visit_id (FK), medication_name, dosage, frequency, instructions, prescribed_by (FK), prescribed_at\n2. Create appropriate indexes for performance\n3. Set up foreign key constraints\n4. Create database migration scripts\n5. Implement database models in Python that correspond to these tables",
+      "testStrategy": "1. Verify all tables are created correctly in Supabase\n2. Test foreign key constraints\n3. Create test data for each EHR-related table\n4. Verify Python models can interact with the database correctly\n5. Test basic CRUD operations for each EHR model\n6. Verify relationships between tables work correctly",
+      "priority": "high",
+      "dependencies": [
+        2
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create EHR Database Schema Migrations",
+          "description": "Create migration scripts for all EHR-related tables in Supabase",
+          "details": "Create the migration scripts to establish the database schema for the EHR system, including all tables, indexes, and constraints as outlined in the task. The migration should include:\n1. EHR table and essential relationships\n2. EHR_Visits table with appropriate foreign keys\n3. EHR_Diagnoses with diagnosis information\n4. EHR_Medications for prescription records\n5. EHR_Allergies for patient allergy information\n6. EHR_Procedures for medical procedures\n7. EHR_Vitals for patient vital sign records\n8. EHR_Immunizations for vaccination records\n9. EHR_TestResults for lab and other test results\n10. EHR_ProviderNotes for clinical documentation\n11. Prescriptions table for prescription management",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 11
+        },
+        {
+          "id": 2,
+          "title": "Implement Python EHR Models",
+          "description": "Create Python model classes for all EHR-related entities",
+          "details": "Develop Python model classes for all EHR-related entities that correspond to the database tables. Each model should include:\n1. Appropriate properties/fields matching database columns\n2. Class initialization method with proper typing\n3. to_dict() method for serialization\n4. from_dict() class method for deserialization\n5. Any necessary validation logic\n\nModels to implement:\n- EHR\n- EHR_Visit\n- EHR_Diagnosis\n- EHR_Medication\n- EHR_Allergy\n- EHR_Procedure\n- EHR_Vital\n- EHR_Immunization\n- EHR_TestResult\n- EHR_ProviderNote\n- Prescription",
+          "status": "done",
+          "dependencies": [
+            1
+          ],
+          "parentTaskId": 11
+        },
+        {
+          "id": 3,
+          "title": "Update Database Utility Class",
+          "description": "Update the Database class to handle the new EHR models",
+          "details": "Update the Database utility class in app/utils/db.py to support CRUD operations for the new EHR models:\n\n1. Add the new EHR models to the _get_table_name method mapping\n2. Implement any specialized query methods for EHR data retrieval, such as:\n   - get_ehr_by_patient_id\n   - get_visits_by_ehr_id\n   - get_diagnoses_by_visit_id\n   - get_medications_by_visit_id\n   - get_allergies_by_ehr_id\n   - get_procedures_by_visit_id\n   - get_vitals_by_visit_id\n   - get_immunizations_by_ehr_id\n   - get_test_results_by_ehr_id\n   - get_provider_notes_by_visit_id\n   - get_prescriptions_by_visit_id\n\nEnsure all methods are properly typed and documented with docstrings.",
+          "status": "done",
+          "dependencies": [
+            2
+          ],
+          "parentTaskId": 11
+        },
+        {
+          "id": 4,
+          "title": "Create Test Data and Verification",
+          "description": "Create test data and implement verification for EHR models",
+          "details": "Create test data to verify the correct implementation of the EHR models and database operations:\n\n1. Create test data for each EHR-related table\n2. Implement tests to verify:\n   - Foreign key constraints work correctly\n   - Basic CRUD operations function properly for each model\n   - Relationships between tables are established correctly\n   - Indexes are created and performing correctly\n   - Query performance is acceptable\n\nDocument all tests and their results, including any performance metrics or issues encountered.",
+          "status": "done",
+          "dependencies": [
+            3
+          ],
+          "parentTaskId": 11
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Implement Patient EHR View",
+      "description": "Create the patient interface for viewing their own Electronic Health Record.",
+      "details": "1. Create EHR dashboard for patients\n2. Implement tabbed interface for different EHR sections:\n   - Overview/Summary\n   - Visit History\n   - Diagnoses\n   - Medications/Prescriptions\n   - Allergies\n   - Procedures\n   - Vitals\n   - Immunizations\n   - Test Results\n3. Create read-only views for each section\n4. Implement chronological sorting of entries\n5. Add filtering capabilities for each section\n6. Create detailed view for individual entries\n7. Implement test result file viewing/download\n8. Add print functionality for EHR sections\n9. Create breadcrumb navigation\n10. Implement responsive design for mobile viewing",
+      "testStrategy": "1. Test EHR dashboard loads correctly for patients\n2. Verify all tabs display appropriate data\n3. Test chronological sorting in each section\n4. Verify filtering works correctly\n5. Test detailed view for individual entries\n6. Verify test result file viewing/download\n7. Test print functionality\n8. Verify responsive design on different screen sizes",
+      "priority": "medium",
+      "dependencies": [
+        4,
+        11
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 13,
+      "title": "Implement Doctor EHR Search and View",
+      "description": "Create the interface for doctors to search for patients by ID and view their EHR.",
+      "details": "1. Create patient search interface for doctors\n2. Implement patient ID search functionality\n3. Create patient EHR overview for doctors\n4. Implement tabbed interface similar to patient view but with edit capabilities\n5. Create patient history summary view\n6. Implement chronological display of patient visits\n7. Add filtering capabilities for EHR sections\n8. Create detailed view for individual entries\n9. Implement test result viewing\n10. Add print functionality for EHR sections\n11. Create breadcrumb navigation",
+      "testStrategy": "1. Test patient search by ID\n2. Verify EHR overview displays correctly\n3. Test navigation between different EHR sections\n4. Verify chronological display of visits\n5. Test filtering in each section\n6. Verify detailed view for entries\n7. Test test result viewing\n8. Verify print functionality works",
+      "priority": "high",
+      "dependencies": [
+        7,
+        11
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 14,
+      "title": "Implement Doctor EHR Update Functionality",
+      "description": "Create the interface and backend for doctors to update patient EHR information.",
+      "details": "1. Create edit interfaces for each EHR section:\n   - Diagnoses (add/edit diagnosis codes and descriptions)\n   - Medications (add/edit medications, dosage, frequency)\n   - Allergies (add/edit allergens, reactions, severity)\n   - Procedures (add/edit procedure codes and descriptions)\n   - Vitals (add/edit temperature, pulse, blood pressure, etc.)\n   - Immunizations (add/edit vaccines and dates)\n   - Provider Notes (add/edit clinical notes)\n2. Implement form validation for all fields\n3. Create database update operations\n4. Implement audit logging for EHR changes\n5. Add confirmation dialogs for updates\n6. Create success/error notifications\n7. Implement auto-save functionality where appropriate\n8. Add form reset/cancel functionality",
+      "testStrategy": "1. Test adding new entries to each EHR section\n2. Verify editing existing entries works correctly\n3. Test form validation for all fields\n4. Verify database updates are performed correctly\n5. Test audit logging captures all changes\n6. Verify confirmation dialogs work\n7. Test auto-save functionality\n8. Verify form reset/cancel works correctly",
+      "priority": "high",
+      "dependencies": [
+        13
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 15,
+      "title": "Implement Prescription Management",
+      "description": "Create the interface for doctors to add and manage prescriptions for patients.",
+      "details": "1. Create prescription form with fields:\n   - Medication name\n   - Dosage\n   - Frequency\n   - Duration\n   - Special instructions\n2. Implement form validation\n3. Create database operations for prescription creation\n4. Implement prescription listing for a patient\n5. Create prescription detail view\n6. Add prescription editing functionality\n7. Implement prescription printing\n8. Create prescription history view\n9. Add medication interaction checking (placeholder for future implementation)\n10. Implement success/error notifications",
+      "testStrategy": "1. Test prescription creation with valid data\n2. Verify form validation works\n3. Test prescription listing for patients\n4. Verify prescription detail view displays correctly\n5. Test prescription editing\n6. Verify prescription printing works\n7. Test prescription history view\n8. Verify success/error notifications",
+      "priority": "medium",
+      "dependencies": [
+        14
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 16,
+      "title": "Implement Test/Imaging Request and Result Management",
+      "description": "Create the system for doctors to request tests and for Test/Imaging Admins to upload results.",
+      "details": "1. Create test/imaging request form for doctors\n2. Implement test type selection\n3. Create notes/instructions field for requests\n4. Implement database operations for request creation\n5. Create Test/Imaging Admin registration and approval workflow\n6. Implement Test/Imaging Admin dashboard\n7. Create patient search for Test/Imaging Admins\n8. Implement test result upload interface (file upload and/or data entry)\n9. Create test result viewing for doctors and patients\n10. Implement notification system for new test results\n11. Add test result history view",
+      "testStrategy": "1. Test test/imaging request creation\n2. Verify request appears for Test/Imaging Admins\n3. Test Test/Imaging Admin registration and approval\n4. Verify patient search for Test/Imaging Admins\n5. Test result upload (both file and data entry)\n6. Verify test results appear correctly for doctors and patients\n7. Test notification system\n8. Verify test result history view",
+      "priority": "medium",
+      "dependencies": [
+        14
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 17,
+      "title": "Implement Hospital Admin Role and Approval Workflow",
+      "description": "Create the Hospital Admin role and the approval workflow for Test/Imaging Admins.",
+      "status": "done",
+      "dependencies": [
+        5
+      ],
+      "priority": "medium",
+      "details": "1. Create Hospital Admin user model\n2. Implement Hospital Admin registration form\n3. Create System Admin approval interface for Hospital Admins\n4. Implement Hospital Admin dashboard\n5. Create Test/Imaging Admin application form\n6. Implement Hospital Admin approval interface for Test/Imaging Admins\n7. Simplify approval: Mark Test/Imaging Admin requests as approved without creating accounts/passwords. Approved users register with their approved email.\n8. Implement email notification system (placeholder)\n9. Add Hospital Admin profile management\n10. Create listing of all Test/Imaging Admin applications with status filters",
+      "testStrategy": "1. Test Hospital Admin registration\n2. Verify System Admin approval interface\n3. Test Hospital Admin dashboard access\n4. Verify Test/Imaging Admin application submission\n5. Test Hospital Admin approval process\n6. Verify that Test/Imaging Admin approval only marks the request as approved.\n7. Test email notification placeholders\n8. Verify profile management for Hospital Admins",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create Hospital Admin user model",
+          "description": "Implement the Hospital Admin user model with appropriate fields and database integration",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 17
+        },
+        {
+          "id": 2,
+          "title": "Implement Hospital Admin registration form",
+          "description": "Create a registration form specifically for Hospital Admins with necessary validation and submission logic",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 17
+        },
+        {
+          "id": 3,
+          "title": "Create System Admin approval interface for Hospital Admins",
+          "description": "Develop the interface for System Admins to approve or reject Hospital Admin applications",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 17
+        },
+        {
+          "id": 4,
+          "title": "Implement Hospital Admin dashboard",
+          "description": "Create the main dashboard view for Hospital Admins with relevant functionality and navigation",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 17
+        },
+        {
+          "id": 5,
+          "title": "Create Test/Imaging Admin application form",
+          "description": "Implement the application form for Test/Imaging Admin role requests",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 17
+        },
+        {
+          "id": 6,
+          "title": "Implement Hospital Admin approval interface for Test/Imaging Admins",
+          "description": "Create the interface for Hospital Admins to review and approve Test/Imaging Admin applications",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 17
+        },
+        {
+          "id": 7,
+          "title": "Create random password generation for approved admins",
+          "description": "Implement secure random password generation functionality for newly approved admin accounts",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 17
+        },
+        {
+          "id": 8,
+          "title": "Implement email notification system (placeholder)",
+          "description": "Create a placeholder email notification system for account approvals and credentials",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 17
+        },
+        {
+          "id": 9,
+          "title": "Add Hospital Admin profile management",
+          "description": "Create functionality for Hospital Admins to view and update their profile information",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 17
+        },
+        {
+          "id": 10,
+          "title": "Create listing of all Test/Imaging Admin applications with status filters",
+          "description": "Implement a dashboard view listing all Test/Imaging Admin applications with filtering capabilities",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 17
+        },
+        {
+          "id": 11,
+          "title": "Modify approval workflow: Remove password generation",
+          "description": "Modify the Test/Imaging Admin approval workflow to only mark the request as approved, without generating a password or creating a user account.",
+          "details": "Update the approval logic to reflect the new simplified process.",
+          "status": "done",
+          "dependencies": [
+            6
+          ],
+          "parentTaskId": 17
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "title": "Implement Patient Appointment Management",
+      "description": "Create the interface for patients to reschedule or cancel their appointments.",
+      "details": "1. Enhance patient appointment listing with action buttons (Reschedule, Cancel)\n2. Implement appointment cancellation with confirmation\n3. Create rescheduling interface with available slot selection\n4. Implement validation to ensure rescheduling is only for future appointments\n5. Create database operations for status updates\n6. Implement notification system for appointment changes\n7. Add reason field for cancellations\n8. Create appointment history with status tracking\n9. Implement success/error notifications",
+      "testStrategy": "1. Test appointment cancellation flow\n2. Verify confirmation dialog works\n3. Test rescheduling interface\n4. Verify available slots are calculated correctly\n5. Test validation for future appointments only\n6. Verify database updates for status changes\n7. Test notification system\n8. Verify appointment history tracking",
+      "priority": "medium",
+      "dependencies": [
+        10
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 19,
+      "title": "Implement Feedback and Review System",
+      "description": "Create the system for patients to submit feedback for doctors, hospitals, or appointments.",
+      "details": "1. Design and implement Feedback database model\n2. Create feedback submission form with fields:\n   - Target type (Doctor, Hospital, Appointment)\n   - Target selection (based on type)\n   - Rating (1-5 stars)\n   - Comments\n3. Implement form validation\n4. Create database operations for feedback submission\n5. Implement Hospital Admin feedback viewing interface\n6. Create filtering and sorting for feedback listings\n7. Implement feedback statistics/summary view\n8. Add feedback history for patients\n9. Create success/error notifications",
+      "testStrategy": "1. Test feedback submission for different target types\n2. Verify form validation works\n3. Test feedback storage in database\n4. Verify Hospital Admin feedback viewing\n5. Test filtering and sorting\n6. Verify statistics/summary calculations\n7. Test feedback history for patients\n8. Verify success/error notifications",
+      "priority": "low",
+      "dependencies": [
+        10
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 20,
+      "title": "Implement Government Regulatory Body Role",
+      "description": "Create the Government Regulatory Body user role and approval workflow.",
+      "details": "1. Create Government Regulatory Body user model\n2. Implement registration form for government users\n3. Create System Admin approval interface for government users\n4. Implement random password generation for approved users\n5. Create government user dashboard\n6. Implement profile management for government users\n7. Create role-specific navigation\n8. Add email notification system (placeholder)\n9. Implement government user listing for System Admins",
+      "testStrategy": "1. Test government user registration\n2. Verify System Admin approval interface\n3. Test random password generation\n4. Verify government dashboard access\n5. Test profile management\n6. Verify role-specific navigation\n7. Test email notification placeholders\n8. Verify government user listing for System Admins",
+      "priority": "low",
+      "dependencies": [
+        3
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 21,
+      "title": "Implement Feedback Viewing for Government Users",
+      "description": "Create the interface for Government Regulatory Body users to view and analyze all feedback in the system.",
+      "details": "1. Create feedback viewing interface for government users\n2. Implement advanced filtering (by hospital, region, date range, rating)\n3. Create sorting options for feedback listings\n4. Implement feedback statistics and summary views\n5. Create data export functionality (CSV/Excel)\n6. Add data visualization for feedback trends\n7. Implement feedback comparison between hospitals\n8. Create detailed view for individual feedback entries",
+      "testStrategy": "1. Test feedback viewing with different filters\n2. Verify sorting options work correctly\n3. Test statistics and summary calculations\n4. Verify data export functionality\n5. Test data visualization components\n6. Verify hospital comparison features\n7. Test detailed view for individual entries",
+      "priority": "low",
+      "dependencies": [
+        19,
+        20
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 22,
+      "title": "Implement Health Analytics Dashboard for Government Users",
+      "description": "Create the analytics dashboard for Government Regulatory Body users to view anonymized health data and trends.",
+      "details": "1. Design and implement data anonymization logic\n2. Create analytics dashboard interface\n3. Implement filtering by region, hospital, date range, diagnosis\n4. Create data visualizations for key health metrics:\n   - Common diagnoses by region\n   - Hospital utilization rates\n   - Appointment statistics\n   - Disease prevalence trends\n5. Implement data export functionality\n6. Create detailed drill-down views\n7. Add comparison features between regions/hospitals\n8. Implement dashboard customization options",
+      "testStrategy": "1. Test data anonymization logic\n2. Verify dashboard loads with correct data\n3. Test filtering options\n4. Verify data visualizations render correctly\n5. Test data export functionality\n6. Verify drill-down views work\n7. Test comparison features\n8. Verify dashboard customization",
+      "priority": "low",
+      "dependencies": [
+        20,
+        11
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 23,
+      "title": "Implement Outbreak Notification System",
+      "description": "Create a simple system to detect potential disease outbreaks based on diagnosis patterns and notify Government Regulatory Body users.",
+      "details": "1. Design and implement outbreak detection algorithm\n2. Create configurable thresholds for different diseases\n3. Implement notification generation logic\n4. Create notification viewing interface for government users\n5. Implement email notification system (placeholder)\n6. Add outbreak detail view with affected regions\n7. Create historical outbreak tracking\n8. Implement manual override for false positives",
+      "testStrategy": "1. Test outbreak detection with simulated data\n2. Verify threshold configuration works\n3. Test notification generation\n4. Verify notification viewing interface\n5. Test email notification placeholders\n6. Verify outbreak detail view\n7. Test historical tracking\n8. Verify manual override functionality",
+      "priority": "low",
+      "dependencies": [
+        22
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 24,
+      "title": "Implement Hospital Admin Advanced Views",
+      "description": "Create advanced views for Hospital Administrators to monitor appointments and doctor schedules.",
+      "details": "1. Create hospital-wide appointment view by date\n2. Implement filtering by department, doctor, status\n3. Create doctor schedule overview for Hospital Admins\n4. Implement calendar view for hospital appointments\n5. Create appointment statistics dashboard\n6. Add data export functionality\n7. Implement print functionality for schedules\n8. Create doctor performance metrics view (appointment volume, feedback)",
+      "testStrategy": "1. Test hospital-wide appointment view\n2. Verify filtering options work\n3. Test doctor schedule overview\n4. Verify calendar view displays correctly\n5. Test appointment statistics calculations\n6. Verify data export functionality\n7. Test print functionality\n8. Verify doctor performance metrics",
+      "priority": "low",
+      "dependencies": [
+        17,
+        10
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 25,
+      "title": "Implement Password Reset and Account Management",
+      "description": "Create functionality for password reset and general account management for all user types.",
+      "details": "1. Implement password reset request form\n2. Create token-based reset mechanism (placeholder for email)\n3. Implement password change form with validation\n4. Create account settings page for all user types\n5. Implement profile picture upload (optional)\n6. Add language preference setting (Bangla/English)\n7. Create account deactivation functionality\n8. Implement session management (view active sessions, logout all)\n9. Add security settings (password change, 2FA placeholder)",
+      "testStrategy": "1. Test password reset request flow\n2. Verify token-based reset works\n3. Test password change with validation\n4. Verify account settings page for different user types\n5. Test profile picture upload\n6. Verify language preference setting\n7. Test account deactivation\n8. Verify session management features",
+      "priority": "medium",
+      "dependencies": [
+        3
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create Password Reset Request Form",
+          "description": "Develop the form where users can request a password reset by entering their email address.",
+          "details": "1. Create a new route `/auth/reset-password-request` in auth_bp\\n2. Create a Flask form class with email field and validation\\n3. Create an HTML template for the password reset request page\\n4. Add link to this page from the login screen\\n5. Implement form validation and error handling",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 25
+        },
+        {
+          "id": 2,
+          "title": "Implement Token-based Password Reset System",
+          "description": "Create a token-based system for password reset that allows users to securely reset their password.",
+          "details": "1. Create a `PasswordResetToken` model to store tokens in database\\n2. Implement a function to generate secure reset tokens\\n3. Create a function to store token for a user along with expiration time\\n4. Create route to validate tokens\\n5. Create a function to verify if a token is valid and not expired",
+          "status": "done",
+          "dependencies": [
+            "25.1"
+          ],
+          "parentTaskId": 25
+        },
+        {
+          "id": 3,
+          "title": "Create New Password Form After Reset",
+          "description": "Create the form where users can set a new password after clicking the reset link.",
+          "details": "1. Create a new route `/auth/reset-password/<token>` in auth_bp\\n2. Create a Flask form class with password and confirm password fields\\n3. Implement password complexity validation\\n4. Create an HTML template for the new password form\\n5. Update password in database when form is valid",
+          "status": "done",
+          "dependencies": [
+            "25.2"
+          ],
+          "parentTaskId": 25
+        },
+        {
+          "id": 4,
+          "title": "Create Account Settings Page",
+          "description": "Develop a comprehensive account settings page for all user types to manage their account.",
+          "details": "1. Update routes in auth_bp to handle account settings\\n2. Create an HTML template for account settings page\\n3. Display user information from the database\\n4. Include sections for all account management functions\\n5. Implement navigation between account settings sections",
+          "status": "done",
+          "dependencies": [
+            "25.3"
+          ],
+          "parentTaskId": 25
+        },
+        {
+          "id": 5,
+          "title": "Implement Password Change Feature",
+          "description": "Allow users to change their password from the account settings page.",
+          "details": "1. Create a Flask form for password change with current password, new password, and confirm new password fields\\n2. Add password change section to the account settings page\\n3. Implement server-side validation of current password\\n4. Add password complexity requirements\\n5. Update the password in database when form is valid",
+          "status": "done",
+          "dependencies": [
+            "25.4"
+          ],
+          "parentTaskId": 25
+        },
+        {
+          "id": 6,
+          "title": "Implement Profile Picture Upload",
+          "description": "Allow users to upload and update their profile picture.",
+          "details": "1. Update user model to include profile picture field\\n2. Create a form for uploading profile pictures\\n3. Implement file type and size validation\\n4. Create storage utilities for saving and retrieving profile pictures\\n5. Display the user's profile picture in relevant places",
+          "status": "done",
+          "dependencies": [
+            "25.4"
+          ],
+          "parentTaskId": 25
+        },
+        {
+          "id": 7,
+          "title": "Add Language Preference Setting",
+          "description": "Implement functionality to allow users to toggle between Bangla and English language preferences.",
+          "details": "1. Update user model to include language preference field\\n2. Create UI controls for switching language\\n3. Implement backend logic to save language preference\\n4. Create a mechanism to apply language preference across sessions\\n5. Add translation capability for Bangla",
+          "status": "done",
+          "dependencies": [
+            "25.4"
+          ],
+          "parentTaskId": 25
+        },
+        {
+          "id": 8,
+          "title": "Implement Account Deactivation",
+          "description": "Allow users to deactivate their account from the account settings page.",
+          "details": "1. Update user model to handle deactivated status\\n2. Create a form for account deactivation with password confirmation\\n3. Add a confirmation dialog to prevent accidental deactivation\\n4. Implement backend logic to deactivate accounts\\n5. Prevent login for deactivated accounts",
+          "status": "done",
+          "dependencies": [
+            "25.4"
+          ],
+          "parentTaskId": 25
+        },
+        {
+          "id": 9,
+          "title": "Implement Session Management",
+          "description": "Allow users to view and manage their active sessions and provide an option to log out from all devices.",
+          "details": "1. Create a model to store user sessions\\n2. Add functionality to view active sessions\\n3. Implement a mechanism to terminate individual sessions\\n4. Add a 'logout from all devices' feature\\n5. Update login and logout functionality to work with session management",
+          "status": "done",
+          "dependencies": [
+            "25.4"
+          ],
+          "parentTaskId": 25
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "title": "Task #26: Establish Frontend Design Guidelines and Component Library",
+      "description": "Analyze the frontendExamples/ folder to establish comprehensive frontend design guidelines, document design patterns, create reusable components, and define coding standards that align with existing design conventions.",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "details": "This high-priority task involves a thorough analysis of the frontendExamples/ folder to create a unified design system for the application. The developer should:\n\n1. Conduct a comprehensive inventory of all UI elements in the frontendExamples/ folder, categorizing them by type (buttons, forms, navigation, layouts, etc.)\n2. Document the existing color palette, typography, spacing, and responsive design approaches\n3. Identify common interaction patterns and behaviors (hover states, animations, error handling)\n4. Create a component library with the following:\n   - Base UI components (buttons, inputs, selectors, modals)\n   - Composite components (forms, cards, navigation bars)\n   - Layout templates and grid systems\n5. Establish coding standards for:\n   - Component structure and naming conventions\n   - CSS/SCSS organization and methodology (BEM, SMACSS, etc.)\n   - JavaScript/TypeScript patterns for component behavior\n   - Accessibility requirements (WCAG compliance level)\n   - Responsive design breakpoints and approach\n6. Document all guidelines in a centralized location (e.g., Storybook, Figma, or dedicated documentation site)\n7. Create examples of proper implementation for each component\n8. Establish a process for extending the design system with new components\n\nThis task is a critical dependency for all frontend-related work and should be completed before substantial frontend development begins on features like the Hospital Admin Views or Account Management interfaces.",
+      "testStrategy": "The completion of this task should be verified through the following steps:\n\n1. Documentation Review:\n   - Ensure all design patterns are thoroughly documented with visual examples\n   - Verify that color palette, typography, spacing guidelines are clearly defined\n   - Confirm that coding standards are specific and actionable\n\n2. Component Library Validation:\n   - Create a test page that renders all components in various states\n   - Verify each component against the examples in frontendExamples/\n   - Test components across different screen sizes to validate responsive behavior\n   - Run accessibility tests (using tools like axe, Lighthouse) on all components\n\n3. Developer Experience Testing:\n   - Have 2-3 developers attempt to implement a simple UI feature using only the guidelines\n   - Collect feedback on clarity and completeness of documentation\n   - Identify any gaps or ambiguities in the guidelines\n\n4. Integration Testing:\n   - Apply the design system to an existing feature (e.g., a portion of Task #24 or #25)\n   - Verify visual consistency with frontendExamples/\n   - Measure implementation time to assess efficiency gains\n\n5. Stakeholder Review:\n   - Present the design system to project stakeholders\n   - Demonstrate how it maintains consistency with existing design\n   - Get formal approval that the guidelines satisfy project requirements\n\nThe task is considered complete when all documentation is finalized, the component library is implemented, and at least one feature has been successfully built using the new guidelines.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Analyze and Document UI Elements",
+          "description": "Create an inventory of all UI elements in the frontendExamples/ folder, categorizing them by type (buttons, forms, navigation, layouts, etc.)",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 26
+        },
+        {
+          "id": 2,
+          "title": "Define Color Palette and Typography",
+          "description": "Document the existing color palette, typography, spacing, and responsive design approaches",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 26
+        },
+        {
+          "id": 3,
+          "title": "Create Base UI Components",
+          "description": "Develop reusable base UI components including buttons, inputs, selectors, and modals",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 26
+        },
+        {
+          "id": 4,
+          "title": "Create Composite Components",
+          "description": "Develop reusable composite components including forms, cards, navigation bars",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 26
+        },
+        {
+          "id": 5,
+          "title": "Establish Layout Templates and Patterns",
+          "description": "Define layout templates and grid systems for consistent page structures",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 26
+        },
+        {
+          "id": 6,
+          "title": "Document Coding Standards",
+          "description": "Establish coding standards for component structure, naming conventions, CSS/SCSS organization, and accessibility requirements",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 26
+        },
+        {
+          "id": 7,
+          "title": "Create Design System Documentation",
+          "description": "Create comprehensive documentation for the design system with examples and usage guidelines",
+          "details": "",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 26
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "title": "Document Test/Imaging Admin Implementation",
+      "description": "Create a summary task that describes the recent implementation of the Test/Imaging Admin functionality, including user roles, registration, approval interfaces, schema changes, and workflow.",
+      "status": "done",
+      "dependencies": [],
+      "priority": "medium",
+      "details": "This task involves creating a comprehensive summary document detailing the implementation of the Test/Imaging Admin functionality. The document should include the following sections:\n\n1.  Test Admin user role and model: Describe the new user role, its permissions, and the data model used to represent Test Admins. Include details on the `TEST_ADMIN` enum value added to the `UserRole` enum in `database.py`, and the `TestAdmin` model class with its fields (`id`, `user_id`, `full_name`, `hospital_id`, `contact_number`, `department`, `qualification`, `created_at`, and `updated_at`).\n\n2.  Registration process: Outline the steps involved in registering a new Test Admin, including any required approvals. Describe the `register_test_admin` route in `auth.py`, the `register_test_admin.html` form template, the initial `INACTIVE` status of new accounts, and the warning message displayed to users.\n\n3.  Hospital Admin approval interface: Document the interface used by Hospital Admins to approve or reject Test Admin registration requests. Include details on the pending Test Admin count displayed on the Hospital Admin dashboard, the `pending_test_admins.html` template (including the list of pending applications, details displayed, and Approve/Reject buttons), and the validation logic ensuring Hospital Admins can only approve Test Admins for their own hospital.\n\n4.  Database schema changes: Detail all changes made to the database schema to support the Test/Imaging Admin functionality, including new tables, columns, and relationships. Provide the `test_admin_migration.sql` script for the `test_admins` table, the indexes added for `user_id` and `hospital_id` fields, the `AdminRequestStatus` enum (`PENDING`, `APPROVED`, `REJECTED`), and the `TestImageAdminRequest` model.\n\n5.  Approval workflow: Describe the complete approval workflow, including all states, transitions, and actions. Use a diagram or flowchart to illustrate the workflow. Detail the registration process, initial `INACTIVE` status, Hospital Admin review, status change upon approval (from `INACTIVE` to `ACTIVE`), login access after approval, and the outcome of rejection (status remains `INACTIVE`).\n\nThe document should be written in clear, concise language and should be suitable for both technical and non-technical audiences.",
+      "testStrategy": "The summary document will be reviewed by the project lead and senior developers to ensure accuracy, completeness, and clarity. Each section of the document will be verified against the actual implementation to ensure that it accurately reflects the current state of the system. Specific attention will be paid to the database schema changes and the approval workflow to ensure that they are correctly documented. The document will also be reviewed by a technical writer to ensure that it is well-written and easy to understand. The review should specifically check that the documented workflow matches the implemented registration and approval process, and that all database changes are accurately represented in the documentation.",
+      "subtasks": []
+    }
+  ]
+}

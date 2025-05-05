@@ -1,0 +1,39 @@
+# Task ID: 1
+# Title: Setup Project Structure and Environment
+# Status: done
+# Dependencies: 26
+# Priority: high
+# Description: Set up the basic structure for a Flask application with Tailwind CSS integration and Supabase connection within the existing Git repository, following design patterns from frontendExamples/.
+# Details:
+1. Use the existing Git repository structure
+2. Set up virtual environment for Python
+3. Install Flask and required packages (flask, python-dotenv, supabase, psycopg2-binary)
+4. Configure Tailwind CSS with the project
+   - Review frontendExamples/ to identify design conventions
+   - Set up Tailwind configuration to match design patterns
+   - Create reusable Tailwind CSS patterns/classes based on examples
+5. Create or update basic folder structure:
+   - `/app` - Main application code
+   - `/app/static` - Static files (CSS, JS)
+   - `/app/templates` - HTML templates
+   - `/app/models` - Database models
+   - `/app/routes` - API routes
+   - `/app/services` - Business logic
+   - `/app/utils` - Utility functions
+   - `/app/components` - Reusable UI components following frontendExamples/ patterns
+6. Create configuration files (.env, .gitignore, requirements.txt)
+7. Setup basic Flask application entry point (app.py)
+8. Configure Supabase connection
+9. Create a simple home page to verify setup
+   - Implement using design conventions from frontendExamples/
+   - Include examples of reusable components/patterns
+10. Document design patterns extracted from frontendExamples/ for team reference
+
+# Test Strategy:
+1. Verify all dependencies install correctly
+2. Ensure Flask server starts without errors
+3. Confirm Tailwind CSS compiles correctly and matches design conventions
+4. Test Supabase connection
+5. Verify the home page renders correctly and follows design patterns
+6. Validate that reusable Tailwind CSS patterns/classes work as expected
+7. Compare implemented components with frontendExamples/ to ensure consistency

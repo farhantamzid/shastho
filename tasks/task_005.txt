@@ -1,0 +1,91 @@
+# Task ID: 5
+# Title: Implement System Admin Portal - Hospital Management
+# Status: done
+# Dependencies: 3
+# Priority: medium
+# Description: Create the System Admin interface for managing hospitals and departments in the system.
+# Details:
+1. Create System Admin dashboard template
+2. Implement hospital listing page with search and filter options
+3. Create hospital creation form with fields (name, location, address, contact)
+4. Implement hospital edit functionality
+5. Create department management interface (create, edit, delete)
+6. Implement department-hospital relationship management
+7. Add data validation for all forms
+8. Create success/error notifications
+9. Implement pagination for hospital and department listings
+10. Add confirmation dialogs for delete operations
+11. Create breadcrumb navigation for admin portal
+
+# Test Strategy:
+1. Test hospital creation with valid data
+2. Test hospital editing functionality
+3. Verify hospital listing with search and filters
+4. Test department creation and association with hospitals
+5. Test department editing and deletion
+6. Verify validation works for all form fields
+7. Test pagination with large datasets
+8. Verify breadcrumb navigation works correctly
+
+# Subtasks:
+## 1. Create System Admin Dashboard Template [done]
+### Dependencies: None
+### Description: Implement the base dashboard template for the System Admin portal with navigation and layout
+### Details:
+1. Create admin dashboard layout template with sidebar navigation
+2. Design page header with title and breadcrumb area
+3. Implement navigation menu with links to hospital and department management
+4. Add dashboard overview section with summary statistics
+5. Ensure responsive design for all device sizes
+6. Create consistent styling following the project's design patterns
+
+## 2. Implement Hospital Management Interface [done]
+### Dependencies: None
+### Description: Create interfaces for listing, creating, and editing hospital records
+### Details:
+1. Implement hospital listing page showing all hospitals in a table
+2. Add search functionality by hospital name and location
+3. Create filters for sorting and filtering hospitals
+4. Design hospital creation form with fields:
+   - Name
+   - Location
+   - Address
+   - Contact Number
+5. Implement form validation for all hospital fields
+6. Create hospital edit functionality that pre-populates form with existing data
+7. Add hospital deletion with confirmation dialog
+8. Implement pagination for hospital listings
+9. Add success/error notifications for all hospital operations
+
+## 3. Implement Department Management Interface [done]
+### Dependencies: None
+### Description: Create interfaces for listing, creating, and editing department records and their hospital associations
+### Details:
+1. Implement department listing page showing all departments in a table
+2. Include hospital association in department listing
+3. Add search and filter functionality for departments
+4. Design department creation form with fields:
+   - Name
+   - Hospital (dropdown selection)
+5. Implement form validation for all department fields
+6. Create department edit functionality that pre-populates form with existing data
+7. Add department deletion with confirmation dialog
+8. Implement pagination for department listings
+9. Add success/error notifications for all department operations
+10. Create hospital-department relationship management interface
+11. Implement validation to prevent orphaned departments (departments without hospitals)
+
+## 4. Implement Common UI Components and Navigation [done]
+### Dependencies: None
+### Description: Create reusable UI components, notifications, and navigation elements for the admin portal
+### Details:
+1. Create breadcrumb navigation component for admin portal
+2. Implement reusable confirmation dialog component for delete operations
+3. Design standardized success/error notification system
+4. Create pagination component for data tables
+5. Implement search component that can be reused across admin interfaces
+6. Add filter components for data tables
+7. Ensure all components are responsive and follow the project's design patterns
+8. Implement form validation helpers and error display
+9. Create loading indicators for asynchronous operations
+

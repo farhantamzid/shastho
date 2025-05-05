@@ -1,0 +1,36 @@
+# Task ID: 12
+# Title: Implement Patient EHR View
+# Status: pending
+# Dependencies: 4, 11
+# Priority: medium
+# Description: Create the patient interface for viewing their own Electronic Health Record.
+# Details:
+1. Create EHR dashboard for patients
+2. Implement tabbed interface for different EHR sections:
+   - Overview/Summary
+   - Visit History
+   - Diagnoses
+   - Medications/Prescriptions
+   - Allergies
+   - Procedures
+   - Vitals
+   - Immunizations
+   - Test Results
+3. Create read-only views for each section
+4. Implement chronological sorting of entries
+5. Add filtering capabilities for each section
+6. Create detailed view for individual entries
+7. Implement test result file viewing/download
+8. Add print functionality for EHR sections
+9. Create breadcrumb navigation
+10. Implement responsive design for mobile viewing
+
+# Test Strategy:
+1. Test EHR dashboard loads correctly for patients
+2. Verify all tabs display appropriate data
+3. Test chronological sorting in each section
+4. Verify filtering works correctly
+5. Test detailed view for individual entries
+6. Verify test result file viewing/download
+7. Test print functionality
+8. Verify responsive design on different screen sizes

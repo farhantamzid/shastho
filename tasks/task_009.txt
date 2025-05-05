@@ -1,0 +1,29 @@
+# Task ID: 9
+# Title: Implement Patient Appointment Booking Flow
+# Status: pending
+# Dependencies: 4, 8
+# Priority: high
+# Description: Create the patient interface for searching and booking appointments with doctors.
+# Details:
+1. Create appointment booking interface
+2. Implement hospital selection dropdown
+3. Create department selection (filtered by selected hospital)
+4. Implement doctor selection (filtered by selected department)
+5. Create date selection with calendar interface
+6. Implement available time slot display based on doctor availability
+7. Create appointment confirmation screen with details
+8. Implement appointment creation in database
+9. Add validation to prevent double-booking
+10. Create success/error notifications
+11. Implement appointment summary view after booking
+12. Add breadcrumb navigation for booking flow
+
+# Test Strategy:
+1. Test complete booking flow from hospital to confirmation
+2. Verify filtering works for departments and doctors
+3. Test available slot calculation based on doctor availability
+4. Verify appointment is created correctly in database
+5. Test double-booking prevention
+6. Verify success notifications and summary view
+7. Test breadcrumb navigation
+8. Verify calendar interface works correctly

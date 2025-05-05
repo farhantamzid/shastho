@@ -1,0 +1,28 @@
+# Task ID: 16
+# Title: Implement Test/Imaging Request and Result Management
+# Status: pending
+# Dependencies: 14
+# Priority: medium
+# Description: Create the system for doctors to request tests and for Test/Imaging Admins to upload results.
+# Details:
+1. Create test/imaging request form for doctors
+2. Implement test type selection
+3. Create notes/instructions field for requests
+4. Implement database operations for request creation
+5. Create Test/Imaging Admin registration and approval workflow
+6. Implement Test/Imaging Admin dashboard
+7. Create patient search for Test/Imaging Admins
+8. Implement test result upload interface (file upload and/or data entry)
+9. Create test result viewing for doctors and patients
+10. Implement notification system for new test results
+11. Add test result history view
+
+# Test Strategy:
+1. Test test/imaging request creation
+2. Verify request appears for Test/Imaging Admins
+3. Test Test/Imaging Admin registration and approval
+4. Verify patient search for Test/Imaging Admins
+5. Test result upload (both file and data entry)
+6. Verify test results appear correctly for doctors and patients
+7. Test notification system
+8. Verify test result history view

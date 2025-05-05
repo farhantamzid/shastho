@@ -1,0 +1,95 @@
+# Task ID: 17
+# Title: Implement Hospital Admin Role and Approval Workflow
+# Status: done
+# Dependencies: 5
+# Priority: medium
+# Description: Create the Hospital Admin role and the approval workflow for Test/Imaging Admins.
+# Details:
+1. Create Hospital Admin user model
+2. Implement Hospital Admin registration form
+3. Create System Admin approval interface for Hospital Admins
+4. Implement Hospital Admin dashboard
+5. Create Test/Imaging Admin application form
+6. Implement Hospital Admin approval interface for Test/Imaging Admins
+7. Simplify approval: Mark Test/Imaging Admin requests as approved without creating accounts/passwords. Approved users register with their approved email.
+8. Implement email notification system (placeholder)
+9. Add Hospital Admin profile management
+10. Create listing of all Test/Imaging Admin applications with status filters
+
+# Test Strategy:
+1. Test Hospital Admin registration
+2. Verify System Admin approval interface
+3. Test Hospital Admin dashboard access
+4. Verify Test/Imaging Admin application submission
+5. Test Hospital Admin approval process
+6. Verify that Test/Imaging Admin approval only marks the request as approved.
+7. Test email notification placeholders
+8. Verify profile management for Hospital Admins
+
+# Subtasks:
+## 1. Create Hospital Admin user model [done]
+### Dependencies: None
+### Description: Implement the Hospital Admin user model with appropriate fields and database integration
+### Details:
+
+
+## 2. Implement Hospital Admin registration form [done]
+### Dependencies: None
+### Description: Create a registration form specifically for Hospital Admins with necessary validation and submission logic
+### Details:
+
+
+## 3. Create System Admin approval interface for Hospital Admins [done]
+### Dependencies: None
+### Description: Develop the interface for System Admins to approve or reject Hospital Admin applications
+### Details:
+
+
+## 4. Implement Hospital Admin dashboard [done]
+### Dependencies: None
+### Description: Create the main dashboard view for Hospital Admins with relevant functionality and navigation
+### Details:
+
+
+## 5. Create Test/Imaging Admin application form [done]
+### Dependencies: None
+### Description: Implement the application form for Test/Imaging Admin role requests
+### Details:
+
+
+## 6. Implement Hospital Admin approval interface for Test/Imaging Admins [done]
+### Dependencies: None
+### Description: Create the interface for Hospital Admins to review and approve Test/Imaging Admin applications
+### Details:
+
+
+## 7. Create random password generation for approved admins [done]
+### Dependencies: None
+### Description: Implement secure random password generation functionality for newly approved admin accounts
+### Details:
+
+
+## 8. Implement email notification system (placeholder) [done]
+### Dependencies: None
+### Description: Create a placeholder email notification system for account approvals and credentials
+### Details:
+
+
+## 9. Add Hospital Admin profile management [done]
+### Dependencies: None
+### Description: Create functionality for Hospital Admins to view and update their profile information
+### Details:
+
+
+## 10. Create listing of all Test/Imaging Admin applications with status filters [done]
+### Dependencies: None
+### Description: Implement a dashboard view listing all Test/Imaging Admin applications with filtering capabilities
+### Details:
+
+
+## 11. Modify approval workflow: Remove password generation [done]
+### Dependencies: 17.6
+### Description: Modify the Test/Imaging Admin approval workflow to only mark the request as approved, without generating a password or creating a user account.
+### Details:
+Update the approval logic to reflect the new simplified process.
+

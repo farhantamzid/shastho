@@ -1,0 +1,26 @@
+# Task ID: 20
+# Title: Implement Government Regulatory Body Role
+# Status: pending
+# Dependencies: 3
+# Priority: low
+# Description: Create the Government Regulatory Body user role and approval workflow.
+# Details:
+1. Create Government Regulatory Body user model
+2. Implement registration form for government users
+3. Create System Admin approval interface for government users
+4. Implement random password generation for approved users
+5. Create government user dashboard
+6. Implement profile management for government users
+7. Create role-specific navigation
+8. Add email notification system (placeholder)
+9. Implement government user listing for System Admins
+
+# Test Strategy:
+1. Test government user registration
+2. Verify System Admin approval interface
+3. Test random password generation
+4. Verify government dashboard access
+5. Test profile management
+6. Verify role-specific navigation
+7. Test email notification placeholders
+8. Verify government user listing for System Admins

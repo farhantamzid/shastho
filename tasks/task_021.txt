@@ -1,0 +1,24 @@
+# Task ID: 21
+# Title: Implement Feedback Viewing for Government Users
+# Status: pending
+# Dependencies: 19, 20
+# Priority: low
+# Description: Create the interface for Government Regulatory Body users to view and analyze all feedback in the system.
+# Details:
+1. Create feedback viewing interface for government users
+2. Implement advanced filtering (by hospital, region, date range, rating)
+3. Create sorting options for feedback listings
+4. Implement feedback statistics and summary views
+5. Create data export functionality (CSV/Excel)
+6. Add data visualization for feedback trends
+7. Implement feedback comparison between hospitals
+8. Create detailed view for individual feedback entries
+
+# Test Strategy:
+1. Test feedback viewing with different filters
+2. Verify sorting options work correctly
+3. Test statistics and summary calculations
+4. Verify data export functionality
+5. Test data visualization components
+6. Verify hospital comparison features
+7. Test detailed view for individual entries

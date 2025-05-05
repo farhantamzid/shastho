@@ -1,0 +1,82 @@
+# Task ID: 25
+# Title: Implement Password Reset and Account Management
+# Status: done
+# Dependencies: 3
+# Priority: medium
+# Description: Create functionality for password reset and general account management for all user types.
+# Details:
+1. Implement password reset request form
+2. Create token-based reset mechanism (placeholder for email)
+3. Implement password change form with validation
+4. Create account settings page for all user types
+5. Implement profile picture upload (optional)
+6. Add language preference setting (Bangla/English)
+7. Create account deactivation functionality
+8. Implement session management (view active sessions, logout all)
+9. Add security settings (password change, 2FA placeholder)
+
+# Test Strategy:
+1. Test password reset request flow
+2. Verify token-based reset works
+3. Test password change with validation
+4. Verify account settings page for different user types
+5. Test profile picture upload
+6. Verify language preference setting
+7. Test account deactivation
+8. Verify session management features
+
+# Subtasks:
+## 1. Create Password Reset Request Form [done]
+### Dependencies: None
+### Description: Develop the form where users can request a password reset by entering their email address.
+### Details:
+1. Create a new route `/auth/reset-password-request` in auth_bp\n2. Create a Flask form class with email field and validation\n3. Create an HTML template for the password reset request page\n4. Add link to this page from the login screen\n5. Implement form validation and error handling
+
+## 2. Implement Token-based Password Reset System [done]
+### Dependencies: 25.1
+### Description: Create a token-based system for password reset that allows users to securely reset their password.
+### Details:
+1. Create a `PasswordResetToken` model to store tokens in database\n2. Implement a function to generate secure reset tokens\n3. Create a function to store token for a user along with expiration time\n4. Create route to validate tokens\n5. Create a function to verify if a token is valid and not expired
+
+## 3. Create New Password Form After Reset [done]
+### Dependencies: 25.2
+### Description: Create the form where users can set a new password after clicking the reset link.
+### Details:
+1. Create a new route `/auth/reset-password/<token>` in auth_bp\n2. Create a Flask form class with password and confirm password fields\n3. Implement password complexity validation\n4. Create an HTML template for the new password form\n5. Update password in database when form is valid
+
+## 4. Create Account Settings Page [done]
+### Dependencies: 25.3
+### Description: Develop a comprehensive account settings page for all user types to manage their account.
+### Details:
+1. Update routes in auth_bp to handle account settings\n2. Create an HTML template for account settings page\n3. Display user information from the database\n4. Include sections for all account management functions\n5. Implement navigation between account settings sections
+
+## 5. Implement Password Change Feature [done]
+### Dependencies: 25.4
+### Description: Allow users to change their password from the account settings page.
+### Details:
+1. Create a Flask form for password change with current password, new password, and confirm new password fields\n2. Add password change section to the account settings page\n3. Implement server-side validation of current password\n4. Add password complexity requirements\n5. Update the password in database when form is valid
+
+## 6. Implement Profile Picture Upload [done]
+### Dependencies: 25.4
+### Description: Allow users to upload and update their profile picture.
+### Details:
+1. Update user model to include profile picture field\n2. Create a form for uploading profile pictures\n3. Implement file type and size validation\n4. Create storage utilities for saving and retrieving profile pictures\n5. Display the user's profile picture in relevant places
+
+## 7. Add Language Preference Setting [done]
+### Dependencies: 25.4
+### Description: Implement functionality to allow users to toggle between Bangla and English language preferences.
+### Details:
+1. Update user model to include language preference field\n2. Create UI controls for switching language\n3. Implement backend logic to save language preference\n4. Create a mechanism to apply language preference across sessions\n5. Add translation capability for Bangla
+
+## 8. Implement Account Deactivation [done]
+### Dependencies: 25.4
+### Description: Allow users to deactivate their account from the account settings page.
+### Details:
+1. Update user model to handle deactivated status\n2. Create a form for account deactivation with password confirmation\n3. Add a confirmation dialog to prevent accidental deactivation\n4. Implement backend logic to deactivate accounts\n5. Prevent login for deactivated accounts
+
+## 9. Implement Session Management [done]
+### Dependencies: 25.4
+### Description: Allow users to view and manage their active sessions and provide an option to log out from all devices.
+### Details:
+1. Create a model to store user sessions\n2. Add functionality to view active sessions\n3. Implement a mechanism to terminate individual sessions\n4. Add a 'logout from all devices' feature\n5. Update login and logout functionality to work with session management
+

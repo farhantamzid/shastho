@@ -1,0 +1,25 @@
+# Task ID: 24
+# Title: Implement Hospital Admin Advanced Views
+# Status: pending
+# Dependencies: 17, 10
+# Priority: low
+# Description: Create advanced views for Hospital Administrators to monitor appointments and doctor schedules.
+# Details:
+1. Create hospital-wide appointment view by date
+2. Implement filtering by department, doctor, status
+3. Create doctor schedule overview for Hospital Admins
+4. Implement calendar view for hospital appointments
+5. Create appointment statistics dashboard
+6. Add data export functionality
+7. Implement print functionality for schedules
+8. Create doctor performance metrics view (appointment volume, feedback)
+
+# Test Strategy:
+1. Test hospital-wide appointment view
+2. Verify filtering options work
+3. Test doctor schedule overview
+4. Verify calendar view displays correctly
+5. Test appointment statistics calculations
+6. Verify data export functionality
+7. Test print functionality
+8. Verify doctor performance metrics
