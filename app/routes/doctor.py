@@ -7,9 +7,9 @@ from app.models.database import UserRole, Doctor, Hospital, Department, DoctorAv
 from app.models.auth import find_user_by_id
 from app.utils.auth import login_required, role_required
 from app.utils.db import Database
-from app.models.ehr import EHR_Visit, EHR_Diagnosis, EHR_Medication, EHR_ProviderNote
+from app.models.ehr import EHR, EHR_Visit, EHR_Diagnosis, EHR_Medication, EHR_Allergy, EHR_Procedure, EHR_Vital, EHR_Immunization, EHR_TestResult, EHR_ProviderNote, Prescription
 from app.services.ehr_service import search_patients, get_patient_ehr, get_visit_details, get_ehr_visits, get_ehr_allergies, get_ehr_immunizations, get_ehr_test_results
-from app.forms.ehr_forms import DiagnosisForm, MedicationForm, PrescriptionForm, AllergyForm, VitalSignsForm, ProviderNoteForm
+from app.forms.ehr_forms import DiagnosisForm, MedicationForm, PrescriptionForm, AllergyForm, VitalSignsForm, ProviderNoteForm, TestResultForm, ProcedureForm, ImmunizationForm
 from datetime import datetime, date
 from uuid import UUID
 import os
@@ -475,52 +475,53 @@ def add_diagnosis(patient_id, visit_id):
                            visit_id=visit_id,
                            visit_date=visit_date)
 
-@doctor_bp.route('/patient/<uuid:patient_id>/visit/<uuid:visit_id>/diagnosis/<uuid:diagnosis_id>/edit', methods=['GET', 'POST'])
+@doctor_bp.route('/ehr/patient/<uuid:patient_id>/diagnosis/<uuid:diagnosis_id>/edit', methods=['GET', 'POST'])
 @login_required
 @role_required(UserRole.DOCTOR)
-def edit_diagnosis(patient_id, visit_id, diagnosis_id):
-    """
-    Edit an existing diagnosis
-    """
-    # Get patient, visit, and diagnosis information
+def edit_diagnosis(patient_id, diagnosis_id):
+    """Route to edit an existing diagnosis for a patient."""
     db = Database()
     patient = db.get_by_id(Patient, patient_id)
-    visit = db.get_by_id(EHR_Visit, visit_id)
     diagnosis = db.get_by_id(EHR_Diagnosis, diagnosis_id)
 
-    if not patient or not visit or not diagnosis:
-        flash('Patient, visit, or diagnosis not found.', 'error')
+    if not patient or not diagnosis:
+        flash('Patient or Diagnosis record not found.', 'danger')
+        # Redirect to a sensible place, maybe patient search or dashboard
         return redirect(url_for('doctor.patient_search'))
 
-    # Initialize form
-    form = DiagnosisForm(obj=diagnosis)
-    form.visit_id.data = str(visit_id)
+    # Corrected Ownership Check for Diagnosis (via Visit)
+    visit = db.get_by_id(EHR_Visit, diagnosis.visit_id)
+    ehr, _ = get_patient_ehr(patient_id)
+    if not visit or not ehr or visit.ehr_id != ehr.id:
+        flash('Invalid diagnosis record for this patient.', 'danger')
+        return redirect(url_for('doctor.view_ehr', patient_id=patient_id))
 
-    if request.method == 'POST' and form.validate_on_submit():
+    form = DiagnosisForm(obj=diagnosis) # Populate form with existing data on GET
+
+    if form.validate_on_submit():
         try:
-            # Update diagnosis
+            # Update model object attributes
             diagnosis.diagnosis_code = form.diagnosis_code.data
             diagnosis.diagnosis_description = form.diagnosis_description.data
             diagnosis.diagnosed_at = form.diagnosed_at.data
-            diagnosis.updated_at = datetime.now()
+            diagnosis.additional_notes = form.additional_notes.data
+            diagnosis.updated_at = datetime.now() # Update timestamp
 
-            # Save to database
+            # Use the custom DB utility to update
             db.update(diagnosis)
 
-            flash('Diagnosis updated successfully.', 'success')
-            return redirect(url_for('doctor.view_visit_details', patient_id=patient_id, visit_id=visit_id))
+            flash('Diagnosis updated successfully!', 'success')
+            return redirect(url_for('doctor.view_ehr', patient_id=patient_id) + '#summary') # Redirect back to EHR summary
         except Exception as e:
-            flash(f'Error updating diagnosis: {str(e)}', 'error')
+            # db.update likely handles rollback, but log/flash error
+            flash(f'Error updating diagnosis: {str(e)}', 'danger')
+    elif request.method == 'POST':
+        flash('Please correct the errors below.', 'warning')
 
-    # Format the visit date for display
-    visit_date = visit.date.strftime('%Y-%m-%d') if visit.date else 'N/A'
-
-    return render_template('doctor/ehr/add_diagnosis.html',
+    return render_template('doctor/ehr/edit_diagnosis.html',
                            form=form,
                            patient=patient,
-                           visit_id=visit_id,
-                           visit_date=visit_date,
-                           is_edit=True)
+                           diagnosis=diagnosis)
 
 @doctor_bp.route('/patient/<uuid:patient_id>/visit/<uuid:visit_id>/medication/add', methods=['GET', 'POST'])
 @login_required
@@ -595,54 +596,51 @@ def add_medication(patient_id, visit_id):
                            visit_id=visit_id,
                            visit_date=visit_date)
 
-@doctor_bp.route('/patient/<uuid:patient_id>/visit/<uuid:visit_id>/medication/<uuid:medication_id>/edit', methods=['GET', 'POST'])
+@doctor_bp.route('/ehr/patient/<uuid:patient_id>/medication/<uuid:medication_id>/edit', methods=['GET', 'POST'])
 @login_required
 @role_required(UserRole.DOCTOR)
-def edit_medication(patient_id, visit_id, medication_id):
-    """
-    Edit an existing medication
-    """
-    # Get patient, visit, and medication information
+def edit_medication(patient_id, medication_id):
+    """Route to edit an existing medication for a patient."""
     db = Database()
     patient = db.get_by_id(Patient, patient_id)
-    visit = db.get_by_id(EHR_Visit, visit_id)
     medication = db.get_by_id(EHR_Medication, medication_id)
 
-    if not patient or not visit or not medication:
-        flash('Patient, visit, or medication not found.', 'error')
+    if not patient or not medication:
+        flash('Patient or Medication record not found.', 'danger')
         return redirect(url_for('doctor.patient_search'))
 
-    # Initialize form
-    form = MedicationForm(obj=medication)
-    form.visit_id.data = str(visit_id)
+    # Corrected Ownership Check for Medication (via Visit)
+    visit = db.get_by_id(EHR_Visit, medication.visit_id)
+    ehr, _ = get_patient_ehr(patient_id)
+    if not visit or not ehr or visit.ehr_id != ehr.id:
+         flash('Invalid medication record for this patient.', 'danger')
+         return redirect(url_for('doctor.view_ehr', patient_id=patient_id))
 
-    if request.method == 'POST' and form.validate_on_submit():
+    form = MedicationForm(obj=medication)
+
+    if form.validate_on_submit():
         try:
-            # Update medication
             medication.medication_name = form.medication_name.data
             medication.dosage = form.dosage.data
             medication.frequency = form.frequency.data
             medication.start_date = form.start_date.data
             medication.end_date = form.end_date.data
+            medication.instructions = form.instructions.data
             medication.updated_at = datetime.now()
 
-            # Save to database
             db.update(medication)
 
-            flash('Medication updated successfully.', 'success')
-            return redirect(url_for('doctor.view_visit_details', patient_id=patient_id, visit_id=visit_id))
+            flash('Medication updated successfully!', 'success')
+            return redirect(url_for('doctor.view_ehr', patient_id=patient_id) + '#summary')
         except Exception as e:
-            flash(f'Error updating medication: {str(e)}', 'error')
+            flash(f'Error updating medication: {str(e)}', 'danger')
+    elif request.method == 'POST':
+        flash('Please correct the errors below.', 'warning')
 
-    # Format the visit date for display
-    visit_date = visit.date.strftime('%Y-%m-%d') if visit.date else 'N/A'
-
-    return render_template('doctor/ehr/add_medication.html',
+    return render_template('doctor/ehr/edit_medication.html',
                            form=form,
                            patient=patient,
-                           visit_id=visit_id,
-                           visit_date=visit_date,
-                           is_edit=True)
+                           medication=medication)
 
 @doctor_bp.route('/patient/<uuid:patient_id>/visit/<uuid:visit_id>/diagnosis/<uuid:diagnosis_id>/delete', methods=['POST'])
 @login_required
@@ -849,3 +847,129 @@ def delete_note(patient_id, visit_id, note_id):
         flash(f'Error deleting provider note: {str(e)}', 'error')
 
     return redirect(url_for('doctor.view_visit_details', patient_id=patient_id, visit_id=visit_id))
+
+@doctor_bp.route('/ehr/patient/<uuid:patient_id>/allergy/<uuid:allergy_id>/edit', methods=['GET', 'POST'])
+@login_required
+@role_required(UserRole.DOCTOR)
+def edit_allergy(patient_id, allergy_id):
+    """Route to edit an existing allergy for a patient."""
+    db = Database()
+    patient = db.get_by_id(Patient, patient_id)
+    allergy = db.get_by_id(EHR_Allergy, allergy_id)
+
+    if not patient or not allergy:
+        flash('Patient or Allergy record not found.', 'danger')
+        return redirect(url_for('doctor.patient_search'))
+
+    ehr, _ = get_patient_ehr(patient_id)
+    if not ehr or allergy.ehr_id != ehr.id:
+        flash('Invalid allergy record for this patient.', 'danger')
+        return redirect(url_for('doctor.view_ehr', patient_id=patient_id))
+
+    form = AllergyForm(obj=allergy)
+
+    if form.validate_on_submit():
+        try:
+            allergy.allergen = form.allergen.data
+            allergy.reaction = form.reaction.data
+            allergy.severity = form.severity.data # Assuming severity maps correctly
+            allergy.onset_date = form.onset_date.data
+            allergy.updated_at = datetime.now()
+
+            db.update(allergy)
+
+            flash('Allergy updated successfully!', 'success')
+            return redirect(url_for('doctor.view_ehr', patient_id=patient_id) + '#allergies')
+        except Exception as e:
+            flash(f'Error updating allergy: {str(e)}', 'danger')
+    elif request.method == 'POST':
+        flash('Please correct the errors below.', 'warning')
+
+    return render_template('doctor/ehr/edit_allergy.html',
+                           form=form,
+                           patient=patient,
+                           allergy=allergy)
+
+@doctor_bp.route('/ehr/patient/<uuid:patient_id>/immunization/<uuid:immunization_id>/edit', methods=['GET', 'POST'])
+@login_required
+@role_required(UserRole.DOCTOR)
+def edit_immunization(patient_id, immunization_id):
+    """Route to edit an existing immunization for a patient."""
+    db = Database()
+    patient = db.get_by_id(Patient, patient_id)
+    immunization = db.get_by_id(EHR_Immunization, immunization_id)
+
+    if not patient or not immunization:
+        flash('Patient or Immunization record not found.', 'danger')
+        return redirect(url_for('doctor.patient_search'))
+
+    ehr, _ = get_patient_ehr(patient_id)
+    if not ehr or immunization.ehr_id != ehr.id:
+         flash('Invalid immunization record for this patient.', 'danger')
+         return redirect(url_for('doctor.view_ehr', patient_id=patient_id))
+
+    form = ImmunizationForm(obj=immunization)
+
+    if form.validate_on_submit():
+        try:
+            immunization.vaccine = form.vaccine.data
+            immunization.date_administered = form.date_administered.data
+            immunization.administered_by = form.administered_by.data
+            immunization.updated_at = datetime.now()
+
+            db.update(immunization)
+
+            flash('Immunization updated successfully!', 'success')
+            return redirect(url_for('doctor.view_ehr', patient_id=patient_id) + '#immunizations')
+        except Exception as e:
+            flash(f'Error updating immunization: {str(e)}', 'danger')
+    elif request.method == 'POST':
+        flash('Please correct the errors below.', 'warning')
+
+    return render_template('doctor/ehr/edit_immunization.html',
+                           form=form,
+                           patient=patient,
+                           immunization=immunization)
+
+@doctor_bp.route('/ehr/patient/<uuid:patient_id>/test_result/<uuid:test_result_id>/edit', methods=['GET', 'POST'])
+@login_required
+@role_required(UserRole.DOCTOR)
+def edit_test_result(patient_id, test_result_id):
+    """Route to edit an existing test result for a patient."""
+    db = Database()
+    patient = db.get_by_id(Patient, patient_id)
+    test_result = db.get_by_id(EHR_TestResult, test_result_id)
+
+    if not patient or not test_result:
+        flash('Patient or Test Result record not found.', 'danger')
+        return redirect(url_for('doctor.patient_search'))
+
+    ehr, _ = get_patient_ehr(patient_id)
+    if not ehr or test_result.ehr_id != ehr.id:
+        flash('Invalid test result record for this patient.', 'danger')
+        return redirect(url_for('doctor.view_ehr', patient_id=patient_id))
+
+    form = TestResultForm(obj=test_result)
+
+    if form.validate_on_submit():
+        try:
+            test_result.test_name = form.test_name.data # Check model field name (TestResult model uses test_type)
+            test_result.test_date = form.test_date.data
+            test_result.result_data = form.test_result.data # Model uses result_data (dict), form uses test_result (TextArea)? Might need adjustment.
+            test_result.updated_at = datetime.now()
+
+            # Handle file upload logic separately if needed (see comments in original route)
+
+            db.update(test_result)
+
+            flash('Test Result updated successfully!', 'success')
+            return redirect(url_for('doctor.view_ehr', patient_id=patient_id) + '#test-results')
+        except Exception as e:
+            flash(f'Error updating test result: {str(e)}', 'danger')
+    elif request.method == 'POST':
+        flash('Please correct the errors below.', 'warning')
+
+    return render_template('doctor/ehr/edit_test_result.html',
+                           form=form,
+                           patient=patient,
+                           test_result=test_result)

@@ -422,20 +422,62 @@
         7,
         11
       ],
-      "status": "pending",
-      "subtasks": []
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Patient Search and EHR Retrieval Module",
+          "description": "Develop the functionality to search for patients using various criteria (name, ID, etc.) and retrieve their complete Electronic Health Record (EHR).",
+          "dependencies": [],
+          "details": "Implement search functionality with fuzzy matching. Ensure secure access and retrieval of patient data based on user roles and permissions.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Diagnosis and Medication Management Forms",
+          "description": "Create forms for entering diagnoses, prescribing medications, and managing medication lists. Include drug interaction checks and allergy alerts.",
+          "dependencies": [
+            1
+          ],
+          "details": "Integrate with drug databases for accurate medication information. Implement validation rules to prevent errors in dosage and frequency.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Provider Notes and Clinical Data Entry",
+          "description": "Design and implement a system for providers to enter clinical notes, observations, and other relevant patient data. Support structured and unstructured data entry.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Implement templates for common note types. Allow for free-text entry with support for voice-to-text. Ensure data is stored in a structured format for reporting and analysis.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Audit Logging and Validation System",
+          "description": "Implement a comprehensive audit logging system to track all user actions and data modifications. Develop validation rules to ensure data integrity and compliance with regulations.",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Log all access attempts, data changes, and system events. Implement validation rules for data entry fields. Generate reports for auditing purposes.",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": 14,
       "title": "Implement Doctor EHR Update Functionality",
       "description": "Create the interface and backend for doctors to update patient EHR information.",
-      "details": "1. Create edit interfaces for each EHR section:\n   - Diagnoses (add/edit diagnosis codes and descriptions)\n   - Medications (add/edit medications, dosage, frequency)\n   - Allergies (add/edit allergens, reactions, severity)\n   - Procedures (add/edit procedure codes and descriptions)\n   - Vitals (add/edit temperature, pulse, blood pressure, etc.)\n   - Immunizations (add/edit vaccines and dates)\n   - Provider Notes (add/edit clinical notes)\n2. Implement form validation for all fields\n3. Create database update operations\n4. Implement audit logging for EHR changes\n5. Add confirmation dialogs for updates\n6. Create success/error notifications\n7. Implement auto-save functionality where appropriate\n8. Add form reset/cancel functionality",
-      "testStrategy": "1. Test adding new entries to each EHR section\n2. Verify editing existing entries works correctly\n3. Test form validation for all fields\n4. Verify database updates are performed correctly\n5. Test audit logging captures all changes\n6. Verify confirmation dialogs work\n7. Test auto-save functionality\n8. Verify form reset/cancel works correctly",
-      "priority": "high",
+      "status": "pending",
       "dependencies": [
         13
       ],
-      "status": "pending",
+      "priority": "high",
+      "details": "1. Create edit interfaces for each EHR section:\n   - Diagnoses (add/edit diagnosis codes and descriptions)\n   - Medications (add/edit medications, dosage, frequency)\n   - Allergies (add/edit allergens, reactions, severity)\n   - Procedures (add/edit procedure codes and descriptions)\n   - Vitals (add/edit temperature, pulse, blood pressure, etc.)\n   - Immunizations (add/edit vaccines and dates)\n   - Provider Notes (add/edit clinical notes)\n2. Implement form validation for all fields\n3. Create database update operations\n4. Add confirmation dialogs for updates\n5. Create success/error notifications\n6. Implement auto-save functionality where appropriate\n7. Add form reset/cancel functionality",
+      "testStrategy": "1. Test adding new entries to each EHR section\n2. Verify editing existing entries works correctly\n3. Test form validation for all fields\n4. Verify database updates are performed correctly\n5. Verify confirmation dialogs work\n6. Test auto-save functionality\n7. Verify form reset/cancel works correctly",
       "subtasks": []
     },
     {

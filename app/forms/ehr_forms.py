@@ -42,6 +42,16 @@ class AllergyForm(FlaskForm):
     onset_date = DateField('Onset Date', validators=[Optional()])
     additional_notes = TextAreaField('Additional Notes', validators=[Optional(), Length(max=500)])
 
+class ImmunizationForm(FlaskForm):
+    """Form for adding or editing an immunization"""
+    visit_id = HiddenField('Visit ID')
+    vaccine = StringField('Vaccine Name', validators=[DataRequired(), Length(min=2, max=100)])
+    date_administered = DateField('Date Administered', validators=[DataRequired()])
+    administered_by = StringField('Administered By', validators=[Optional(), Length(max=100)])
+    lot_number = StringField('Lot Number', validators=[Optional(), Length(max=50)])
+    site = StringField('Administration Site', validators=[Optional(), Length(max=100)])
+    notes = TextAreaField('Notes', validators=[Optional(), Length(max=500)])
+
 class VitalSignsForm(FlaskForm):
     """Form for adding or editing vital signs"""
     visit_id = HiddenField('Visit ID')

@@ -194,15 +194,26 @@
             </h3>
             {% set diagnoses_found = false %} {% for visit_info in visits[:3] %}
             {% for diagnosis in visit_info.diagnoses %}
-            <div class="mb-3 last:mb-0">
-              <p class="font-medium">{{ diagnosis.diagnosis_description }}</p>
-              <p class="text-sm text-gray-500">
-                Code: {{ diagnosis.diagnosis_code }}
-              </p>
-              <p class="text-sm text-gray-500">
-                Date: {{ diagnosis.diagnosed_at.strftime('%Y-%m-%d') if
-                diagnosis.diagnosed_at else 'N/A' }}
-              </p>
+            <div class="mb-3 last:mb-0 border-b border-gray-100 pb-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="font-medium">
+                    {{ diagnosis.diagnosis_description }}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    Code: {{ diagnosis.diagnosis_code }}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    Date: {{ diagnosis.diagnosed_at.strftime('%Y-%m-%d') if
+                    diagnosis.diagnosed_at else 'N/A' }}
+                  </p>
+                </div>
+                <a
+                  href="{{ url_for('doctor.edit_diagnosis', patient_id=patient.id, diagnosis_id=diagnosis.id) }}"
+                  class="text-xs text-indigo-600 hover:text-indigo-900 ml-2"
+                  >Edit</a
+                >
+              </div>
             </div>
             {% set diagnoses_found = true %} {% endfor %} {% endfor %} {% if not
             diagnoses_found %}
@@ -215,14 +226,23 @@
             </h3>
             {% set medications_found = false %} {% for visit_info in visits %}
             {% for medication in visit_info.medications %}
-            <div class="mb-3 last:mb-0">
-              <p class="font-medium">{{ medication.medication_name }}</p>
-              <p class="text-sm text-gray-500">
-                Dosage: {{ medication.dosage }}
-              </p>
-              <p class="text-sm text-gray-500">
-                Frequency: {{ medication.frequency }}
-              </p>
+            <div class="mb-3 last:mb-0 border-b border-gray-100 pb-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="font-medium">{{ medication.medication_name }}</p>
+                  <p class="text-sm text-gray-500">
+                    Dosage: {{ medication.dosage }}
+                  </p>
+                  <p class="text-sm text-gray-500">
+                    Frequency: {{ medication.frequency }}
+                  </p>
+                </div>
+                <a
+                  href="{{ url_for('doctor.edit_medication', patient_id=patient.id, medication_id=medication.id) }}"
+                  class="text-xs text-indigo-600 hover:text-indigo-900 ml-2"
+                  >Edit</a
+                >
+              </div>
             </div>
             {% set medications_found = true %} {% endfor %} {% endfor %} {% if
             not medications_found %}
@@ -388,6 +408,9 @@
                 >
                   Noted Date
                 </th>
+                <th scope="col" class="relative px-6 py-3">
+                  <span class="sr-only">Edit</span>
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -440,6 +463,15 @@
                   {{ allergy.noted_at.strftime('%Y-%m-%d') if allergy.noted_at
                   else 'N/A' }}
                 </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                >
+                  <a
+                    href="{{ url_for('doctor.edit_allergy', patient_id=patient.id, allergy_id=allergy.id) }}"
+                    class="text-indigo-600 hover:text-indigo-900"
+                    >Edit</a
+                  >
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -488,6 +520,9 @@
                 >
                   Administered By
                 </th>
+                <th scope="col" class="relative px-6 py-3">
+                  <span class="sr-only">Edit</span>
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -504,6 +539,15 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {{ immunization.administered_by or 'N/A' }}
+                </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                >
+                  <a
+                    href="{{ url_for('doctor.edit_immunization', patient_id=patient.id, immunization_id=immunization.id) }}"
+                    class="text-indigo-600 hover:text-indigo-900"
+                    >Edit</a
+                  >
                 </td>
               </tr>
               {% endfor %}
@@ -565,6 +609,9 @@
                 >
                   Actions
                 </th>
+                <th scope="col" class="relative px-6 py-3">
+                  <span class="sr-only">Edit</span>
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -602,6 +649,15 @@
                   <button class="text-indigo-600 hover:text-indigo-900">
                     View Details
                   </button>
+                </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                >
+                  <a
+                    href="{{ url_for('doctor.edit_test_result', patient_id=patient.id, test_result_id=test_result.id) }}"
+                    class="text-indigo-600 hover:text-indigo-900"
+                    >Edit</a
+                  >
                 </td>
               </tr>
               {% endfor %}

@@ -1,0 +1,58 @@
+{% extends \"doctor/layout.html\" %}
+{% from \"_form_helpers.html\" import render_field %}
+
+{% block title %}Edit Test Result - {{ patient.full_name }}{% endblock %}
+
+{% block content %}
+<div class=\"container mx-auto px-4 py-8\">
+  <h1 class=\"text-2xl font-bold text-gray-800 mb-6\">Edit Test Result for {{ patient.full_name }}</h1>
+
+  <div class=\"bg-white rounded-lg shadow-md p-6\">
+    {# IMPORTANT: File uploads require enctype=\"multipart/form-data\" #}
+    <form method=\"POST\" action=\"{{ url_for('doctor.edit_test_result', patient_id=patient.id, test_result_id=test_result.id) }}\" enctype=\"multipart/form-data\"
+          onsubmit=\"return confirm('Are you sure you want to save these changes? This might replace the existing file attachment.');\">
+      {{ form.hidden_tag() }}
+
+      <div class=\"space-y-4\">
+        {{ render_field(form.test_name, class='form-input w-full') }}
+        {{ render_field(form.test_date, class='form-input w-full') }}
+        {{ render_field(form.test_description, class='form-textarea w-full', rows=2) }}
+        {{ render_field(form.test_result, label_text='Result Summary/Value', class='form-textarea w-full', rows=3) }} {# Check label #}
+        {{ render_field(form.test_units, class='form-input w-full') }}
+        {{ render_field(form.reference_range, class='form-input w-full') }}
+        {{ render_field(form.result_interpretation, class='form-textarea w-full', rows=3) }}
+        {{ render_field(form.is_abnormal, class='form-checkbox') }}
+
+        {# File handling needs thought: Show current file? Allow replacement? #}
+        {# For simplicity, just show the upload field for replacement if needed #}
+        <div class=\"border-t pt-4 mt-4\">
+            <p class=\"text-sm text-gray-600 mb-2\">Current File:
+                {% if test_result.file_path %}
+                    <a href=\"{{ test_result.file_path }}\" target=\"_blank\" class=\"text-indigo-600 hover:underline\">View Current Document</a>
+                {% else %}
+                    None
+                {% endif %}
+            </p>
+            {{ render_field(form.test_file, label_text='Replace Result Document (Optional)', class='form-input w-full') }}
+        </div>
+        {# visit_id is likely not applicable or not edited here #}
+      </div>
+
+      <div class=\"mt-6 flex justify-end space-x-3\">
+        <a href=\"{{ url_for('doctor.view_ehr', patient_id=patient.id) }}#test-results\"
+           class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none\">
+          Cancel
+        </a>
+         <button type=\"reset\"
+                class=\"px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none\">
+            Reset Form
+        </button>
+        <button type=\"submit\"
+                class=\"px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500\">
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
