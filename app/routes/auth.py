@@ -197,6 +197,8 @@ def login():
                 return redirect(url_for('hospital_admin.dashboard'))
             elif user.role == UserRole.DOCTOR:
                 return redirect(url_for('doctor.dashboard'))
+            elif user.role == UserRole.PATIENT:
+                return redirect(url_for('patient.dashboard'))
             else:
                 return redirect(url_for('main.index'))
         else:

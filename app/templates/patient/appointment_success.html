@@ -1,0 +1,112 @@
+{% extends "patient/layout.html" %} {% block title %}Appointment Confirmation{%
+endblock %} {% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    <!-- Success header -->
+    <div class="bg-green-500 text-white px-6 py-4">
+      <div class="flex items-center">
+        <svg
+          class="w-6 h-6 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          ></path>
+        </svg>
+        <h1 class="text-xl font-semibold">Appointment Booked Successfully!</h1>
+      </div>
+    </div>
+
+    <!-- Appointment details -->
+    <div class="p-6">
+      <h2 class="text-lg font-medium text-gray-800 mb-4">
+        Appointment Details
+      </h2>
+
+      <div class="border border-gray-200 rounded-lg p-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-500">Hospital</p>
+            <p class="font-medium">{{ appointment.hospital_name }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Department</p>
+            <p class="font-medium">{{ appointment.department_name }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Doctor</p>
+            <p class="font-medium">{{ appointment.doctor_name }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Appointment ID</p>
+            <p class="font-medium">{{ appointment.id }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Date</p>
+            <p class="font-medium">{{ appointment.date }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Time</p>
+            <p class="font-medium">{{ appointment.time }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">Status</p>
+            <span
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+            >
+              {{ appointment.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-5 w-5 text-blue-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-700">
+              Please arrive 15 minutes before your appointment time. Bring any
+              relevant medical records or test results.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col md:flex-row justify-between space-y-4 md:space-y-0 md:space-x-4"
+      >
+        <a
+          href="{{ url_for('patient.my_appointments') }}"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded text-center"
+        >
+          View All Appointments
+        </a>
+        <a
+          href="{{ url_for('patient.dashboard') }}"
+          class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded text-center"
+        >
+          Return to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -32,6 +32,9 @@
 
     <!-- Additional CSS -->
     {% block extra_css %}{% endblock %}
+
+    <!-- Additional head content -->
+    {% block head_extra %}{% endblock %}
   </head>
   <body class="bg-gray-50 min-h-screen flex flex-col">
     <!-- Header / Navigation -->
@@ -62,7 +65,7 @@
           url_for('main.dashboard') %} {# Default/Fallback #} {% if
           session.get('user_role') == 'doctor' %} {% set dashboard_url =
           url_for('doctor.dashboard') %} {% elif session.get('user_role') ==
-          'patient' %} {% set dashboard_url = url_for('main.dashboard') %} {%
+          'patient' %} {% set dashboard_url = url_for('patient.dashboard') %} {%
           elif session.get('user_role') == 'hospital_admin' %} {% set
           dashboard_url = url_for('hospital_admin.dashboard') %} {% elif
           session.get('user_role') == 'system_admin' %} {% set dashboard_url =
@@ -73,18 +76,6 @@
             >{{ 'Dashboard'|t }}</a
           >
           {% endif %}
-          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
-            >{{ 'Services'|t }}</a
-          >
-          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
-            >{{ 'Doctors'|t }}</a
-          >
-          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
-            >{{ 'About'|t }}</a
-          >
-          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600"
-            >{{ 'Contact'|t }}</a
-          >
         </div>
 
         <!-- Mobile menu button -->
@@ -175,7 +166,7 @@
           url_for('main.dashboard') %} {# Default/Fallback #} {% if
           session.get('user_role') == 'doctor' %} {% set dashboard_url =
           url_for('doctor.dashboard') %} {% elif session.get('user_role') ==
-          'patient' %} {% set dashboard_url = url_for('main.dashboard') %} {%
+          'patient' %} {% set dashboard_url = url_for('patient.dashboard') %} {%
           elif session.get('user_role') == 'hospital_admin' %} {% set
           dashboard_url = url_for('hospital_admin.dashboard') %} {% elif
           session.get('user_role') == 'system_admin' %} {% set dashboard_url =
@@ -185,21 +176,7 @@
             class="font-medium text-gray-700 hover:text-cyan-600 py-2"
             >{{ 'Dashboard'|t }}</a
           >
-          {% endif %}
-          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >{{ 'Services'|t }}</a
-          >
-          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >{{ 'Doctors'|t }}</a
-          >
-          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >{{ 'About'|t }}</a
-          >
-          <a href="#" class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >{{ 'Contact'|t }}</a
-          >
-
-          {% if session.get('user_id') %}
+          {% endif %} {% if session.get('user_id') %}
           <div class="flex items-center pt-2">
             {% if session.get('profile_picture_url') %}
             <img

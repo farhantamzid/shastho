@@ -1,0 +1,685 @@
+{% extends "patient/layout.html" %} {% block title %}My Health Records -
+Shastho{% endblock %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="flex items-center mb-6">
+    <a
+      href="{{ url_for('patient.dashboard') }}"
+      class="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-1"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      Back to Dashboard
+    </a>
+    <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+      <ol class="list-none p-0 inline-flex">
+        <li class="flex items-center">
+          <a
+            href="{{ url_for('patient.dashboard') }}"
+            class="hover:text-gray-900"
+            >Dashboard</a
+          >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 mx-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </li>
+        <li class="text-gray-900 font-medium">My Health Records</li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800">My Health Records</h1>
+          <div class="flex items-center mt-2 text-gray-600">
+            <div class="mr-6">
+              <span class="font-medium">Name:</span> {{ patient.full_name if
+              patient else 'N/A' }}
+            </div>
+            <div class="mr-6">
+              <span class="font-medium">DOB:</span> {{
+              patient.date_of_birth.strftime('%Y-%m-%d') if patient and
+              patient.date_of_birth else 'N/A' }}
+            </div>
+          </div>
+        </div>
+        <div class="flex">
+          <button
+            onclick="window.print()"
+            class="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Print
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if not has_ehr %}
+  <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-yellow-400"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-yellow-700">
+          Your health records are not available. Please contact your healthcare
+          provider for assistance.
+        </p>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- Tabs -->
+  <div class="mb-8">
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8 overflow-x-auto" aria-label="Tabs">
+        <button
+          onclick="showTab('summary')"
+          class="tab-btn active whitespace-nowrap py-4 px-1 border-b-2 border-cyan-500 font-medium text-sm text-cyan-600"
+          aria-current="page"
+        >
+          Summary
+        </button>
+        <button
+          onclick="showTab('visits')"
+          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        >
+          Visit History
+        </button>
+        <button
+          onclick="showTab('allergies')"
+          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        >
+          Allergies
+        </button>
+        <button
+          onclick="showTab('medications')"
+          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        >
+          Medications
+        </button>
+        <button
+          onclick="showTab('immunizations')"
+          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        >
+          Immunizations
+        </button>
+        <button
+          onclick="showTab('test-results')"
+          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
+        >
+          Test Results
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <div>
+    <!-- Summary Tab -->
+    <div id="summary" class="tab-content">
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Health Summary</h2>
+
+        <!-- Vitals -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-700 mb-4 border-b pb-2">
+            My Vitals
+            <span class="text-sm font-normal text-gray-500 ml-2">
+              Last updated: {{ vitals.last_updated.strftime('%Y-%m-%d') }}
+            </span>
+          </h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-sm text-gray-500">Height</p>
+              <p class="text-lg font-medium">{{ vitals.height }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-sm text-gray-500">Weight</p>
+              <p class="text-lg font-medium">{{ vitals.weight }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-sm text-gray-500">BMI</p>
+              <p class="text-lg font-medium">{{ vitals.bmi }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-sm text-gray-500">Blood Pressure</p>
+              <p class="text-lg font-medium">{{ vitals.blood_pressure }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-sm text-gray-500">Heart Rate</p>
+              <p class="text-lg font-medium">{{ vitals.heart_rate }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-sm text-gray-500">Temperature</p>
+              <p class="text-lg font-medium">{{ vitals.temperature }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Diagnoses -->
+        <div class="mb-8">
+          <h3 class="text-lg font-medium text-gray-700 mb-4 border-b pb-2">
+            Recent Diagnoses
+          </h3>
+
+          {% if visits|length > 0 %} {% for visit in visits[:3] %} {% for
+          diagnosis in visit.diagnoses %}
+          <div class="mb-4 bg-gray-50 p-4 rounded-lg">
+            <div class="flex flex-wrap justify-between items-start">
+              <div>
+                <p class="font-medium text-gray-800">{{ diagnosis.name }}</p>
+                <p class="text-sm text-gray-500">
+                  Diagnosed on {{ visit.date.strftime('%Y-%m-%d') }} by {{
+                  visit.doctor }}
+                </p>
+                {% if diagnosis.notes %}
+                <p class="mt-2 text-sm text-gray-600">{{ diagnosis.notes }}</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %} {% endfor %} {% else %}
+          <p class="text-gray-500 italic">No recent diagnoses available.</p>
+          {% endif %}
+        </div>
+
+        <!-- Current Medications -->
+        <div>
+          <h3 class="text-lg font-medium text-gray-700 mb-4 border-b pb-2">
+            Current Medications
+          </h3>
+
+          {% set current_meds_found = false %} {% for visit in visits %} {% for
+          medication in visit.medications %} {% if medication.end_date >=
+          vitals.last_updated %} {% set current_meds_found = true %}
+          <div class="mb-4 bg-gray-50 p-4 rounded-lg">
+            <div class="flex flex-wrap justify-between items-start">
+              <div>
+                <p class="font-medium text-gray-800">
+                  {{ medication.name }} ({{ medication.dosage }})
+                </p>
+                <p class="text-sm text-gray-500">{{ medication.frequency }}</p>
+                <p class="text-sm text-gray-500">
+                  {{ medication.start_date.strftime('%Y-%m-%d') }} to {{
+                  medication.end_date.strftime('%Y-%m-%d') }}
+                </p>
+              </div>
+            </div>
+          </div>
+          {% endif %} {% endfor %} {% endfor %} {% if not current_meds_found %}
+          <p class="text-gray-500 italic">No current medications.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Visits History Tab -->
+    <div id="visits" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Visit History</h2>
+
+        {% if visits|length > 0 %}
+        <div class="space-y-8">
+          {% for visit in visits %}
+          <div class="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
+            <div class="flex flex-wrap items-center justify-between mb-4">
+              <h3 class="text-lg font-medium text-gray-800">
+                Visit on {{ visit.date.strftime('%B %d, %Y') }}
+              </h3>
+              <span class="text-sm text-gray-500">
+                {{ visit.doctor }} - {{ visit.department }}
+              </span>
+            </div>
+
+            {% if visit.diagnoses|length > 0 %}
+            <div class="mb-4">
+              <h4 class="text-md font-medium text-gray-700 mb-2">Diagnoses</h4>
+              <ul class="list-disc pl-5 space-y-1">
+                {% for diagnosis in visit.diagnoses %}
+                <li>
+                  <span class="font-medium">{{ diagnosis.name }}</span>
+                  {% if diagnosis.notes %}
+                  <p class="text-sm text-gray-600 mt-1">
+                    {{ diagnosis.notes }}
+                  </p>
+                  {% endif %}
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %} {% if visit.medications|length > 0 %}
+            <div class="mb-4">
+              <h4 class="text-md font-medium text-gray-700 mb-2">
+                Medications
+              </h4>
+              <ul class="list-disc pl-5 space-y-1">
+                {% for medication in visit.medications %}
+                <li>
+                  <span class="font-medium">{{ medication.name }}</span> ({{
+                  medication.dosage }}) - {{ medication.frequency }}
+                  <p class="text-sm text-gray-500">
+                    {{ medication.start_date.strftime('%Y-%m-%d') }} to {{
+                    medication.end_date.strftime('%Y-%m-%d') }}
+                  </p>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %} {% if visit.notes %}
+            <div>
+              <h4 class="text-md font-medium text-gray-700 mb-2">Notes</h4>
+              <p class="text-gray-600">{{ visit.notes }}</p>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 italic">No visit history available.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Allergies Tab -->
+    <div id="allergies" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Allergies</h2>
+
+        {% if allergies|length > 0 %}
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Allergy
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Severity
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Reaction
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for allergy in allergies %}
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ allergy.name }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">
+                    {{ allergy.severity }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ allergy.reaction }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500 italic">No allergies recorded.</p>
+        {% endif %}
+
+        <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-5 w-5 text-blue-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-blue-700">
+                If you have allergies that are not listed here, please inform
+                your healthcare provider during your next visit.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medications Tab -->
+    <div id="medications" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Medications</h2>
+
+        {% set medications_found = false %} {% for visit in visits %} {% for
+        medication in visit.medications %} {% set medications_found = true %} {%
+        endfor %} {% endfor %} {% if medications_found %}
+        <div class="space-y-6">
+          <h3 class="text-lg font-medium text-gray-700 mb-4 border-b pb-2">
+            Current Medications
+          </h3>
+
+          {% set current_meds_found = false %} {% for visit in visits %} {% for
+          medication in visit.medications %} {% if medication.end_date >=
+          vitals.last_updated %} {% set current_meds_found = true %}
+          <div class="bg-gray-50 p-4 rounded-lg mb-4">
+            <div class="flex flex-wrap justify-between">
+              <div>
+                <p class="font-medium text-gray-800">{{ medication.name }}</p>
+                <p class="text-sm text-gray-600">
+                  {{ medication.dosage }} - {{ medication.frequency }}
+                </p>
+                <p class="text-xs text-gray-500 mt-1">
+                  Prescribed on {{ medication.start_date.strftime('%b %d, %Y')
+                  }} until {{ medication.end_date.strftime('%b %d, %Y') }}
+                </p>
+              </div>
+              <div class="text-right text-xs text-gray-500">
+                Prescribed by {{ visit.doctor }}
+              </div>
+            </div>
+          </div>
+          {% endif %} {% endfor %} {% endfor %} {% if not current_meds_found %}
+          <p class="text-gray-500 italic">No current medications.</p>
+          {% endif %}
+
+          <h3 class="text-lg font-medium text-gray-700 mb-4 border-b pb-2 mt-8">
+            Medication History
+          </h3>
+
+          {% set past_meds_found = false %} {% for visit in visits %} {% for
+          medication in visit.medications %} {% if medication.end_date <
+          vitals.last_updated %} {% set past_meds_found = true %}
+          <div class="bg-gray-50 p-4 rounded-lg mb-4">
+            <div class="flex flex-wrap justify-between">
+              <div>
+                <p class="font-medium text-gray-800">{{ medication.name }}</p>
+                <p class="text-sm text-gray-600">
+                  {{ medication.dosage }} - {{ medication.frequency }}
+                </p>
+                <p class="text-xs text-gray-500 mt-1">
+                  Prescribed on {{ medication.start_date.strftime('%b %d, %Y')
+                  }} until {{ medication.end_date.strftime('%b %d, %Y') }}
+                </p>
+              </div>
+              <div class="text-right text-xs text-gray-500">
+                Prescribed by {{ visit.doctor }}
+              </div>
+            </div>
+          </div>
+          {% endif %} {% endfor %} {% endfor %} {% if not past_meds_found %}
+          <p class="text-gray-500 italic">No past medication history.</p>
+          {% endif %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 italic">No medications recorded.</p>
+        {% endif %}
+
+        <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-5 w-5 text-blue-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-blue-700">
+                Always take medications as prescribed. Contact your healthcare
+                provider if you experience any adverse effects.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Immunizations Tab -->
+    <div id="immunizations" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Immunizations</h2>
+
+        {% if immunizations|length > 0 %}
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Immunization
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Date
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Administered By
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for immunization in immunizations %}
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ immunization.name }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">
+                    {{ immunization.date.strftime('%Y-%m-%d') }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ immunization.administered_by }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500 italic">No immunization records available.</p>
+        {% endif %}
+
+        <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-5 w-5 text-blue-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-blue-700">
+                Staying up-to-date with immunizations is important for your
+                health. Talk to your healthcare provider about which
+                vaccinations are recommended for you.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Results Tab -->
+    <div id="test-results" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Test Results</h2>
+
+        {% if test_results|length > 0 %}
+        <div class="space-y-6">
+          {% for test in test_results %}
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="flex flex-wrap justify-between items-start">
+              <div>
+                <p class="font-medium text-gray-800">{{ test.name }}</p>
+                <p class="text-sm text-gray-500">
+                  {{ test.date.strftime('%Y-%m-%d') }}
+                </p>
+              </div>
+              <div>
+                <span
+                  class="px-2 py-1 text-sm rounded-full {% if test.result == 'Normal' %}bg-green-100 text-green-800{% elif test.result == 'Abnormal' %}bg-yellow-100 text-yellow-800{% else %}bg-gray-100 text-gray-800{% endif %}"
+                >
+                  {{ test.result }}
+                </span>
+              </div>
+            </div>
+            {% if test.notes %}
+            <p class="mt-2 text-sm text-gray-600">{{ test.notes }}</p>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 italic">No test results available.</p>
+        {% endif %}
+
+        <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-5 w-5 text-blue-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-blue-700">
+                If you have questions about your test results, please schedule
+                an appointment with your healthcare provider to discuss them.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  function showTab(tabId) {
+    // Hide all tab contents
+    document.querySelectorAll(".tab-content").forEach((content) => {
+      content.classList.add("hidden");
+    });
+
+    // Show the selected tab content
+    document.getElementById(tabId).classList.remove("hidden");
+
+    // Update active tab button styling
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.classList.remove("active");
+      btn.classList.remove("border-cyan-500");
+      btn.classList.remove("text-cyan-600");
+      btn.classList.add("border-transparent");
+      btn.classList.add("text-gray-500");
+    });
+
+    const activeBtn = document.querySelector(
+      `.tab-btn[onclick="showTab('${tabId}')"]`
+    );
+    activeBtn.classList.add("active");
+    activeBtn.classList.add("border-cyan-500");
+    activeBtn.classList.add("text-cyan-600");
+    activeBtn.classList.remove("border-transparent");
+    activeBtn.classList.remove("text-gray-500");
+  }
+</script>
+{% endblock %}

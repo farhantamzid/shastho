@@ -1,6 +1,6 @@
 # Task ID: 8
 # Title: Implement Doctor Availability Management
-# Status: pending
+# Status: done
 # Dependencies: 7
 # Priority: medium
 # Description: Create the interface for doctors to set their availability schedule and time slots.

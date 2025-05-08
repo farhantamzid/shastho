@@ -1,0 +1,729 @@
+{% extends "patient/layout.html" %} {% block title %}Book Appointment{% endblock
+%} {% block page_title %}Book an Appointment{% endblock %} {% block
+patient_content %}
+<div class="container mx-auto px-4 py-6">
+  <div class="mb-6">
+    <nav aria-label="breadcrumb">
+      <ol class="flex text-sm">
+        <li class="hover:text-cyan-600">
+          <a href="{{ url_for('patient.dashboard') }}">Dashboard</a>
+        </li>
+        <li class="mx-2">/</li>
+        <li class="text-gray-500" aria-current="page">Book Appointment</li>
+      </ol>
+    </nav>
+    <h1 class="text-2xl font-bold mt-2">Book an Appointment</h1>
+    <p class="text-gray-600">
+      Please follow the steps below to book your appointment
+    </p>
+  </div>
+
+  <!-- Booking Progress Indicator -->
+  <div class="mb-6">
+    <div class="h-1 bg-gray-200 rounded">
+      <div
+        class="h-1 bg-cyan-600 rounded"
+        role="progressbar"
+        style="width: {% if step == 1 %}20%{% elif step == 2 %}40%{% elif step == 3 %}60%{% elif step == 4 %}80%{% else %}100%{% endif %};"
+      ></div>
+    </div>
+    <div class="flex justify-between mt-2 text-sm">
+      <span
+        class="{% if step >= 1 %}text-cyan-600 font-medium{% else %}text-gray-500{% endif %}"
+        >Select Hospital</span
+      >
+      <span
+        class="{% if step >= 2 %}text-cyan-600 font-medium{% else %}text-gray-500{% endif %}"
+        >Select Department</span
+      >
+      <span
+        class="{% if step >= 3 %}text-cyan-600 font-medium{% else %}text-gray-500{% endif %}"
+        >Select Doctor</span
+      >
+      <span
+        class="{% if step >= 4 %}text-cyan-600 font-medium{% else %}text-gray-500{% endif %}"
+        >Select Date</span
+      >
+      <span
+        class="{% if step >= 5 %}text-cyan-600 font-medium{% else %}text-gray-500{% endif %}"
+        >Confirm</span
+      >
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md">
+    <div class="p-6">
+      <form
+        id="appointmentForm"
+        action="{{ url_for('patient.submit_appointment') }}"
+        method="POST"
+      >
+        <!-- CSRF token -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <!-- Step 1: Select Hospital -->
+        <div id="step1" class="{% if step != 1 %}hidden{% endif %}">
+          <h3 class="text-lg font-semibold mb-4">Select Hospital</h3>
+          <div class="mb-4">
+            <label
+              for="hospital"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Hospital <span class="text-red-500">*</span>
+            </label>
+            <select
+              class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+              id="hospital"
+              name="hospital_id"
+              required
+            >
+              <option value="">Please select a hospital</option>
+              {% for hospital in hospitals %}
+              <option value="{{ hospital.id }}">
+                {{ hospital.name }} - {{ hospital.location }}
+              </option>
+              {% endfor %}
+            </select>
+            <p class="mt-1 hidden text-sm text-red-600" id="hospital-error">
+              Please select a hospital
+            </p>
+          </div>
+          <div class="flex justify-end mt-6">
+            <button
+              type="button"
+              class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 next-step"
+              data-next="2"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Select Department -->
+        <div id="step2" class="{% if step != 2 %}hidden{% endif %}">
+          <h3 class="text-lg font-semibold mb-4">Select Department</h3>
+          <div class="mb-4">
+            <label
+              for="department"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Department <span class="text-red-500">*</span>
+            </label>
+            <select
+              class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50 disabled:bg-gray-100"
+              id="department"
+              name="department_id"
+              required
+              disabled
+            >
+              <option value="">Please select a department</option>
+              <!-- Departments will be loaded here via AJAX -->
+            </select>
+            <p class="mt-1 hidden text-sm text-red-600" id="department-error">
+              Please select a department
+            </p>
+          </div>
+          <div class="flex justify-between mt-6">
+            <button
+              type="button"
+              class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 prev-step"
+              data-prev="1"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 next-step"
+              data-next="3"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Select Doctor -->
+        <div id="step3" class="{% if step != 3 %}hidden{% endif %}">
+          <h3 class="text-lg font-semibold mb-4">Select a Doctor</h3>
+          <div id="loadingDoctors" class="hidden">
+            <div class="flex items-center justify-center py-8">
+              <div
+                class="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-600"
+              ></div>
+              <span class="ml-2 text-gray-600">Loading doctors...</span>
+            </div>
+          </div>
+          <div id="noDoctors" class="hidden">
+            <div class="py-8 text-center">
+              <p class="text-gray-600">
+                No doctors available for the selected department. Please choose
+                another department or contact the hospital.
+              </p>
+            </div>
+          </div>
+          <div id="doctorList" class="mb-4"></div>
+          <input type="hidden" id="doctor" name="doctor_id" required />
+          <div class="flex justify-between mt-6">
+            <button
+              type="button"
+              class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 prev-step"
+              data-prev="2"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 next-step disabled:opacity-50 disabled:cursor-not-allowed"
+              data-next="4"
+              id="doctorNextBtn"
+              disabled
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4: Select Date and Time -->
+        <div id="step4" class="{% if step != 4 %}hidden{% endif %}">
+          <h3 class="text-lg font-semibold mb-4">Select Date and Time</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div class="mb-4">
+                <label
+                  for="appointment-date"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Appointment Date <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                  id="appointment-date"
+                  name="appointment_date"
+                  required
+                />
+                <p class="mt-1 hidden text-sm text-red-600" id="date-error">
+                  Please select a date
+                </p>
+              </div>
+              <div id="dateFeedback" class="hidden mb-4 flex items-center">
+                <div
+                  class="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-600 mr-2"
+                  id="dateLoading"
+                ></div>
+                <span id="dateMessage" class="text-sm text-gray-600"></span>
+              </div>
+            </div>
+            <div>
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Appointment Time <span class="text-red-500">*</span>
+                </label>
+                <div id="timeSlotContainer" class="mt-2">
+                  <p class="text-gray-500 text-sm">
+                    Please select a date first
+                  </p>
+                </div>
+                <input
+                  type="hidden"
+                  id="appointment-time"
+                  name="appointment_time"
+                  required
+                />
+                <p class="mt-1 hidden text-sm text-red-600" id="time-error">
+                  Please select a time slot
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-between mt-6">
+            <button
+              type="button"
+              class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 prev-step"
+              data-prev="3"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 next-step disabled:opacity-50 disabled:cursor-not-allowed"
+              data-next="5"
+              id="dateTimeNextBtn"
+              disabled
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 5: Confirm Appointment -->
+        <div id="step5" class="{% if step != 5 %}hidden{% endif %}">
+          <h3 class="text-lg font-semibold mb-4">Confirm Appointment</h3>
+          <div class="bg-gray-50 p-4 rounded-lg mb-4">
+            <div class="mb-3">
+              <p class="text-sm text-gray-500">Hospital</p>
+              <p class="font-medium" id="summary-hospital"></p>
+            </div>
+            <div class="mb-3">
+              <p class="text-sm text-gray-500">Department</p>
+              <p class="font-medium" id="summary-department"></p>
+            </div>
+            <div class="mb-3">
+              <p class="text-sm text-gray-500">Doctor</p>
+              <p class="font-medium" id="summary-doctor"></p>
+            </div>
+            <div class="mb-3">
+              <p class="text-sm text-gray-500">Date</p>
+              <p class="font-medium" id="summary-date"></p>
+            </div>
+            <div class="mb-3">
+              <p class="text-sm text-gray-500">Time</p>
+              <p class="font-medium" id="summary-time"></p>
+            </div>
+          </div>
+          <div class="flex justify-between mt-6">
+            <button
+              type="button"
+              class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 prev-step"
+              data-prev="4"
+            >
+              Previous
+            </button>
+            <button
+              type="submit"
+              class="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+            >
+              Book Appointment
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Get all the DOM elements
+    const hospitalSelect = document.getElementById("hospital");
+    const departmentSelect = document.getElementById("department");
+    const doctorInput = document.getElementById("doctor");
+    const dateInput = document.getElementById("appointment-date");
+    const timeInput = document.getElementById("appointment-time");
+    const doctorNextBtn = document.getElementById("doctorNextBtn");
+    const dateTimeNextBtn = document.getElementById("dateTimeNextBtn");
+    const steps = document.querySelectorAll('[id^="step"]');
+    const nextButtons = document.querySelectorAll(".next-step");
+    const prevButtons = document.querySelectorAll(".prev-step");
+    const doctorList = document.getElementById("doctorList");
+    const loadingDoctors = document.getElementById("loadingDoctors");
+    const noDoctors = document.getElementById("noDoctors");
+    const timeSlotContainer = document.getElementById("timeSlotContainer");
+    const dateFeedback = document.getElementById("dateFeedback");
+    const dateLoading = document.getElementById("dateLoading");
+    const dateMessage = document.getElementById("dateMessage");
+
+    // Set min date to today
+    const today = new Date();
+    const formattedDate = today.toISOString().split("T")[0];
+    dateInput.setAttribute("min", formattedDate);
+
+    // Next/Previous navigation
+    nextButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const currentStep = parseInt(
+          this.closest("[id^='step']").id.replace("step", "")
+        );
+        const nextStep = parseInt(this.dataset.next);
+
+        if (validateStep(currentStep)) {
+          showStep(nextStep);
+          updateSummary();
+        }
+      });
+    });
+
+    prevButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const prevStep = parseInt(this.dataset.prev);
+        showStep(prevStep);
+      });
+    });
+
+    function showStep(stepNumber) {
+      steps.forEach((step) => {
+        step.classList.add("hidden");
+      });
+      document.getElementById(`step${stepNumber}`).classList.remove("hidden");
+
+      // Update URL to reflect current step
+      const url = new URL(window.location);
+      url.searchParams.set("step", stepNumber);
+      window.history.pushState({}, "", url);
+    }
+
+    function validateStep(stepNumber) {
+      if (stepNumber === 1) {
+        if (!hospitalSelect.value) {
+          document.getElementById("hospital-error").classList.remove("hidden");
+          return false;
+        }
+        document.getElementById("hospital-error").classList.add("hidden");
+        return true;
+      } else if (stepNumber === 2) {
+        if (!departmentSelect.value) {
+          document
+            .getElementById("department-error")
+            .classList.remove("hidden");
+          return false;
+        }
+        document.getElementById("department-error").classList.add("hidden");
+        return true;
+      } else if (stepNumber === 3) {
+        if (!doctorInput.value) {
+          return false;
+        }
+        return true;
+      } else if (stepNumber === 4) {
+        if (!dateInput.value) {
+          document.getElementById("date-error").classList.remove("hidden");
+          return false;
+        }
+        document.getElementById("date-error").classList.add("hidden");
+
+        if (!timeInput.value) {
+          document.getElementById("time-error").classList.remove("hidden");
+          return false;
+        }
+        document.getElementById("time-error").classList.add("hidden");
+        return true;
+      }
+      return true;
+    }
+
+    // Hospital change handler
+    hospitalSelect.addEventListener("change", function () {
+      if (this.value) {
+        fetchDepartments(this.value);
+        departmentSelect.disabled = false;
+      } else {
+        departmentSelect.disabled = true;
+        departmentSelect.innerHTML =
+          '<option value="">Please select a department</option>';
+      }
+    });
+
+    // Department change handler
+    departmentSelect.addEventListener("change", function () {
+      if (this.value) {
+        fetchDoctors(this.value);
+      } else {
+        doctorList.innerHTML = "";
+        noDoctors.classList.remove("hidden");
+        doctorNextBtn.disabled = true;
+      }
+    });
+
+    // Date change handler
+    dateInput.addEventListener("change", function () {
+      if (this.value) {
+        fetchTimeSlots(doctorInput.value, this.value);
+      } else {
+        timeSlotContainer.innerHTML =
+          '<p class="text-gray-500 text-sm">Please select a date first</p>';
+        timeInput.value = "";
+        dateTimeNextBtn.disabled = true;
+      }
+    });
+
+    // Fetch departments for selected hospital
+    function fetchDepartments(hospitalId) {
+      console.log("Fetching departments for hospital ID:", hospitalId);
+      const url = `/patient/get_departments/${hospitalId}`;
+      console.log("Request URL:", url);
+      fetch(url)
+        .then((response) => {
+          console.log("Response status:", response.status);
+          return response.json();
+        })
+        .then((data) => {
+          console.log("Departments data:", data);
+          let options = '<option value="">Please select a department</option>';
+          if (data && data.departments) {
+            data.departments.forEach((dept) => {
+              options += `<option value="${dept.id}">${dept.name}</option>`;
+            });
+          }
+          departmentSelect.innerHTML = options;
+        })
+        .catch((error) => {
+          console.error("Error fetching departments:", error);
+          departmentSelect.innerHTML =
+            '<option value="">Error loading departments</option>';
+        });
+    }
+
+    // Fetch doctors for selected department
+    function fetchDoctors(departmentId) {
+      doctorList.innerHTML = "";
+      loadingDoctors.classList.remove("hidden");
+      noDoctors.classList.add("hidden");
+      doctorNextBtn.disabled = true;
+      doctorInput.value = "";
+
+      console.log("Fetching doctors for department ID:", departmentId);
+      const url = `/patient/get_doctors/${departmentId}`;
+      console.log("Request URL:", url);
+
+      // Show loading state
+      const startTime = new Date().getTime();
+
+      fetch(url)
+        .then((response) => {
+          console.log("Response status:", response.status);
+          if (!response.ok) {
+            throw new Error(`Server responded with status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log("Doctors data received:", data);
+
+          // Calculate loading time to ensure minimum loading time for UI
+          const loadTime = new Date().getTime() - startTime;
+          const minLoadTime = 500; // minimum loading time in milliseconds
+
+          if (loadTime < minLoadTime) {
+            // If loading was too fast, wait a bit to avoid UI flashing
+            setTimeout(() => {
+              processDoctor(data);
+            }, minLoadTime - loadTime);
+          } else {
+            processDoctor(data);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching doctors:", error);
+          loadingDoctors.classList.add("hidden");
+          noDoctors.classList.remove("hidden");
+
+          // Show a more specific error message
+          const errorElement = document.createElement("div");
+          errorElement.className = "py-8 text-center";
+          errorElement.innerHTML = `
+            <p class="text-red-600 mb-2">Error loading doctors.</p>
+            <p class="text-gray-600">There was a problem fetching the doctor list. Please try selecting another department or refresh the page and try again.</p>
+            <p class="text-gray-500 text-sm mt-2">Error details: ${error.message}</p>
+          `;
+          noDoctors.innerHTML = "";
+          noDoctors.appendChild(errorElement);
+        });
+
+      // Function to process doctor data and update UI
+      function processDoctor(data) {
+        loadingDoctors.classList.add("hidden");
+
+        if (data && data.doctors && data.doctors.length > 0) {
+          console.log(`Found ${data.doctors.length} doctors`);
+          const doctorsContainer = document.createElement("div");
+          doctorsContainer.className = "space-y-4";
+
+          // Use a Set to track unique doctor IDs and prevent duplicates
+          const seenDoctorIds = new Set();
+
+          data.doctors.forEach((doctor) => {
+            // Skip if we've already seen this doctor
+            if (seenDoctorIds.has(doctor.id)) {
+              console.log(`Skipping duplicate doctor: ${doctor.id}`);
+              return;
+            }
+
+            // Mark this doctor as seen
+            seenDoctorIds.add(doctor.id);
+            console.log(`Adding doctor: ${doctor.name} (${doctor.id})`);
+
+            const doctorCard = createDoctorCard(doctor);
+            doctorsContainer.appendChild(doctorCard);
+          });
+
+          doctorList.appendChild(doctorsContainer);
+        } else {
+          console.log("No doctors found in the response");
+          noDoctors.classList.remove("hidden");
+
+          // Show a helpful message
+          noDoctors.innerHTML = `
+            <div class="py-8 text-center">
+              <p class="text-gray-600 mb-2">No doctors are available for the selected department.</p>
+              <p class="text-gray-500">Please try selecting another department or contact the hospital for assistance.</p>
+            </div>
+          `;
+        }
+      }
+    }
+
+    // Create doctor card for selection
+    function createDoctorCard(doctor) {
+      const card = document.createElement("div");
+      card.className =
+        "border rounded-lg overflow-hidden bg-white hover:shadow-md transition-shadow";
+      card.dataset.doctorId = doctor.id;
+
+      // Set click handler for selection
+      card.addEventListener("click", function () {
+        // Remove selected class from all cards
+        document.querySelectorAll(".doctor-card-selected").forEach((el) => {
+          el.classList.remove("doctor-card-selected");
+          el.classList.remove("ring-2");
+          el.classList.remove("ring-cyan-500");
+        });
+
+        // Add selected class to clicked card
+        this.classList.add("doctor-card-selected");
+        this.classList.add("ring-2");
+        this.classList.add("ring-cyan-500");
+
+        // Set the doctor ID in the hidden input
+        doctorInput.value = this.dataset.doctorId;
+        doctorNextBtn.disabled = false;
+      });
+
+      const cardContent = `
+        <div class="p-4 flex items-center">
+          <div class="flex-shrink-0 mr-4">
+            <img src="${
+              doctor.profile_picture || "/static/images/default-doctor.png"
+            }"
+                 alt="${doctor.name}"
+                 class="h-16 w-16 rounded-full object-cover">
+          </div>
+          <div>
+            <h4 class="font-medium text-gray-900">${doctor.name}</h4>
+            <p class="text-sm text-gray-500">${doctor.specialization}</p>
+            <div class="mt-2">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Available
+              </span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      card.innerHTML = cardContent;
+      return card;
+    }
+
+    // Fetch time slots for selected doctor and date
+    function fetchTimeSlots(doctorId, date) {
+      timeSlotContainer.innerHTML = "";
+      timeInput.value = "";
+      dateTimeNextBtn.disabled = true;
+
+      dateFeedback.classList.remove("hidden");
+      dateLoading.classList.remove("hidden");
+      dateMessage.textContent = "Loading available time slots...";
+
+      const url = `/patient/get_time_slots/${doctorId}/${date}`;
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          dateLoading.classList.add("hidden");
+
+          if (data && data.time_slots && data.time_slots.length > 0) {
+            dateMessage.textContent = "Select a time slot below";
+
+            const timeSlots = document.createElement("div");
+            timeSlots.className = "grid grid-cols-3 gap-2";
+
+            data.time_slots.forEach((slot) => {
+              const slotBtn = document.createElement("button");
+              slotBtn.type = "button";
+              slotBtn.className =
+                "time-slot-btn px-3 py-2 text-sm border rounded text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-cyan-500";
+
+              // Format the time slot properly
+              let formattedSlot = "";
+              if (
+                typeof slot === "object" &&
+                slot.start_time &&
+                slot.end_time
+              ) {
+                formattedSlot = `${slot.start_time} - ${slot.end_time}`;
+              } else if (typeof slot === "string") {
+                formattedSlot = slot; // If already formatted
+              } else {
+                formattedSlot = "Unknown time";
+              }
+
+              slotBtn.textContent = formattedSlot;
+              slotBtn.dataset.timeSlot = formattedSlot;
+
+              slotBtn.addEventListener("click", function () {
+                // Remove selected class from all time slots
+                document
+                  .querySelectorAll(".time-slot-selected")
+                  .forEach((el) => {
+                    el.classList.remove("time-slot-selected");
+                    el.classList.remove("bg-cyan-100");
+                    el.classList.remove("text-cyan-800");
+                    el.classList.remove("border-cyan-300");
+                  });
+
+                // Add selected class to clicked slot
+                this.classList.add("time-slot-selected");
+                this.classList.add("bg-cyan-100");
+                this.classList.add("text-cyan-800");
+                this.classList.add("border-cyan-300");
+
+                // Set the time slot in the hidden input
+                timeInput.value = this.dataset.timeSlot;
+                dateTimeNextBtn.disabled = false;
+              });
+
+              timeSlots.appendChild(slotBtn);
+            });
+
+            timeSlotContainer.appendChild(timeSlots);
+          } else {
+            dateMessage.textContent =
+              "No available time slots for the selected date";
+            timeSlotContainer.innerHTML =
+              '<div class="bg-yellow-50 border-l-4 border-yellow-400 p-4"><p class="text-yellow-700">No available time slots for the selected date. Please choose another date.</p></div>';
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching time slots:", error);
+          dateLoading.classList.add("hidden");
+          dateMessage.textContent = "Error loading time slots";
+          timeSlotContainer.innerHTML =
+            '<div class="bg-red-50 border-l-4 border-red-400 p-4"><p class="text-red-700">Error loading time slots. Please try again.</p></div>';
+        });
+    }
+
+    // Update summary in the confirmation step
+    function updateSummary() {
+      if (document.getElementById("step5").classList.contains("hidden")) {
+        return;
+      }
+
+      document.getElementById("summary-hospital").textContent =
+        hospitalSelect.options[hospitalSelect.selectedIndex].text;
+
+      document.getElementById("summary-department").textContent =
+        departmentSelect.options[departmentSelect.selectedIndex].text;
+
+      // Get doctor name from selected card
+      const selectedDoctor = document.querySelector(".doctor-card-selected");
+      if (selectedDoctor) {
+        const doctorName = selectedDoctor.querySelector("h4").textContent;
+        document.getElementById("summary-doctor").textContent = doctorName;
+      }
+
+      document.getElementById("summary-date").textContent = dateInput.value
+        ? new Date(dateInput.value).toLocaleDateString()
+        : "";
+
+      document.getElementById("summary-time").textContent = timeInput.value;
+    }
+  });
+</script>
+{% endblock %}

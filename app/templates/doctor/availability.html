@@ -1,0 +1,909 @@
+{% extends "doctor/layout.html" %} {% block title %}Manage Availability{%
+endblock %} {% block extra_css %}
+<!-- Bootstrap CSS -->
+<link
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
+<!-- Font Awesome CSS (for icons like fa-save) -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+/>
+<style>
+  .bootstrap-override-container {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .toast-container {
+    position: fixed !important;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+  }
+
+  .availability-card {
+    margin-bottom: 1rem;
+  }
+
+  .slot-container {
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+
+  .slot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .saved-slots-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+  }
+
+  .saved-slot-pill {
+    display: inline-block;
+    background-color: #e2f0ff;
+    padding: 5px 10px;
+    margin: 3px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+  }
+
+  .alert-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1060;
+    min-width: 300px;
+  }
+</style>
+{% endblock %} {% block doctor_content %}
+<div class="bootstrap-override-container">
+  <div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Manage Your Availability</h1>
+      <div>
+        <button class="btn btn-primary" id="save-all-btn">
+          <i class="fas fa-save fa-sm text-white-50"></i> Save All Changes
+        </button>
+      </div>
+    </div>
+
+    <!-- Alert container for more visible notifications -->
+    <div class="alert-container" id="alert-container"></div>
+
+    <div class="row">
+      <div class="col-xl-12 col-lg-12">
+        <div class="card shadow mb-4">
+          <div
+            class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+          >
+            <h6 class="m-0 font-weight-bold text-primary">
+              Weekly Availability Schedule
+            </h6>
+          </div>
+          <div class="card-body">
+            <p class="mb-4">
+              Set your availability for each day of the week using the form
+              below. You can add multiple slots per day with 1-hour increments.
+              Times are from 9:00 AM to 3:00 PM.
+            </p>
+
+            <!-- Current Saved Slots Section -->
+            <div class="saved-slots-section mb-4" id="saved-slots-section">
+              <h6 class="font-weight-bold">Your Current Availability:</h6>
+              <div id="saved-slots-display">
+                <!-- Saved slots will be displayed here -->
+                <div class="text-center text-muted my-3" id="no-slots-message">
+                  <em>No availability slots have been saved yet.</em>
+                </div>
+              </div>
+            </div>
+
+            <!-- Availability slots container -->
+            <div id="slots-container">
+              <!-- Slots will be displayed here -->
+            </div>
+
+            <div class="row mt-4">
+              <div class="col-md-12">
+                <button class="btn btn-success" id="add-slot-btn">
+                  <i class="fas fa-plus"></i> Add Availability Slot
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Quick Templates</h6>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3 mb-2">
+                <button
+                  class="btn btn-outline-primary btn-block"
+                  id="weekday-morning-template"
+                >
+                  Weekday Mornings (9AM-12PM)
+                </button>
+              </div>
+              <div class="col-md-3 mb-2">
+                <button
+                  class="btn btn-outline-primary btn-block"
+                  id="weekday-afternoon-template"
+                >
+                  Weekday Afternoons (1PM-3PM)
+                </button>
+              </div>
+              <div class="col-md-3 mb-2">
+                <button
+                  class="btn btn-outline-primary btn-block"
+                  id="weekend-template"
+                >
+                  Weekend Hours (10AM-2PM)
+                </button>
+              </div>
+              <div class="col-md-3 mb-2">
+                <button
+                  class="btn btn-outline-primary btn-block"
+                  id="full-day-template"
+                >
+                  Weekday Full (9AM-3PM)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div
+    class="modal fade"
+    id="deleteModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="deleteModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+          <button
+            class="close"
+            type="button"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this availability slot?
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">
+            Cancel
+          </button>
+          <button class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page specific JavaScript -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Initialize variables
+      let availabilitySlots = [];
+      let currentSlotId = null;
+
+      // Day of week mapping
+      const dayNames = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ];
+
+      // Create time options for dropdowns
+      function getTimeOptions() {
+        const options = [];
+        for (let hour = 9; hour <= 15; hour++) {
+          const hourDisplay = hour > 12 ? hour - 12 : hour;
+          const ampm = hour >= 12 ? "PM" : "AM";
+          options.push({
+            value: `${hour.toString().padStart(2, "0")}:00`,
+            label: `${hourDisplay}:00 ${ampm}`,
+          });
+        }
+        return options;
+      }
+
+      // Create a new slot element
+      function createSlotElement(slot = null) {
+        const slotId = slot ? slot.id : `new-${Date.now()}`;
+        const day = slot ? parseInt(slot.day_of_week) : 0;
+        const startTime = slot ? slot.start_time : "09:00";
+        const endTime = slot ? slot.end_time : "10:00";
+
+        const slotElement = document.createElement("div");
+        slotElement.className = "slot-container";
+        slotElement.setAttribute("data-slot-id", slotId);
+
+        // Create time options
+        const timeOptions = getTimeOptions();
+        let startTimeOptions = "";
+        let endTimeOptions = "";
+
+        timeOptions.forEach((option) => {
+          const startSelected = option.value === startTime ? "selected" : "";
+          startTimeOptions += `<option value="${option.value}" ${startSelected}>${option.label}</option>`;
+
+          const endSelected = option.value === endTime ? "selected" : "";
+          endTimeOptions += `<option value="${option.value}" ${endSelected}>${option.label}</option>`;
+        });
+
+        slotElement.innerHTML = `
+          <div class="slot-header">
+            <h6 class="mb-0">Availability Slot</h6>
+            <button class="btn btn-sm btn-danger delete-slot-btn" data-slot-id="${slotId}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+          <div class="row">
+            <div class="col-md-4 form-group">
+              <label>Day of Week</label>
+              <select class="form-control day-select" data-slot-id="${slotId}">
+                ${dayNames
+                  .map(
+                    (name, index) =>
+                      `<option value="${index}" ${
+                        index === day ? "selected" : ""
+                      }>${name}</option>`
+                  )
+                  .join("")}
+              </select>
+            </div>
+            <div class="col-md-4 form-group">
+              <label>Start Time</label>
+              <select class="form-control start-time-select" data-slot-id="${slotId}">
+                ${startTimeOptions}
+              </select>
+            </div>
+            <div class="col-md-4 form-group">
+              <label>End Time</label>
+              <select class="form-control end-time-select" data-slot-id="${slotId}">
+                ${endTimeOptions}
+              </select>
+            </div>
+          </div>
+        `;
+
+        // Add event listener for delete button
+        slotElement
+          .querySelector(".delete-slot-btn")
+          .addEventListener("click", function () {
+            const slotId = this.getAttribute("data-slot-id");
+            if (slotId.startsWith("new-")) {
+              // Just remove the element if it's a new slot
+              slotElement.remove();
+            } else {
+              // Set current slot ID and show delete confirmation modal
+              currentSlotId = slotId;
+              $("#deleteModal").modal("show");
+            }
+          });
+
+        // Add validation for start/end times
+        const startSelect = slotElement.querySelector(".start-time-select");
+        const endSelect = slotElement.querySelector(".end-time-select");
+
+        startSelect.addEventListener("change", function () {
+          validateTimes(startSelect, endSelect);
+        });
+
+        endSelect.addEventListener("change", function () {
+          validateTimes(startSelect, endSelect);
+        });
+
+        return slotElement;
+      }
+
+      // Validate that end time is after start time
+      function validateTimes(startSelect, endSelect) {
+        const startTime = startSelect.value;
+        const endTime = endSelect.value;
+
+        if (startTime >= endTime) {
+          // Set end time to one hour after start time
+          const startHour = parseInt(startTime.split(":")[0]);
+          const endHour = Math.min(startHour + 1, 15);
+          endSelect.value = `${endHour.toString().padStart(2, "0")}:00`;
+        }
+      }
+
+      // Check if a new slot overlaps with existing saved slots
+      function checkForOverlap(day, startTime, endTime) {
+        for (const slot of availabilitySlots) {
+          if (parseInt(slot.day_of_week) === parseInt(day)) {
+            const slotStart = slot.start_time;
+            const slotEnd = slot.end_time;
+
+            // Check for overlap - new slot starts during existing slot
+            if (
+              (startTime >= slotStart && startTime < slotEnd) ||
+              // new slot ends during existing slot
+              (endTime > slotStart && endTime <= slotEnd) ||
+              // new slot completely contains existing slot
+              (startTime <= slotStart && endTime >= slotEnd)
+            ) {
+              return {
+                overlap: true,
+                existingSlot: `${
+                  dayNames[slot.day_of_week]
+                } from ${formatTimeForDisplay(
+                  slotStart
+                )} to ${formatTimeForDisplay(slotEnd)}`,
+              };
+            }
+          }
+        }
+        return { overlap: false };
+      }
+
+      // Format time for display (HH:MM to readable format)
+      function formatTimeForDisplay(timeStr) {
+        const hour = parseInt(timeStr.split(":")[0]);
+        const minute = timeStr.split(":")[1] || "00";
+        const hourDisplay = hour > 12 ? hour - 12 : hour;
+        const ampm = hour >= 12 ? "PM" : "AM";
+        return `${hourDisplay}:${minute} ${ampm}`;
+      }
+
+      // Add a new slot to the UI
+      function addSlot(slot = null) {
+        const slotElement = createSlotElement(slot);
+        document.getElementById("slots-container").appendChild(slotElement);
+      }
+
+      // Render all slots
+      function renderSlots() {
+        const container = document.getElementById("slots-container");
+        container.innerHTML = "";
+
+        if (availabilitySlots.length === 0) {
+          // Add a default slot if none exist
+          addSlot();
+        } else {
+          availabilitySlots.forEach((slot) => {
+            addSlot(slot);
+          });
+        }
+
+        // Update the saved slots display
+        renderSavedSlotsDisplay();
+      }
+
+      // Display all saved slots in a readable format
+      function renderSavedSlotsDisplay() {
+        const container = document.getElementById("saved-slots-display");
+        const noSlotsMessage = document.getElementById("no-slots-message");
+
+        if (availabilitySlots.length === 0) {
+          noSlotsMessage.style.display = "block";
+          container.innerHTML = "";
+          return;
+        }
+
+        noSlotsMessage.style.display = "none";
+
+        // Group slots by day of week
+        const slotsByDay = {};
+        for (let i = 0; i < 7; i++) {
+          slotsByDay[i] = [];
+        }
+
+        availabilitySlots.forEach((slot) => {
+          const day = parseInt(slot.day_of_week);
+          slotsByDay[day].push(slot);
+        });
+
+        // Clear container
+        container.innerHTML = "";
+
+        // Create a section for each day that has slots
+        for (let day = 0; day < 7; day++) {
+          if (slotsByDay[day].length > 0) {
+            const dayElement = document.createElement("div");
+            dayElement.className = "mb-2";
+
+            const dayHeader = document.createElement("strong");
+            dayHeader.textContent = dayNames[day] + ": ";
+            dayElement.appendChild(dayHeader);
+
+            // Add each slot as a pill
+            slotsByDay[day].forEach((slot) => {
+              const slotPill = document.createElement("span");
+              slotPill.className = "saved-slot-pill";
+              slotPill.textContent = `${formatTimeForDisplay(
+                slot.start_time
+              )} - ${formatTimeForDisplay(slot.end_time)}`;
+              dayElement.appendChild(slotPill);
+            });
+
+            container.appendChild(dayElement);
+          }
+        }
+      }
+
+      // Custom alert function that shows more prominent messages
+      function showAlert(message, type = "info") {
+        const alertContainer = document.getElementById("alert-container");
+
+        const alertElement = document.createElement("div");
+        alertElement.className = `alert alert-${type} alert-dismissible fade show`;
+        alertElement.innerHTML = `
+          ${message}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        `;
+
+        alertContainer.appendChild(alertElement);
+
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+          $(alertElement).alert("close");
+        }, 5000);
+      }
+
+      // Load availability slots from server
+      function loadAvailabilitySlots() {
+        fetch("/doctor/availability/slots")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (data && data.success && data.slots) {
+              console.log("Loaded slots:", data.slots);
+              availabilitySlots = data.slots;
+              renderSlots();
+            } else {
+              console.error("Data format error:", data);
+              availabilitySlots = [];
+              renderSlots();
+            }
+          })
+          .catch((error) => {
+            console.error("Error loading availability slots:", error);
+            showAlert(
+              "Error loading availability data. Please try refreshing the page.",
+              "danger"
+            );
+            availabilitySlots = [];
+            renderSlots();
+          });
+      }
+
+      // Save all changes to availability
+      function saveAllChanges() {
+        // Show saving indicator
+        const saveBtn = document.getElementById("save-all-btn");
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        saveBtn.disabled = true;
+
+        const slots = [];
+        let hasOverlap = false;
+        let overlapMessage = "";
+
+        // Collect all slots from the UI
+        document.querySelectorAll(".slot-container").forEach((slotElement) => {
+          const slotId = slotElement.getAttribute("data-slot-id");
+          const day = slotElement.querySelector(".day-select").value;
+          const startTime =
+            slotElement.querySelector(".start-time-select").value;
+          const endTime = slotElement.querySelector(".end-time-select").value;
+
+          // Only include valid slots (end time after start time)
+          if (startTime < endTime) {
+            // Create the slot data without ID for both new and existing slots
+            const slotData = {
+              day_of_week: parseInt(day),
+              start_time: startTime,
+              end_time: endTime,
+              is_available: true,
+              slot_duration_minutes: 60, // Fixed at 1 hour
+            };
+
+            // For existing slots (not starting with 'new-'), include the ID
+            if (slotId && !slotId.startsWith("new-")) {
+              slotData.id = slotId;
+            }
+
+            // Check for overlaps with existing saved slots
+            if (!slotId.startsWith("new-")) {
+              // Skip overlap check for existing saved slots
+              slots.push(slotData);
+            } else {
+              const overlap = checkForOverlap(day, startTime, endTime);
+              if (overlap.overlap) {
+                hasOverlap = true;
+                overlapMessage = `Time slot overlaps with existing slot: ${overlap.existingSlot}`;
+                // Highlight the offending slot with a red border
+                slotElement.style.borderColor = "red";
+              } else {
+                slots.push(slotData);
+              }
+            }
+          }
+        });
+
+        if (hasOverlap) {
+          // Restore button
+          saveBtn.innerHTML = originalText;
+          saveBtn.disabled = false;
+
+          // Show overlap error
+          showAlert(
+            `Cannot save: ${overlapMessage}. Please fix the highlighted slot.`,
+            "warning"
+          );
+          return;
+        }
+
+        if (slots.length === 0) {
+          // Restore button
+          saveBtn.innerHTML = originalText;
+          saveBtn.disabled = false;
+
+          showAlert(
+            "No valid time slots to save. Please add at least one slot.",
+            "warning"
+          );
+          return;
+        }
+
+        console.log("Slots to save:", slots);
+
+        // Send the slots to the backend
+        fetch("/doctor/availability/save", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCsrfToken(),
+          },
+          body: JSON.stringify({
+            slots: slots,
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                `Server returned ${response.status}: ${response.statusText}`
+              );
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Save response:", data);
+
+            // Restore button
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+
+            if (data.success) {
+              showAlert("Availability has been saved successfully!", "success");
+              // Reload the slots to get server-assigned IDs and ensure UI matches DB state
+              loadAvailabilitySlots();
+            } else {
+              showAlert(
+                data.message || "There was an error saving your availability.",
+                "danger"
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error saving availability:", error);
+
+            // Restore button
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+
+            showAlert(
+              "There was an error saving your availability: " + error.message,
+              "danger"
+            );
+          });
+      }
+
+      // Delete a time slot
+      function deleteTimeSlot() {
+        if (!currentSlotId) {
+          console.error("No slot ID set for deletion");
+          return;
+        }
+
+        console.log("Deleting slot ID:", currentSlotId);
+
+        // If this is a new slot (not saved to DB yet), just remove it from the UI
+        if (currentSlotId.startsWith("new-")) {
+          const slotElement = document.querySelector(
+            `.slot-container[data-slot-id="${currentSlotId}"]`
+          );
+          if (slotElement) {
+            slotElement.remove();
+          }
+          $("#deleteModal").modal("hide");
+          return;
+        }
+
+        // Show deleting indicator
+        const deleteBtn = document.getElementById("confirm-delete-btn");
+        const originalText = deleteBtn.textContent;
+        deleteBtn.innerHTML =
+          '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        deleteBtn.disabled = true;
+
+        fetch(`/doctor/availability/delete/${currentSlotId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCsrfToken(),
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                `Server returned ${response.status}: ${response.statusText}`
+              );
+            }
+            return response.json();
+          })
+          .then((data) => {
+            $("#deleteModal").modal("hide");
+
+            // Restore button
+            deleteBtn.textContent = originalText;
+            deleteBtn.disabled = false;
+
+            if (data.success) {
+              showAlert("Time slot deleted successfully", "success");
+              // Remove the slot from the UI
+              const slotElement = document.querySelector(
+                `.slot-container[data-slot-id="${currentSlotId}"]`
+              );
+              if (slotElement) {
+                slotElement.remove();
+              }
+              // Reload slots from server to ensure UI is in sync
+              loadAvailabilitySlots();
+            } else {
+              showAlert(data.message || "Error deleting time slot", "danger");
+            }
+          })
+          .catch((error) => {
+            console.error("Error deleting time slot:", error);
+
+            // Restore button
+            deleteBtn.textContent = originalText;
+            deleteBtn.disabled = false;
+
+            showAlert("Error deleting time slot: " + error.message, "danger");
+            $("#deleteModal").modal("hide");
+          });
+      }
+
+      // Helper function to get CSRF token
+      function getCsrfToken() {
+        return document
+          .querySelector('meta[name="csrf-token"]')
+          .getAttribute("content");
+      }
+
+      // Custom toast notification
+      function showToast(title, message) {
+        const toastContainer = document.querySelector(".toast-container");
+        if (!toastContainer) {
+          const newContainer = document.createElement("div");
+          newContainer.className = "toast-container";
+          document.body.appendChild(newContainer);
+        }
+
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.setAttribute("role", "alert");
+        toast.setAttribute("aria-live", "assertive");
+        toast.setAttribute("aria-atomic", "true");
+        toast.setAttribute("data-delay", "3000");
+
+        toast.innerHTML = `
+          <div class="toast-header">
+            <strong class="mr-auto">${title}</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="toast-body">${message}</div>
+        `;
+
+        document.querySelector(".toast-container").appendChild(toast);
+        $(".toast").toast("show");
+
+        // Remove the toast after it's hidden
+        $(toast).on("hidden.bs.toast", function () {
+          toast.remove();
+        });
+      }
+
+      // Template functions
+      function applyWeekdayMorningTemplate() {
+        // Clear existing slots
+        document.getElementById("slots-container").innerHTML = "";
+
+        // Add morning slots for weekdays (Monday-Friday, 9AM-12PM)
+        for (let day = 0; day < 5; day++) {
+          const timestamp = Date.now() + day; // Ensure unique IDs
+          const slot = {
+            id: `new-${timestamp}`,
+            day_of_week: day,
+            start_time: "09:00",
+            end_time: "12:00",
+            is_available: true,
+            slot_duration_minutes: 60,
+          };
+          addSlot(slot);
+        }
+      }
+
+      function applyWeekdayAfternoonTemplate() {
+        // Clear existing slots
+        document.getElementById("slots-container").innerHTML = "";
+
+        // Add afternoon slots for weekdays (Monday-Friday, 1PM-3PM)
+        for (let day = 0; day < 5; day++) {
+          const timestamp = Date.now() + day; // Ensure unique IDs
+          const slot = {
+            id: `new-${timestamp}`,
+            day_of_week: day,
+            start_time: "13:00",
+            end_time: "15:00",
+            is_available: true,
+            slot_duration_minutes: 60,
+          };
+          addSlot(slot);
+        }
+      }
+
+      function applyWeekendTemplate() {
+        // Clear existing slots
+        document.getElementById("slots-container").innerHTML = "";
+
+        // Add slots for weekend (Saturday-Sunday, 10AM-2PM)
+        for (let day = 5; day < 7; day++) {
+          const timestamp = Date.now() + day; // Ensure unique IDs
+          const slot = {
+            id: `new-${timestamp}`,
+            day_of_week: day,
+            start_time: "10:00",
+            end_time: "14:00",
+            is_available: true,
+            slot_duration_minutes: 60,
+          };
+          addSlot(slot);
+        }
+      }
+
+      function applyFullDayTemplate() {
+        // Clear existing slots
+        document.getElementById("slots-container").innerHTML = "";
+
+        // Add full day slots for weekdays (Monday-Friday, 9AM-3PM)
+        for (let day = 0; day < 5; day++) {
+          const timestamp = Date.now() + day; // Ensure unique IDs
+          const slot = {
+            id: `new-${timestamp}`,
+            day_of_week: day,
+            start_time: "09:00",
+            end_time: "15:00",
+            is_available: true,
+            slot_duration_minutes: 60,
+          };
+          addSlot(slot);
+        }
+      }
+
+      // Initialize the page
+      function init() {
+        loadAvailabilitySlots();
+
+        // Set up event listeners
+        document
+          .getElementById("save-all-btn")
+          .addEventListener("click", saveAllChanges);
+        document
+          .getElementById("add-slot-btn")
+          .addEventListener("click", () => addSlot());
+        document
+          .getElementById("confirm-delete-btn")
+          .addEventListener("click", deleteTimeSlot);
+
+        // Template buttons
+        document
+          .getElementById("weekday-morning-template")
+          .addEventListener("click", applyWeekdayMorningTemplate);
+        document
+          .getElementById("weekday-afternoon-template")
+          .addEventListener("click", applyWeekdayAfternoonTemplate);
+        document
+          .getElementById("weekend-template")
+          .addEventListener("click", applyWeekendTemplate);
+        document
+          .getElementById("full-day-template")
+          .addEventListener("click", applyFullDayTemplate);
+
+        // Use direct event handling for delete buttons on existing slots
+        document.querySelectorAll(".delete-slot-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const slotId = this.getAttribute("data-slot-id");
+            currentSlotId = slotId;
+            $("#deleteModal").modal("show");
+          });
+        });
+
+        // Use event delegation for delete buttons on dynamically added slots
+        document
+          .getElementById("slots-container")
+          .addEventListener("click", function (e) {
+            // Check if the click target is the delete button or a child of it
+            const deleteBtn = e.target.closest(".delete-slot-btn");
+            if (deleteBtn) {
+              const slotId = deleteBtn.getAttribute("data-slot-id");
+              if (slotId) {
+                currentSlotId = slotId;
+                console.log("Setting currentSlotId to:", slotId);
+                $("#deleteModal").modal("show");
+              }
+            }
+          });
+      }
+
+      // Start the app
+      init();
+    });
+  </script>
+
+  <!-- Toast container for notifications -->
+  <div
+    class="toast-container"
+    style="position: fixed; top: 20px; right: 20px; z-index: 9999"
+  ></div>
+</div>
+{% endblock %} {% block head_extra %}
+<!-- Add CSRF token for AJAX requests -->
+<meta name="csrf-token" content="{{ csrf_token() }}" />
+{% endblock %}

@@ -311,7 +311,7 @@
       "dependencies": [
         7
       ],
-      "status": "pending",
+      "status": "done",
       "subtasks": []
     },
     {
@@ -326,7 +326,138 @@
         8
       ],
       "status": "pending",
-      "subtasks": []
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Create appointment booking interface",
+          "description": "Design and implement the main appointment booking interface page with appropriate layout and styling.",
+          "details": "Create a responsive appointment booking interface that provides a clear step-by-step process for patients. The interface should include a multi-step form with appropriate progress indicators and follow the application's design system.",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 9
+        },
+        {
+          "id": 2,
+          "title": "Implement hospital selection dropdown",
+          "description": "Create a dropdown component for selecting hospitals with appropriate data fetching.",
+          "details": "Implement a dropdown component that displays a list of available hospitals. The component should fetch hospital data from the backend API, handle loading and error states, and allow users to select a hospital as the first step in the booking process.",
+          "status": "done",
+          "dependencies": [
+            1
+          ],
+          "parentTaskId": 9
+        },
+        {
+          "id": 3,
+          "title": "Create department selection (filtered by selected hospital)",
+          "description": "Implement a department selection component that filters departments based on the selected hospital.",
+          "details": "Create a department selection dropdown or list that dynamically updates based on the selected hospital. The component should only display departments available at the chosen hospital, fetch data from the backend API with appropriate filters, and handle loading and error states.",
+          "status": "done",
+          "dependencies": [
+            2
+          ],
+          "parentTaskId": 9
+        },
+        {
+          "id": 4,
+          "title": "Implement doctor selection (filtered by selected department)",
+          "description": "Create a doctor selection component that filters doctors based on the selected department.",
+          "details": "Implement a doctor selection interface that shows doctors within the selected department. This could be a dropdown or a card-based interface with doctor profiles (name, photo, specialties). The component should fetch doctor data from the backend API filtered by the selected department, handle loading and error states, and allow users to select a doctor for their appointment.",
+          "status": "done",
+          "dependencies": [
+            3
+          ],
+          "parentTaskId": 9
+        },
+        {
+          "id": 5,
+          "title": "Create date selection with calendar interface",
+          "description": "Implement a calendar interface for selecting appointment dates.",
+          "details": "Create a calendar component that allows users to select a date for their appointment. The calendar should highlight available dates, disable past dates, and potentially show date-specific availability (e.g., doctor working days). Consider using an established date picker library that can be styled to match the application's design system.",
+          "status": "pending",
+          "dependencies": [
+            4
+          ],
+          "parentTaskId": 9
+        },
+        {
+          "id": 6,
+          "title": "Implement available time slot display based on doctor availability",
+          "description": "Create a component to display available time slots based on the selected doctor and date.",
+          "details": "Implement a time slot selection component that fetches and displays available appointment times for the selected doctor on the selected date. The interface should clearly distinguish between available and unavailable slots, fetch data from the appropriate API endpoint, handle loading and error states, and allow users to select a specific time for their appointment.",
+          "status": "pending",
+          "dependencies": [
+            5
+          ],
+          "parentTaskId": 9
+        },
+        {
+          "id": 7,
+          "title": "Create appointment confirmation screen with details",
+          "description": "Implement a confirmation screen that displays all selected appointment details before final booking.",
+          "details": "Create a confirmation page that summarizes all the appointment details (hospital, department, doctor, date, time) and allows users to review their selections before confirming the booking. The screen should clearly display all relevant information, provide options to go back and modify selections if needed, and include a prominent button to confirm and create the appointment.",
+          "status": "pending",
+          "dependencies": [
+            6
+          ],
+          "parentTaskId": 9
+        },
+        {
+          "id": 8,
+          "title": "Implement appointment creation in database",
+          "description": "Create the backend API endpoint and database operations for saving new appointments.",
+          "details": "Implement an API endpoint to handle appointment creation requests. The endpoint should validate incoming data, create a new appointment record in the database with appropriate fields (patient_id, doctor_id, hospital_id, department_id, date, time, status, etc.), handle potential errors (including concurrency issues), and return appropriate success/error responses.",
+          "status": "pending",
+          "dependencies": [
+            7
+          ],
+          "parentTaskId": 9
+        },
+        {
+          "id": 9,
+          "title": "Add validation to prevent double-booking",
+          "description": "Implement validation logic to prevent double-booking of appointments for the same time slot.",
+          "details": "Add validation logic in both frontend and backend to prevent double-booking scenarios. This includes checking for existing appointments at the requested time slot for the selected doctor, implementing appropriate database constraints, and handling race conditions where two users might try to book the same slot simultaneously. The validation should occur during the booking process and also as a final check before database insertion.",
+          "status": "pending",
+          "dependencies": [
+            8
+          ],
+          "parentTaskId": 9
+        },
+        {
+          "id": 10,
+          "title": "Create success/error notifications",
+          "description": "Implement user notifications for successful booking and error scenarios.",
+          "details": "Create a notification system to provide feedback to users after booking attempts. Implement success notifications that confirm when an appointment has been successfully booked, and error notifications that clearly explain what went wrong when booking fails (e.g., time slot no longer available, network error, validation errors). Notifications should be visually distinctive, appropriately positioned, and include actions where relevant (e.g., \"Try Again\").",
+          "status": "pending",
+          "dependencies": [
+            9
+          ],
+          "parentTaskId": 9
+        },
+        {
+          "id": 11,
+          "title": "Implement appointment summary view after booking",
+          "description": "Create a summary view that displays complete appointment details after successful booking.",
+          "details": "Design and implement a comprehensive appointment summary view that is displayed after successful booking. This view should show all relevant details about the booked appointment (hospital, department, doctor, date, time, etc.), provide options to add the appointment to calendar apps, print the details, and navigate to other relevant sections (e.g., view all appointments, book another appointment). The summary should also include any important instructions or preparation requirements for the appointment.",
+          "status": "pending",
+          "dependencies": [
+            10
+          ],
+          "parentTaskId": 9
+        },
+        {
+          "id": 12,
+          "title": "Add breadcrumb navigation for booking flow",
+          "description": "Implement breadcrumb navigation to help users track their progress through the booking flow.",
+          "details": "Create a breadcrumb navigation component that shows the user's current position in the multi-step booking process. The breadcrumbs should clearly indicate completed steps, the current step, and upcoming steps. Users should be able to click on completed steps to navigate back and modify their selections if needed. The component should be consistently positioned across all booking screens and provide clear visual feedback about the overall flow.",
+          "status": "pending",
+          "dependencies": [
+            1
+          ],
+          "parentTaskId": 9
+        }
+      ]
     },
     {
       "id": 10,

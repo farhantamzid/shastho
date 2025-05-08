@@ -1,0 +1,230 @@
+{% extends "patient/layout.html" %} {% block title %}Doctor Profile{% endblock
+%} {% block page_title %}Doctor Profile{% endblock %} {% block patient_content
+%}
+<div class="mb-6">
+  <nav aria-label="breadcrumb">
+    <ol class="flex text-sm">
+      <li class="hover:text-cyan-600">
+        <a href="{{ url_for('patient.dashboard') }}">Dashboard</a>
+      </li>
+      <li class="mx-2">/</li>
+      <li class="hover:text-cyan-600">
+        <a href="{{ url_for('patient.doctor_list') }}">Doctors</a>
+      </li>
+      <li class="mx-2">/</li>
+      <li class="text-gray-500" aria-current="page">{{ doctor.full_name }}</li>
+    </ol>
+  </nav>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+  <div class="md:col-span-1">
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div class="p-6 text-center">
+        <div class="mb-4 flex justify-center">
+          <div
+            class="w-24 h-24 rounded-full bg-cyan-600 text-white text-3xl flex items-center justify-center"
+          >
+            {{ doctor.full_name[0] }}
+          </div>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-900">
+          {{ doctor.full_name }}
+        </h2>
+        <p class="text-gray-500 mb-1">{{ doctor.specialization }}</p>
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800 mb-4"
+        >
+          {{ doctor.department_name }}
+        </span>
+        <div class="border-t border-gray-200 pt-4 mt-2">
+          <a
+            href="{{ url_for('patient.book_appointment') }}"
+            class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            Book Appointment
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="md:col-span-3">
+    <div class="bg-white rounded-lg shadow-sm mb-6">
+      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Doctor Information</h3>
+      </div>
+      <div class="px-4 py-5 sm:p-6">
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500">Full Name</dt>
+            <dd class="mt-1 text-sm text-gray-900">{{ doctor.full_name }}</dd>
+          </div>
+
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500">Specialization</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              {{ doctor.specialization }}
+            </dd>
+          </div>
+
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500">Department</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              {{ doctor.department_name }}
+            </dd>
+          </div>
+
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500">Hospital</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              {{ doctor.hospital_name }}
+            </dd>
+          </div>
+
+          {% if doctor.credentials %}
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500">Credentials</dt>
+            <dd class="mt-1 text-sm text-gray-900">{{ doctor.credentials }}</dd>
+          </div>
+          {% endif %} {% if doctor.contact_number %}
+          <div class="sm:col-span-1">
+            <dt class="text-sm font-medium text-gray-500">Contact</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              {{ doctor.contact_number }}
+            </dd>
+          </div>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm">
+      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Availability Schedule</h3>
+      </div>
+      <div class="px-4 py-5 sm:p-6">
+        {% if availability %}
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Day
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Hours
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for slot in availability %}
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ slot.day }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ slot.hours }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="rounded-md bg-blue-50 p-4 mt-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-5 w-5 text-blue-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-blue-700">
+                Please note that specific dates may have different availability.
+                Check available time slots during the booking process.
+              </p>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="rounded-md bg-yellow-50 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-5 w-5 text-yellow-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-yellow-700">
+                No regular schedule information available. Please book an
+                appointment to check availability.
+              </p>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="mt-4">
+          <a
+            href="{{ url_for('patient.book_appointment') }}"
+            class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            Check Appointment Availability
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

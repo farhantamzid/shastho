@@ -9,12 +9,23 @@ from app.utils.auth import login_required, role_required
 from app.utils.db import Database
 from app.models.ehr import EHR, EHR_Visit, EHR_Diagnosis, EHR_Medication, EHR_Allergy, EHR_Procedure, EHR_Vital, EHR_Immunization, EHR_TestResult, EHR_ProviderNote, Prescription
 from app.services.ehr_service import search_patients, get_patient_ehr, get_visit_details, get_ehr_visits, get_ehr_allergies, get_ehr_immunizations, get_ehr_test_results
+from app.services.doctor_service import (
+    get_doctor_by_user_id, get_doctor_availability_slots,
+    update_doctor_profile, update_doctor_profile_picture,
+    get_doctor_hospital_info, add_availability_slot,
+    delete_availability_slot, update_availability_slot, # Corrected names
+    bulk_update_availability
+)
 from app.forms.ehr_forms import DiagnosisForm, MedicationForm, PrescriptionForm, AllergyForm, VitalSignsForm, ProviderNoteForm, TestResultForm, ProcedureForm, ImmunizationForm
 from datetime import datetime, date
 from uuid import UUID
 import os
 from werkzeug.utils import secure_filename
 import math
+
+# Assuming current_user is available globally or passed appropriately
+# If using Flask-Login, it's usually available after login
+from flask_login import current_user
 
 doctor_bp = Blueprint('doctor', __name__, url_prefix='/doctor')
 
@@ -82,8 +93,6 @@ def profile():
 
     # Get doctor information
     # In a real app, this would be retrieved from your database
-    from app.services.doctor_service import get_doctor_by_user_id, get_doctor_hospital_info
-
     doctor = get_doctor_by_user_id(user_id)
     if not doctor:
         flash('Doctor profile not found. Please contact support.', 'error')
@@ -94,8 +103,6 @@ def profile():
 
     # Get doctor availability slots
     # In a real app, this would be retrieved from your database
-    from app.services.doctor_service import get_doctor_availability_slots
-
     availability_slots = get_doctor_availability_slots(doctor.id)
 
     return render_template('doctor/profile.html',
@@ -118,8 +125,6 @@ def update_profile():
     if form.validate_on_submit():
         # Update doctor information in the database
         # In a real app, this would be a call to your database service
-        from app.services.doctor_service import update_doctor_profile
-
         success = update_doctor_profile(
             user_id=user_id,
             full_name=form.full_name.data,
@@ -167,10 +172,7 @@ def upload_profile_picture():
 
             # Update doctor profile picture URL in database
             # In a real app, this would be a call to your database service
-            from app.services.doctor_service import update_doctor_profile_picture
-
-            relative_path = f"/static/images/profile_pictures/{filename}"
-            success = update_doctor_profile_picture(user_id, relative_path)
+            success = update_doctor_profile_picture(user_id, f"/static/images/profile_pictures/{filename}")
 
             if success:
                 flash('Profile picture updated successfully!', 'success')
@@ -973,3 +975,245 @@ def edit_test_result(patient_id, test_result_id):
                            form=form,
                            patient=patient,
                            test_result=test_result)
+
+@doctor_bp.route('/availability')
+@login_required
+@role_required(UserRole.DOCTOR)
+def availability():
+    """Doctor availability management page"""
+    user_id = session.get('user_id')
+    doctor = get_doctor_by_user_id(user_id)
+    if not doctor:
+        flash("Doctor profile not found.", "error")
+        return redirect(url_for('doctor.profile'))
+
+    # Fetch existing slots to pass to the template
+    slots = get_doctor_availability_slots(doctor.id)
+
+    # Prepare data for the form if needed (e.g., for editing)
+    # This part depends on how you want to handle editing in the template
+    # For now, just passing existing slots.
+
+    return render_template('doctor/availability.html', doctor=doctor, slots=slots)
+
+@doctor_bp.route('/availability/slots', methods=['GET'])
+@login_required
+@role_required(UserRole.DOCTOR)
+def get_availability_slots():
+    """Get all availability slots for current doctor"""
+    user_id = session.get('user_id')
+    doctor = get_doctor_by_user_id(user_id)
+
+    if not doctor:
+        return jsonify({"success": False, "message": "Doctor not found"}), 404
+
+    slots = get_doctor_availability_slots(doctor.id)
+    print(f"Found {len(slots)} availability slots for doctor")
+
+    # Format slots for frontend
+    formatted_slots = []
+    for slot in slots:
+        # Format the time object to string (HH:MM format)
+        try:
+            start_time_str = slot.start_time.strftime('%H:%M') if slot.start_time else None
+            end_time_str = slot.end_time.strftime('%H:%M') if slot.end_time else None
+
+            formatted_slot = {
+                'id': str(slot.id),
+                'day_of_week': slot.day_of_week,
+                'start_time': start_time_str,
+                'end_time': end_time_str,
+                'is_available': slot.is_available,
+                'slot_duration_minutes': slot.slot_duration_minutes
+            }
+            formatted_slots.append(formatted_slot)
+        except Exception as e:
+            print(f"Error formatting slot {slot.id}: {str(e)}")
+
+    return jsonify({"success": True, "slots": formatted_slots})
+
+@doctor_bp.route('/availability/add', methods=['POST'])
+@login_required
+@role_required(UserRole.DOCTOR)
+def add_availability_slot_route():
+    """Add a new availability slot for the current doctor"""
+    data = request.get_json()
+    user_id = session.get('user_id')
+    doctor = get_doctor_by_user_id(user_id)
+
+    if not doctor:
+        return jsonify({"success": False, "message": "Doctor not found"}), 404
+
+    day_of_week = data.get('day_of_week')
+    start_time_str = data.get('start_time')
+    end_time_str = data.get('end_time')
+    is_available = data.get('is_available', True) # Default to True
+    slot_duration_minutes = data.get('slot_duration_minutes', 30) # Default to 30 minutes
+
+    if not all([day_of_week is not None, start_time_str, end_time_str]):
+        return jsonify({"success": False, "message": "Missing required fields"}), 400
+
+    try:
+        start_time = datetime.strptime(start_time_str, '%H:%M').time()
+        end_time = datetime.strptime(end_time_str, '%H:%M').time()
+    except ValueError:
+        return jsonify({"success": False, "message": "Invalid time format. Use HH:MM"}), 400
+
+    # Call the enhanced service function that now returns the created slot
+    created_slot = add_availability_slot(
+        doctor.id, int(day_of_week), start_time, end_time, slot_duration_minutes
+    )
+
+    if created_slot:
+        # Return the created slot data for the frontend
+        return jsonify({
+            "success": True,
+            "message": "Slot added successfully",
+            "slot": {
+                "id": str(created_slot.id),
+                "day_of_week": created_slot.day_of_week,
+                "start_time": start_time_str,
+                "end_time": end_time_str,
+                "is_available": created_slot.is_available,
+                "slot_duration_minutes": created_slot.slot_duration_minutes
+            }
+        }), 201
+    else:
+        return jsonify({"success": False, "message": "Failed to add availability slot"}), 500
+
+@doctor_bp.route('/availability/save', methods=['POST'])
+@login_required
+@role_required(UserRole.DOCTOR)
+def save_availability():
+    """Save/Update multiple availability slots for the current doctor"""
+    try:
+        data = request.get_json()
+        slots_data = data.get('slots', [])
+        user_id = session.get('user_id')
+
+        print(f"Processing availability save request for user_id: {user_id}")
+        print(f"Received {len(slots_data)} slots to save")
+
+        doctor = get_doctor_by_user_id(user_id)
+        if not doctor:
+            print(f"Doctor not found for user_id: {user_id}")
+            return jsonify({"success": False, "message": "Doctor not found"}), 404
+
+        if not isinstance(slots_data, list):
+            print(f"Invalid slots data format: {type(slots_data)}")
+            return jsonify({"success": False, "message": "Invalid slots data format"}), 400
+
+        if len(slots_data) == 0:
+            return jsonify({"success": False, "message": "No slots provided"}), 400
+
+        # Validate each slot before processing
+        for i, slot in enumerate(slots_data):
+            # Check for required fields
+            if 'day_of_week' not in slot:
+                return jsonify({"success": False, "message": f"Slot #{i+1} missing day_of_week"}), 400
+            if 'start_time' not in slot:
+                return jsonify({"success": False, "message": f"Slot #{i+1} missing start_time"}), 400
+            if 'end_time' not in slot:
+                return jsonify({"success": False, "message": f"Slot #{i+1} missing end_time"}), 400
+
+            # Validate day_of_week is in range
+            if not (0 <= int(slot['day_of_week']) <= 6):
+                return jsonify({"success": False, "message": f"Slot #{i+1} has invalid day_of_week: must be 0-6"}), 400
+
+            # Validate time format
+            try:
+                datetime.strptime(slot['start_time'], '%H:%M')
+                datetime.strptime(slot['end_time'], '%H:%M')
+            except ValueError:
+                return jsonify({"success": False, "message": f"Slot #{i+1} has invalid time format. Use HH:MM"}), 400
+
+            # Validate end time is after start time
+            if slot['start_time'] >= slot['end_time']:
+                return jsonify({
+                    "success": False,
+                    "message": f"Slot #{i+1} has end time before or equal to start time"
+                }), 400
+
+        # Add doctor_id to each slot to ensure it's associated with correct doctor
+        for slot in slots_data:
+            slot['doctor_id'] = str(doctor.id)
+
+        print(f"Sending {len(slots_data)} slots to bulk_update_availability")
+        # Print sample slot for debugging
+        if slots_data:
+            print(f"Sample slot: {slots_data[0]}")
+
+        # Use the enhanced bulk update function from service
+        success = bulk_update_availability(slots_data)
+
+        if success:
+            print("Availability update successful")
+            return jsonify({"success": True, "message": "Availability updated successfully."}), 200
+        else:
+            print("Availability update failed")
+            return jsonify({"success": False, "message": "Failed to update availability. Please try again."}), 500
+    except Exception as e:
+        print(f"Exception in save_availability: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        return jsonify({"success": False, "message": f"Server error: {str(e)}"}), 500
+
+@doctor_bp.route('/availability/delete/<slot_id>', methods=['DELETE'])
+@login_required
+@role_required(UserRole.DOCTOR)
+def delete_availability_slot_route(slot_id):
+    """Delete an availability slot"""
+    user_id = session.get('user_id')
+    doctor = get_doctor_by_user_id(user_id)
+    if not doctor:
+        return jsonify({"success": False, "message": "Doctor not found"}), 404
+
+    try:
+        slot_uuid = UUID(slot_id)
+    except ValueError:
+        return jsonify({"success": False, "message": "Invalid slot ID format"}), 400
+
+    # Verify the slot belongs to the doctor before deleting
+    # This is a security check to prevent deleting other doctors' slots
+    slots = get_doctor_availability_slots(doctor.id)
+    slot_belongs_to_doctor = any(str(slot.id) == slot_id for slot in slots)
+
+    if not slot_belongs_to_doctor:
+        return jsonify({"success": False, "message": "Access denied: Slot does not belong to this doctor"}), 403
+
+    # Call the service function
+    success = delete_availability_slot(slot_uuid)
+
+    if success:
+        return jsonify({"success": True, "message": "Availability slot deleted successfully"}), 200
+    else:
+        return jsonify({"success": False, "message": "Error: Failed to delete availability slot"}), 500
+
+@doctor_bp.route('/availability/booking-slots', methods=['GET'])
+@login_required
+def get_doctor_booking_slots():
+    """Get available booking slots for a specific doctor and date"""
+    doctor_id = request.args.get('doctor_id')
+    date = request.args.get('date')
+
+    if not doctor_id or not date:
+        return jsonify({"success": False, "message": "Missing required parameters: doctor_id and date"}), 400
+
+    try:
+        doctor_uuid = UUID(doctor_id)
+    except ValueError:
+        return jsonify({"success": False, "message": "Invalid doctor ID format"}), 400
+
+    # Validate date format (should be YYYY-MM-DD)
+    try:
+        datetime.strptime(date, '%Y-%m-%d')
+    except ValueError:
+        return jsonify({"success": False, "message": "Invalid date format. Use YYYY-MM-DD"}), 400
+
+    # Get available booking slots using the new service function
+    slots = get_available_booking_slots(doctor_uuid, date)
+
+    return jsonify({
+        "success": True,
+        "slots": slots
+    })

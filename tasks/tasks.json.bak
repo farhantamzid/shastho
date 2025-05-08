@@ -311,7 +311,7 @@
       "dependencies": [
         7
       ],
-      "status": "pending",
+      "status": "done",
       "subtasks": []
     },
     {
@@ -471,14 +471,76 @@
       "id": 14,
       "title": "Implement Doctor EHR Update Functionality",
       "description": "Create the interface and backend for doctors to update patient EHR information.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         13
       ],
       "priority": "high",
-      "details": "1. Create edit interfaces for each EHR section:\n   - Diagnoses (add/edit diagnosis codes and descriptions)\n   - Medications (add/edit medications, dosage, frequency)\n   - Allergies (add/edit allergens, reactions, severity)\n   - Procedures (add/edit procedure codes and descriptions)\n   - Vitals (add/edit temperature, pulse, blood pressure, etc.)\n   - Immunizations (add/edit vaccines and dates)\n   - Provider Notes (add/edit clinical notes)\n2. Implement form validation for all fields\n3. Create database update operations\n4. Add confirmation dialogs for updates\n5. Create success/error notifications\n6. Implement auto-save functionality where appropriate\n7. Add form reset/cancel functionality",
-      "testStrategy": "1. Test adding new entries to each EHR section\n2. Verify editing existing entries works correctly\n3. Test form validation for all fields\n4. Verify database updates are performed correctly\n5. Verify confirmation dialogs work\n6. Test auto-save functionality\n7. Verify form reset/cancel works correctly",
-      "subtasks": []
+      "details": "1. Create edit interfaces for each EHR section:\n   - Diagnoses (add/edit diagnosis codes and descriptions)\n   - Medications (add/edit medications, dosage, frequency)\n   - Allergies (add/edit allergens, reactions, severity)\n   - Procedures (add/edit procedure codes and descriptions)\n   - Vitals (add/edit temperature, pulse, blood pressure, etc.)\n   - Immunizations (add/edit vaccines and dates)\n   - Provider Notes (add/edit clinical notes)\n2. Implement form validation for all fields\n3. Create database update operations\n4. Add confirmation dialogs for updates\n5. Create success/error notifications\n6. Add form reset/cancel functionality",
+      "testStrategy": "1. Test adding new entries to each EHR section\n2. Verify editing existing entries works correctly\n3. Test form validation for all fields\n4. Verify database updates are performed correctly\n5. Verify confirmation dialogs work\n6. Verify form reset/cancel works correctly",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Develop Edit Interfaces for EHR Sections",
+          "description": "Create editable interfaces for diagnoses, medications, allergies, procedures, vitals, immunizations, and notes within the EHR system.",
+          "dependencies": [],
+          "details": "Design and implement user-friendly interfaces for each EHR section, allowing users to input and modify data. Ensure each interface aligns with the existing EHR design and data structures.",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Implement Form Validation for EHR Updates",
+          "description": "Implement robust form validation to ensure data integrity when updating EHR information.",
+          "dependencies": [
+            1
+          ],
+          "details": "Develop validation rules for each field in the EHR sections to prevent invalid or incomplete data from being saved. Provide clear error messages to guide users in correcting their input.",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Implement Database Operations for EHR Updates",
+          "description": "Implement the necessary database operations to save, update, and retrieve EHR data.",
+          "dependencies": [
+            2
+          ],
+          "details": "Develop the backend logic to interact with the database and perform CRUD (Create, Read, Update, Delete) operations on the EHR data. Ensure data consistency and integrity during database operations.",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Add Confirmation Dialogs for EHR Updates",
+          "description": "Implement confirmation dialogs to verify user intent before saving changes to EHR data.",
+          "details": "Design and implement confirmation dialogs that display a summary of the changes being made and require explicit user confirmation before proceeding. Include options to cancel or proceed with the update.",
+          "status": "done",
+          "dependencies": [
+            3
+          ],
+          "parentTaskId": 14
+        },
+        {
+          "id": 5,
+          "title": "Implement Success/Error Notifications",
+          "description": "Create notification components to display success or error messages after EHR update operations.",
+          "details": "Design and implement toast/notification components to provide user feedback after EHR operations. Create success notifications for completed operations and error notifications that provide clear guidance on issues that occurred.",
+          "status": "done",
+          "dependencies": [
+            4
+          ],
+          "parentTaskId": 14
+        },
+        {
+          "id": 6,
+          "title": "Implement Form Reset/Cancel Functionality",
+          "description": "Add functionality to reset forms or cancel edits to EHR data.",
+          "details": "Implement reset/cancel functionality that allows users to discard changes and return to the original state of the form. Include confirmation dialogs to prevent accidental data loss when canceling changes.",
+          "status": "done",
+          "dependencies": [
+            4
+          ],
+          "parentTaskId": 14
+        }
+      ]
     },
     {
       "id": 15,

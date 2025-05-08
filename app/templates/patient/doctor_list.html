@@ -1,0 +1,322 @@
+{% extends "patient/layout.html" %} {% block title %}Browse Doctors{% endblock
+%} {% block page_title %}Browse Doctors{% endblock %} {% block patient_content
+%}
+<div class="mb-6">
+  <div class="flex justify-between items-center">
+    <nav aria-label="breadcrumb">
+      <ol class="flex text-sm">
+        <li class="hover:text-cyan-600">
+          <a href="{{ url_for('patient.dashboard') }}">Dashboard</a>
+        </li>
+        <li class="mx-2">/</li>
+        <li class="text-gray-500" aria-current="page">Browse Doctors</li>
+      </ol>
+    </nav>
+    <a
+      href="{{ url_for('patient.book_appointment') }}"
+      class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-md flex items-center"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4 mr-1"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+        />
+      </svg>
+      Book Appointment
+    </a>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+  <div class="md:col-span-1">
+    <div class="bg-white rounded-lg shadow-sm mb-4">
+      <div class="px-4 py-3 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Filter Doctors</h3>
+      </div>
+      <div class="p-4">
+        <div class="mb-4">
+          <label
+            for="hospitalFilter"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Hospital</label
+          >
+          <select
+            class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+            id="hospitalFilter"
+          >
+            <option value="">All Hospitals</option>
+            <!-- Populated by JS -->
+          </select>
+        </div>
+        <div class="mb-4">
+          <label
+            for="departmentFilter"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Department</label
+          >
+          <select
+            class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+            id="departmentFilter"
+          >
+            <option value="">All Departments</option>
+            <!-- Populated by JS -->
+          </select>
+        </div>
+        <div class="mb-4">
+          <label
+            for="searchDoctor"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Search</label
+          >
+          <input
+            type="text"
+            class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+            id="searchDoctor"
+            placeholder="Doctor name..."
+          />
+        </div>
+      </div>
+    </div>
+
+    <a
+      href="{{ url_for('patient.book_appointment') }}"
+      class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4 mr-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+        />
+      </svg>
+      Book an Appointment
+    </a>
+  </div>
+
+  <div class="md:col-span-3">
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+      id="doctorGrid"
+    >
+      {% for doctor in doctors %}
+      <div
+        class="doctor-item"
+        data-hospital="{{ doctor.hospital_id }}"
+        data-department="{{ doctor.department_id }}"
+        data-name="{{ doctor.full_name|lower }}"
+      >
+        <div
+          class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow h-full"
+        >
+          <div class="p-4">
+            <h3 class="text-lg font-medium text-gray-900">
+              {{ doctor.full_name }}
+            </h3>
+            <p class="text-sm text-gray-500 mb-3">
+              {{ doctor.specialization }}
+            </p>
+            <p class="text-xs text-gray-600 mb-1 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 mr-1 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
+              </svg>
+              {{ doctor.hospital_name }}
+            </p>
+            <p class="text-xs text-gray-600 mb-3 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 mr-1 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                />
+              </svg>
+              {{ doctor.department_name }}
+            </p>
+            {% if doctor.credentials %}
+            <p class="text-xs text-gray-500 italic">{{ doctor.credentials }}</p>
+            {% endif %}
+          </div>
+          <div class="px-4 pb-4 pt-2 border-t border-gray-100">
+            <div class="flex justify-between">
+              <a
+                href="{{ url_for('patient.doctor_details', doctor_id=doctor.id) }}"
+                class="text-cyan-600 hover:text-cyan-800 text-sm font-medium"
+              >
+                View Profile
+              </a>
+              <a
+                href="{{ url_for('patient.book_appointment') }}"
+                class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+              >
+                Book
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div
+      id="noResults"
+      class="bg-blue-50 p-4 rounded-md mt-4 text-center hidden"
+    >
+      <p class="text-blue-700">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 inline-block mr-1"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+        No doctors match your search criteria.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Collect unique hospitals and departments to populate filters
+    const doctors = document.querySelectorAll(".doctor-item");
+    const hospitalFilter = document.getElementById("hospitalFilter");
+    const departmentFilter = document.getElementById("departmentFilter");
+    const searchInput = document.getElementById("searchDoctor");
+    const noResults = document.getElementById("noResults");
+
+    // Extract unique hospitals
+    const hospitals = new Map();
+    // Extract unique departments
+    const departments = new Map();
+
+    doctors.forEach((doctor) => {
+      const hospitalId = doctor.getAttribute("data-hospital");
+      // Find all paragraphs with SVG icons and identify hospital by path data
+      const hospitalParagraphs = doctor.querySelectorAll("p svg");
+      let hospitalName = "";
+
+      hospitalParagraphs.forEach((svg) => {
+        // Check if this is the hospital icon
+        if (svg.querySelector('path[d*="M19 21V5"]')) {
+          hospitalName = svg.closest("p").textContent.trim();
+        }
+      });
+
+      if (hospitalName) {
+        hospitals.set(hospitalId, hospitalName);
+      }
+
+      const departmentId = doctor.getAttribute("data-department");
+      // Find all paragraphs with SVG icons and identify department by path data
+      const departmentParagraphs = doctor.querySelectorAll("p svg");
+      let departmentName = "";
+
+      departmentParagraphs.forEach((svg) => {
+        // Check if this is the department icon
+        if (svg.querySelector('path[d*="M19.428 15.428"]')) {
+          departmentName = svg.closest("p").textContent.trim();
+        }
+      });
+
+      if (departmentName) {
+        departments.set(departmentId, departmentName);
+      }
+    });
+
+    // Populate hospital filter
+    hospitals.forEach((name, id) => {
+      const option = document.createElement("option");
+      option.value = id;
+      option.textContent = name;
+      hospitalFilter.appendChild(option);
+    });
+
+    // Populate department filter
+    departments.forEach((name, id) => {
+      const option = document.createElement("option");
+      option.value = id;
+      option.textContent = name;
+      departmentFilter.appendChild(option);
+    });
+
+    // Filter function
+    function filterDoctors() {
+      const hospitalValue = hospitalFilter.value;
+      const departmentValue = departmentFilter.value;
+      const searchValue = searchInput.value.toLowerCase().trim();
+
+      let visibleCount = 0;
+
+      doctors.forEach((doctor) => {
+        const doctorHospital = doctor.getAttribute("data-hospital");
+        const doctorDepartment = doctor.getAttribute("data-department");
+        const doctorName = doctor.getAttribute("data-name");
+
+        const hospitalMatch =
+          !hospitalValue || doctorHospital === hospitalValue;
+        const departmentMatch =
+          !departmentValue || doctorDepartment === departmentValue;
+        const searchMatch = !searchValue || doctorName.includes(searchValue);
+
+        if (hospitalMatch && departmentMatch && searchMatch) {
+          doctor.classList.remove("hidden");
+          visibleCount++;
+        } else {
+          doctor.classList.add("hidden");
+        }
+      });
+
+      // Show/hide no results message
+      if (visibleCount === 0) {
+        noResults.classList.remove("hidden");
+      } else {
+        noResults.classList.add("hidden");
+      }
+    }
+
+    // Add event listeners
+    hospitalFilter.addEventListener("change", filterDoctors);
+    departmentFilter.addEventListener("change", filterDoctors);
+    searchInput.addEventListener("input", filterDoctors);
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,1042 @@
+{% extends "patient/layout.html" %} {% block title %}My Appointments{% endblock
+%} {% block page_title %}My Appointments{% endblock %} {% block patient_content
+%}
+<div class="mb-6">
+  <div class="flex justify-between items-center">
+    <nav aria-label="breadcrumb">
+      <ol class="flex text-sm">
+        <li class="hover:text-cyan-600">
+          <a href="{{ url_for('patient.dashboard') }}">Dashboard</a>
+        </li>
+        <li class="mx-2">/</li>
+        <li class="text-gray-500" aria-current="page">My Appointments</li>
+      </ol>
+    </nav>
+    <a
+      href="{{ url_for('patient.book_appointment') }}"
+      class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-md flex items-center"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4 mr-1"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 6v6m6 0H6"
+        />
+      </svg>
+      Book New Appointment
+    </a>
+  </div>
+</div>
+
+<div class="mb-6">
+  <div class="border-b border-gray-200">
+    <nav class="-mb-px flex space-x-8">
+      <a
+        href="#upcoming"
+        id="upcoming-tab"
+        class="border-cyan-500 text-cyan-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+        role="tab"
+        aria-controls="upcoming"
+        aria-selected="true"
+      >
+        Upcoming
+      </a>
+      <a
+        href="#past"
+        id="past-tab"
+        class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+        role="tab"
+        aria-controls="past"
+        aria-selected="false"
+      >
+        Past
+      </a>
+      <a
+        href="#cancelled"
+        id="cancelled-tab"
+        class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+        role="tab"
+        aria-controls="cancelled"
+        aria-selected="false"
+      >
+        Cancelled
+      </a>
+    </nav>
+  </div>
+</div>
+
+<div class="mb-6">
+  <!-- Upcoming Appointments Tab -->
+  <div
+    class="tab-panel block"
+    id="upcoming-panel"
+    role="tabpanel"
+    aria-labelledby="upcoming-tab"
+  >
+    {% set upcoming_count = 0 %} {% for appointment in appointments %} {% if not
+    appointment.is_past and appointment.status == 'scheduled' %} {% set
+    upcoming_count = upcoming_count + 1 %} {% if upcoming_count == 1 %}
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Date
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Time
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Doctor
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Department
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Hospital
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% endif %}
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.date }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.time }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.doctor_name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.department_name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.hospital_name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <button
+                type="button"
+                class="text-blue-600 hover:text-blue-900 mr-3"
+                onclick="openRescheduleModal('{{ appointment.id }}', '{{ appointment.doctor_name }}', '{{ appointment.date }}', '{{ appointment.time }}')"
+              >
+                Reschedule
+              </button>
+              <button
+                type="button"
+                class="text-red-600 hover:text-red-900"
+                onclick="showCancelConfirmation('{{ appointment.id }}')"
+              >
+                Cancel
+              </button>
+            </td>
+          </tr>
+          {% endif %} {% endfor %} {% if upcoming_count > 0 %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="rounded-md bg-blue-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-blue-400"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-blue-700">
+            You don't have any upcoming appointments.
+            <a
+              href="{{ url_for('patient.book_appointment') }}"
+              class="font-medium underline text-blue-700 hover:text-blue-600"
+            >
+              Book an appointment now
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Past Appointments Tab -->
+  <div
+    class="tab-panel hidden"
+    id="past-panel"
+    role="tabpanel"
+    aria-labelledby="past-tab"
+  >
+    {% set past_count = 0 %} {% for appointment in appointments %} {% if
+    appointment.is_past and appointment.status != 'cancelled' %} {% set
+    past_count = past_count + 1 %} {% if past_count == 1 %}
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Date
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Time
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Doctor
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Department
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Hospital
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Status
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% endif %}
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.date }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.time }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.doctor_name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.department_name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.hospital_name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if appointment.status == 'completed' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}"
+              >
+                {{ appointment.status|capitalize }}
+              </span>
+            </td>
+          </tr>
+          {% endif %} {% endfor %} {% if past_count > 0 %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="rounded-md bg-blue-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-blue-400"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-blue-700">
+            You don't have any past appointments.
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Cancelled Appointments Tab -->
+  <div
+    class="tab-panel hidden"
+    id="cancelled-panel"
+    role="tabpanel"
+    aria-labelledby="cancelled-tab"
+  >
+    {% set cancelled_count = 0 %} {% for appointment in appointments %} {% if
+    appointment.status == 'cancelled' %} {% set cancelled_count =
+    cancelled_count + 1 %} {% if cancelled_count == 1 %}
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Date
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Time
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Doctor
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Department
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Hospital
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% endif %}
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.date }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.time }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.doctor_name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.department_name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ appointment.hospital_name }}
+            </td>
+          </tr>
+          {% endif %} {% endfor %} {% if cancelled_count > 0 %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="rounded-md bg-blue-50 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-blue-400"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-blue-700">
+            You don't have any cancelled appointments.
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Add Reschedule Modal HTML at the end of the content block but before the block end -->
+<div
+  id="rescheduleModal"
+  class="fixed inset-0 z-50 overflow-y-auto hidden"
+  aria-labelledby="reschedule-modal"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+  >
+    <div
+      class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+      aria-hidden="true"
+      onclick="closeRescheduleModal()"
+    ></div>
+    <span
+      class="hidden sm:inline-block sm:align-middle sm:h-screen"
+      aria-hidden="true"
+      >&#8203;</span
+    >
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+    >
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div
+            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10"
+          >
+            <svg
+              class="h-6 w-6 text-blue-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3
+              class="text-lg leading-6 font-medium text-gray-900"
+              id="modal-title"
+            >
+              Reschedule Appointment
+            </h3>
+            <div class="mt-2">
+              <p class="text-sm text-gray-500 mb-3" id="appointmentInfo">
+                Loading appointment information...
+              </p>
+              <form id="rescheduleForm" class="space-y-4">
+                <input type="hidden" id="appointmentId" name="appointment_id" />
+
+                <div>
+                  <label
+                    for="newDate"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >New Date</label
+                  >
+                  <input
+                    type="date"
+                    id="newDate"
+                    name="new_date"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label
+                    for="newTime"
+                    class="block text-sm font-medium text-gray-700 mb-1"
+                    >New Time</label
+                  >
+                  <select
+                    id="newTime"
+                    name="new_time"
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-500 focus:ring-opacity-50"
+                    required
+                  >
+                    <option value="">Select a time slot</option>
+                    <option value="9:00 AM - 9:30 AM">9:00 AM - 9:30 AM</option>
+                    <option value="9:30 AM - 10:00 AM">
+                      9:30 AM - 10:00 AM
+                    </option>
+                    <option value="10:00 AM - 10:30 AM">
+                      10:00 AM - 10:30 AM
+                    </option>
+                    <option value="10:30 AM - 11:00 AM">
+                      10:30 AM - 11:00 AM
+                    </option>
+                    <option value="11:00 AM - 11:30 AM">
+                      11:00 AM - 11:30 AM
+                    </option>
+                    <option value="11:30 AM - 12:00 PM">
+                      11:30 AM - 12:00 PM
+                    </option>
+                    <option value="1:00 PM - 1:30 PM">1:00 PM - 1:30 PM</option>
+                    <option value="1:30 PM - 2:00 PM">1:30 PM - 2:00 PM</option>
+                    <option value="2:00 PM - 2:30 PM">2:00 PM - 2:30 PM</option>
+                    <option value="2:30 PM - 3:00 PM">2:30 PM - 3:00 PM</option>
+                    <option value="3:00 PM - 3:30 PM">3:00 PM - 3:30 PM</option>
+                    <option value="3:30 PM - 4:00 PM">3:30 PM - 4:00 PM</option>
+                    <option value="4:00 PM - 4:30 PM">4:00 PM - 4:30 PM</option>
+                    <option value="4:30 PM - 5:00 PM">4:30 PM - 5:00 PM</option>
+                  </select>
+                </div>
+
+                <div class="text-sm text-gray-500 bg-gray-50 p-3 rounded">
+                  <p class="flex items-center">
+                    <svg
+                      class="h-4 w-4 text-blue-500 mr-1"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Availability shown is based on current open slots. Actual
+                    availability may vary.
+                  </p>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button
+          type="button"
+          id="confirmReschedule"
+          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+        >
+          Confirm Reschedule
+        </button>
+        <button
+          type="button"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          onclick="closeRescheduleModal()"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add a notice/alert element for showing success message -->
+<div
+  id="rescheduleAlert"
+  class="fixed inset-x-0 top-0 mt-4 mx-auto max-w-md z-50 hidden transform transition-all"
+>
+  <div class="bg-green-50 p-4 rounded-md shadow-lg border border-green-200">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg
+          class="h-5 w-5 text-green-400"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm font-medium text-green-800" id="rescheduleAlertText">
+          Appointment successfully rescheduled!
+        </p>
+      </div>
+      <div class="ml-auto pl-3">
+        <div class="-mx-1.5 -my-1.5">
+          <button
+            type="button"
+            class="inline-flex bg-green-50 rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            onclick="hideRescheduleAlert()"
+          >
+            <span class="sr-only">Dismiss</span>
+            <svg
+              class="h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add cancel confirmation modal -->
+<div
+  id="cancelConfirmationModal"
+  class="fixed inset-0 z-50 overflow-y-auto hidden"
+  aria-labelledby="cancel-confirmation-modal"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+  >
+    <div
+      class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+      aria-hidden="true"
+      onclick="closeCancelConfirmation()"
+    ></div>
+    <span
+      class="hidden sm:inline-block sm:align-middle sm:h-screen"
+      aria-hidden="true"
+      >&#8203;</span
+    >
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+    >
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div
+            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+          >
+            <svg
+              class="h-6 w-6 text-red-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3
+              class="text-lg leading-6 font-medium text-gray-900"
+              id="modal-title"
+            >
+              Cancel Appointment
+            </h3>
+            <div class="mt-2">
+              <p class="text-sm text-gray-500">
+                Are you sure you want to cancel this appointment? This action cannot be undone.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button
+          type="button"
+          id="confirmCancelButton"
+          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+          onclick="confirmCancel()"
+        >
+          Cancel Appointment
+        </button>
+        <button
+          type="button"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          onclick="closeCancelConfirmation()"
+        >
+          Keep Appointment
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add a notice/alert element for showing cancel success message -->
+<div
+  id="cancelAlert"
+  class="fixed inset-x-0 top-0 mt-4 mx-auto max-w-md z-50 hidden transform transition-all"
+>
+  <div class="bg-red-50 p-4 rounded-md shadow-lg border border-red-200">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg
+          class="h-5 w-5 text-red-400"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm font-medium text-red-800" id="cancelAlertText">
+          Appointment successfully cancelled!
+        </p>
+      </div>
+      <div class="ml-auto pl-3">
+        <div class="-mx-1.5 -my-1.5">
+          <button
+            type="button"
+            class="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            onclick="hideCancelAlert()"
+          >
+            <span class="sr-only">Dismiss</span>
+            <svg
+              class="h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Tab switching logic
+    const tabs = document.querySelectorAll('[role="tab"]');
+    const panels = document.querySelectorAll('[role="tabpanel"]');
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", (event) => {
+        event.preventDefault();
+
+        // Deactivate all tabs
+        tabs.forEach((t) => {
+          t.classList.remove("border-cyan-500", "text-cyan-600");
+          t.classList.add(
+            "border-transparent",
+            "text-gray-500",
+            "hover:text-gray-700",
+            "hover:border-gray-300"
+          );
+          t.setAttribute("aria-selected", "false");
+        });
+
+        // Hide all panels
+        panels.forEach((p) => {
+          p.classList.add("hidden");
+        });
+
+        // Activate current tab
+        tab.classList.remove(
+          "border-transparent",
+          "text-gray-500",
+          "hover:text-gray-700",
+          "hover:border-gray-300"
+        );
+        tab.classList.add("border-cyan-500", "text-cyan-600");
+        tab.setAttribute("aria-selected", "true");
+
+        // Show current panel
+        const targetId = tab.getAttribute("aria-controls") + "-panel";
+        document.getElementById(targetId).classList.remove("hidden");
+      });
+    });
+  });
+
+  // Reschedule appointment functionality
+  function openRescheduleModal(
+    appointmentId,
+    doctorName,
+    appointmentDate,
+    appointmentTime
+  ) {
+    document.getElementById("appointmentId").value = appointmentId;
+    document.getElementById(
+      "appointmentInfo"
+    ).innerText = `Your appointment with Dr. ${doctorName} on ${appointmentDate} at ${appointmentTime}`;
+
+    // Set minimum date to today
+    const today = new Date();
+    const formattedToday = today.toISOString().split("T")[0];
+    document.getElementById("newDate").min = formattedToday;
+
+    // Set a default date (7 days from now)
+    const nextWeek = new Date();
+    nextWeek.setDate(today.getDate() + 7);
+    const formattedNextWeek = nextWeek.toISOString().split("T")[0];
+    document.getElementById("newDate").value = formattedNextWeek;
+
+    // Show the modal
+    document.getElementById("rescheduleModal").classList.remove("hidden");
+  }
+
+  function closeRescheduleModal() {
+    document.getElementById("rescheduleModal").classList.add("hidden");
+  }
+
+  function showRescheduleAlert() {
+    const alert = document.getElementById("rescheduleAlert");
+    alert.classList.remove("hidden");
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      hideRescheduleAlert();
+    }, 5000);
+  }
+
+  function hideRescheduleAlert() {
+    document.getElementById("rescheduleAlert").classList.add("hidden");
+  }
+
+  // Set up the reschedule form submission
+  document.addEventListener("DOMContentLoaded", function () {
+    const confirmButton = document.getElementById("confirmReschedule");
+
+    confirmButton.addEventListener("click", function () {
+      const form = document.getElementById("rescheduleForm");
+      const appointmentId = document.getElementById("appointmentId").value;
+      const newDate = document.getElementById("newDate").value;
+      const newTime = document.getElementById("newTime").value;
+
+      if (!newDate || !newTime) {
+        alert("Please select both a date and time for rescheduling.");
+        return;
+      }
+
+      // This is a dummy action since we're not implementing the backend
+      // In a real application, you would submit the form to the server
+      console.log(
+        `Rescheduling appointment ${appointmentId} to ${newDate} at ${newTime}`
+      );
+
+      // Simulate successful rescheduling
+      closeRescheduleModal();
+      showRescheduleAlert();
+
+      // Update the appointment in the table for demo purposes
+      const appointmentRows = document.querySelectorAll("tr");
+      appointmentRows.forEach((row) => {
+        const cells = row.querySelectorAll("td");
+        if (cells.length > 0) {
+          const cancelButton = row.querySelector(
+            'form[action*="' + appointmentId + '"]'
+          );
+          if (cancelButton) {
+            // Update the date and time cells
+            cells[0].innerText = formatDisplayDate(newDate);
+            cells[1].innerText = newTime.split(" - ")[0];
+          }
+        }
+      });
+    });
+  });
+
+  // Helper function to format date for display
+  function formatDisplayDate(dateString) {
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  }
+
+  // Cancel appointment functionality - completely client-side
+  let currentAppointmentId = null;
+
+  function showCancelConfirmation(appointmentId) {
+    currentAppointmentId = appointmentId;
+    document.getElementById('cancelConfirmationModal').classList.remove('hidden');
+  }
+
+  function closeCancelConfirmation() {
+    document.getElementById('cancelConfirmationModal').classList.add('hidden');
+    currentAppointmentId = null;
+  }
+
+  function confirmCancel() {
+    if (!currentAppointmentId) return;
+
+    const appointmentId = currentAppointmentId;
+    console.log(`Cancelling appointment ${appointmentId}`);
+
+    // Find the appointment row
+    const appointmentRows = document.querySelectorAll("tr");
+    let appointmentRow;
+
+    appointmentRows.forEach((row) => {
+      // Find the row containing the button for this appointment ID
+      const buttons = row.querySelectorAll('button');
+      buttons.forEach(button => {
+        if (button.getAttribute('onclick') &&
+            button.getAttribute('onclick').includes(appointmentId)) {
+          appointmentRow = row;
+        }
+      });
+    });
+
+    if (appointmentRow) {
+      // Get the appointment data for the cancelled tab
+      const date = appointmentRow.querySelector("td:nth-child(1)").innerText;
+      const time = appointmentRow.querySelector("td:nth-child(2)").innerText;
+      const doctor = appointmentRow.querySelector("td:nth-child(3)").innerText;
+      const department = appointmentRow.querySelector("td:nth-child(4)").innerText;
+      const hospital = appointmentRow.querySelector("td:nth-child(5)").innerText;
+
+      // Remove from upcoming tab
+      appointmentRow.remove();
+
+      // Add to cancelled tab
+      const cancelledPanel = document.getElementById("cancelled-panel");
+      let cancelledTable = cancelledPanel.querySelector("table");
+
+      if (!cancelledTable) {
+        // Create table if it doesn't exist
+        const noAppointmentsMsg = cancelledPanel.querySelector(".rounded-md");
+        if (noAppointmentsMsg) {
+          noAppointmentsMsg.remove(); // Remove "no cancelled appointments" message
+        }
+        const tableHTML = `
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+              </tbody>
+            </table>
+          </div>
+        `;
+        cancelledPanel.innerHTML = tableHTML;
+        cancelledTable = cancelledPanel.querySelector("table");
+      }
+
+      // Add row to cancelled table
+      const tbody = cancelledTable.querySelector("tbody");
+      const newRow = document.createElement("tr");
+      newRow.innerHTML = `
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${date}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${time}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${doctor}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${department}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${hospital}</td>
+      `;
+      tbody.appendChild(newRow);
+
+      // Check if we need to show the "no upcoming appointments" message
+      const upcomingPanel = document.getElementById("upcoming-panel");
+      const remainingRows = upcomingPanel.querySelectorAll("tbody tr");
+      if (remainingRows.length === 0) {
+        const tableDiv = upcomingPanel.querySelector(".overflow-x-auto");
+        if (tableDiv) {
+          tableDiv.remove();
+          upcomingPanel.innerHTML = `
+            <div class="rounded-md bg-blue-50 p-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-blue-700">
+                    You don't have any upcoming appointments.
+                    <a href="{{ url_for('patient.book_appointment') }}" class="font-medium underline text-blue-700 hover:text-blue-600">
+                      Book an appointment now
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }
+    }
+
+    // Close the modal
+    closeCancelConfirmation();
+
+    // Show success alert
+    showCancelAlert();
+  }
+
+  function showCancelAlert() {
+    const alert = document.getElementById("cancelAlert");
+    alert.classList.remove("hidden");
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      hideCancelAlert();
+    }, 5000);
+  }
+
+  function hideCancelAlert() {
+    document.getElementById("cancelAlert").classList.add("hidden");
+  }
+</script>
+{% endblock %}

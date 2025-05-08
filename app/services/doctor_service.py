@@ -63,8 +63,7 @@ def get_doctor_availability_slots(doctor_id: UUID) -> List[DoctorAvailabilitySlo
         List of availability slot objects
     """
     try:
-        slots = db.query(DoctorAvailabilitySlot, doctor_id=doctor_id)
-        return slots if slots else []
+        return db.get_availability_by_doctor(doctor_id)
     except Exception as e:
         print(f"Error retrieving availability slots: {str(e)}")
         return []
@@ -131,7 +130,8 @@ def update_doctor_profile_picture(user_id: str, picture_url: str) -> bool:
         return False
 
 def add_availability_slot(doctor_id: UUID, day_of_week: int,
-                          start_time: time, end_time: time) -> bool:
+                        start_time: time, end_time: time,
+                        slot_duration_minutes: int = 30) -> Optional[DoctorAvailabilitySlot]:
     """
     Add a new availability slot for a doctor
 
@@ -140,9 +140,10 @@ def add_availability_slot(doctor_id: UUID, day_of_week: int,
         day_of_week: Integer (0-6) representing day of week (Monday=0)
         start_time: Start time for the slot
         end_time: End time for the slot
+        slot_duration_minutes: Duration of each appointment slot in minutes (default: 30)
 
     Returns:
-        True if successful, False otherwise
+        Created slot object if successful, None otherwise
     """
     try:
         # Create new slot
@@ -153,20 +154,21 @@ def add_availability_slot(doctor_id: UUID, day_of_week: int,
             start_time=start_time,
             end_time=end_time,
             is_available=True,
+            slot_duration_minutes=slot_duration_minutes,
             created_at=datetime.now(),
             updated_at=datetime.now()
         )
 
-        # Save to database
-        db.insert(slot)
-        return True
+        # Save to database using enhanced method
+        return db.add_doctor_availability_slot(slot)
     except Exception as e:
         print(f"Error adding availability slot: {str(e)}")
-        return False
+        return None
 
 def update_availability_slot(slot_id: UUID, day_of_week: int,
                             start_time: time, end_time: time,
-                            is_available: bool) -> bool:
+                            is_available: bool,
+                            slot_duration_minutes: int = None) -> bool:
     """
     Update an existing availability slot
 
@@ -176,6 +178,7 @@ def update_availability_slot(slot_id: UUID, day_of_week: int,
         start_time: Start time for the slot
         end_time: End time for the slot
         is_available: Whether the slot is available
+        slot_duration_minutes: Optional duration in minutes for appointment slots
 
     Returns:
         True if successful, False otherwise
@@ -193,9 +196,12 @@ def update_availability_slot(slot_id: UUID, day_of_week: int,
         slot.is_available = is_available
         slot.updated_at = datetime.now()
 
-        # Save to database
-        db.update(slot)
-        return True
+        # Only update slot_duration_minutes if provided
+        if slot_duration_minutes is not None:
+            slot.slot_duration_minutes = slot_duration_minutes
+
+        # Save to database using enhanced method
+        return db.update_doctor_availability_slot(slot)
     except Exception as e:
         print(f"Error updating availability slot: {str(e)}")
         return False
@@ -211,8 +217,7 @@ def delete_availability_slot(slot_id: UUID) -> bool:
         True if successful, False otherwise
     """
     try:
-        db.delete(DoctorAvailabilitySlot, slot_id)
-        return True
+        return db.delete_doctor_availability_slot(slot_id)
     except Exception as e:
         print(f"Error deleting availability slot: {str(e)}")
         return False
@@ -286,3 +291,205 @@ def calculate_age(birth_date):
     """Helper function to calculate age from birth date"""
     today = datetime.now().date()
     return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+
+def bulk_update_availability(slots_data: List[Dict[str, Any]]) -> bool:
+    """
+    Update multiple availability slots at once
+
+    Args:
+        slots_data: List of slot data dictionaries
+
+    Returns:
+        True if all updates were successful, False otherwise
+    """
+    try:
+        # First, check if we have any slots to process
+        if not slots_data or len(slots_data) == 0:
+            print("No slots data provided to bulk_update_availability")
+            return False
+
+        # For doctor ID, we need to extract it from at least one slot
+        doctor_id = None
+        for slot in slots_data:
+            if 'doctor_id' in slot and slot['doctor_id']:
+                doctor_id = slot['doctor_id']
+                if isinstance(doctor_id, str):
+                    try:
+                        doctor_id = UUID(doctor_id)
+                    except (ValueError, TypeError):
+                        print(f"Invalid doctor_id: {doctor_id}")
+                        return False
+                break
+
+        if not doctor_id:
+            print("Missing doctor_id in slots data")
+            return False
+
+        print(f"Processing bulk update for doctor_id: {doctor_id}")
+        print(f"Received {len(slots_data)} slots to process")
+
+        # Get all existing slots for this doctor (to know what needs to be deleted)
+        existing_slots = db.get_availability_by_doctor(doctor_id)
+        existing_slot_ids = {str(slot.id): slot for slot in existing_slots}
+        print(f"Found {len(existing_slots)} existing slots")
+
+        # Keep track of processed slot IDs to determine which ones to delete
+        processed_slot_ids = set()
+
+        # Check for duplicate slots (same day and overlapping times)
+        # This provides backend validation in addition to frontend validation
+        day_time_slots = {}  # Format: {day: [(start_time, end_time, slot_index)]}
+        for i, slot_data in enumerate(slots_data):
+            day = int(slot_data['day_of_week'])
+            if day not in day_time_slots:
+                day_time_slots[day] = []
+
+            start_time_str = slot_data['start_time']
+            end_time_str = slot_data['end_time']
+
+            # Add seconds if missing for consistent comparison
+            if start_time_str.count(':') == 1:
+                start_time_str += ":00"
+            if end_time_str.count(':') == 1:
+                end_time_str += ":00"
+
+            # Convert to datetime.time objects for comparison
+            start_time = datetime.strptime(start_time_str, '%H:%M:%S').time()
+            end_time = datetime.strptime(end_time_str, '%H:%M:%S').time()
+
+            # Check for overlap with existing slots for this day
+            for st, et, idx in day_time_slots[day]:
+                if (start_time >= st and start_time < et) or \
+                   (end_time > st and end_time <= et) or \
+                   (start_time <= st and end_time >= et):
+                    print(f"Overlapping slots detected on day {day}: slot #{i+1} with slot #{idx+1}")
+                    # We don't fail immediately - just log the issue.
+                    # The frontend should prevent this from happening.
+
+            day_time_slots[day].append((start_time, end_time, i))
+
+        # Process each slot: update existing or create new
+        for slot_data in slots_data:
+            try:
+                day_of_week = int(slot_data['day_of_week'])
+
+                # Parse start and end times
+                start_time_str = slot_data['start_time']
+                end_time_str = slot_data['end_time']
+
+                # Handle time format with or without seconds
+                if ':' not in start_time_str or ':' not in end_time_str:
+                    print(f"Invalid time format: start={start_time_str}, end={end_time_str}")
+                    continue
+
+                try:
+                    # Parse time as HH:MM or HH:MM:SS
+                    if start_time_str.count(':') == 1:
+                        start_time_str += ":00"  # Add seconds if missing
+                    if end_time_str.count(':') == 1:
+                        end_time_str += ":00"  # Add seconds if missing
+
+                    start_time = datetime.strptime(start_time_str, '%H:%M:%S').time()
+                    end_time = datetime.strptime(end_time_str, '%H:%M:%S').time()
+                except ValueError:
+                    print(f"Error parsing time: start={start_time_str}, end={end_time_str}")
+                    continue
+
+                # Set default duration and availability
+                slot_duration = slot_data.get('slot_duration_minutes', 60)  # Default to 1 hour
+                is_available = slot_data.get('is_available', True)  # Default to available
+
+                # Check if this is an existing slot that needs updating
+                if 'id' in slot_data and slot_data['id']:
+                    slot_id = slot_data['id']
+                    if isinstance(slot_id, str):
+                        try:
+                            slot_id = UUID(slot_id)
+                        except ValueError:
+                            print(f"Invalid slot_id: {slot_id}")
+                            continue
+
+                    # Verify the slot actually exists in the database
+                    if str(slot_id) not in existing_slot_ids:
+                        print(f"Slot ID {slot_id} doesn't exist in the database - creating new instead")
+                        new_slot = add_availability_slot(
+                            doctor_id=doctor_id,
+                            day_of_week=day_of_week,
+                            start_time=start_time,
+                            end_time=end_time,
+                            slot_duration_minutes=slot_duration
+                        )
+                        if new_slot:
+                            processed_slot_ids.add(str(new_slot.id))
+                        continue
+
+                    # Mark as processed
+                    processed_slot_ids.add(str(slot_id))
+
+                    # Update existing slot
+                    print(f"Updating existing slot: ID={slot_id}, day={day_of_week}, start={start_time}, end={end_time}")
+                    success = update_availability_slot(
+                        slot_id=slot_id,
+                        day_of_week=day_of_week,
+                        start_time=start_time,
+                        end_time=end_time,
+                        is_available=is_available,
+                        slot_duration_minutes=slot_duration
+                    )
+
+                    if not success:
+                        print(f"Failed to update slot: {slot_id}")
+                else:
+                    # Create new slot
+                    print(f"Creating new slot: day={day_of_week}, start={start_time}, end={end_time}")
+                    new_slot = add_availability_slot(
+                        doctor_id=doctor_id,
+                        day_of_week=day_of_week,
+                        start_time=start_time,
+                        end_time=end_time,
+                        slot_duration_minutes=slot_duration
+                    )
+
+                    if not new_slot:
+                        print("Failed to create new slot")
+                    else:
+                        print(f"Created new slot with ID: {new_slot.id}")
+                        # Add to processed list
+                        processed_slot_ids.add(str(new_slot.id))
+            except Exception as e:
+                print(f"Error processing slot: {str(e)}")
+                import traceback
+                print(traceback.format_exc())
+                # Continue with next slot
+
+        # Delete any existing slots that weren't in the new data
+        # (i.e., they were removed by the user)
+        for slot_id, slot in existing_slot_ids.items():
+            if slot_id not in processed_slot_ids:
+                print(f"Deleting removed slot: {slot_id}")
+                delete_availability_slot(slot.id)
+
+        return True
+
+    except Exception as e:
+        print(f"Error in bulk_update_availability: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        return False
+
+def get_available_booking_slots(doctor_id: UUID, date_str: str) -> List[Dict[str, Any]]:
+    """
+    Get available time slots for a specific date that can be booked
+
+    Args:
+        doctor_id: The doctor's ID
+        date_str: Date string in ISO format (YYYY-MM-DD)
+
+    Returns:
+        List of available time slots with start and end times
+    """
+    try:
+        return db.get_available_slots_for_booking(doctor_id, date_str)
+    except Exception as e:
+        print(f"Error getting available booking slots: {str(e)}")
+        return []

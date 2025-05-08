@@ -399,17 +399,83 @@ class Database:
 
     def get_doctors_by_department(self, department_id: Union[str, UUID]) -> List[Doctor]:
         """Get all doctors in a department."""
-        return self.query(Doctor, department_id=str(department_id))
+        try:
+            print(f"=== FETCHING DOCTORS BY DEPARTMENT ===")
+            print(f"Department ID: {department_id}")
+
+            # Convert UUID to string if needed
+            if isinstance(department_id, UUID):
+                department_id = str(department_id)
+
+            # Make sure department_id is valid
+            if not department_id or not isinstance(department_id, str):
+                print(f"Invalid department_id: {department_id}")
+                return []
+
+            # Try the direct query approach
+            table_name = self._get_table_name(Doctor)
+            print(f"Using table: {table_name}")
+
+            # Log the query we're about to execute
+            print(f"Executing query: SELECT * FROM {table_name} WHERE department_id = '{department_id}'")
+
+            # Execute the query
+            response = self.client.table(table_name).select("*").eq("department_id", department_id).execute()
+
+            # Log query result
+            if hasattr(response, 'error') and response.error:
+                print(f"Query error: {response.error}")
+                return []
+
+            result_count = len(response.data) if hasattr(response, 'data') and response.data else 0
+            print(f"Query returned {result_count} doctors")
+
+            # Convert the results to Doctor objects
+            if result_count > 0:
+                doctors = [Doctor.from_dict(item) for item in response.data]
+                doctor_ids = [str(doc.id) for doc in doctors]
+                print(f"Doctor IDs: {doctor_ids}")
+                return doctors
+
+            return []
+        except Exception as e:
+            print(f"Error in get_doctors_by_department: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            return []  # Return empty list instead of raising exception
 
     def get_doctors_by_hospital(self, hospital_id: Union[str, UUID]) -> List[Doctor]:
         """Get all doctors in a hospital."""
         return self.query(Doctor, hospital_id=str(hospital_id))
 
+    def get_doctors_by_hospital_department(self, hospital_id: Union[str, UUID], department_id: Union[str, UUID]) -> List[Doctor]:
+        """Get all doctors in a specific department of a hospital."""
+        try:
+            return self.query(Doctor, hospital_id=str(hospital_id), department_id=str(department_id))
+        except Exception as e:
+            print(f"Error fetching doctors by hospital and department: {str(e)}")
+            return []
+
+    def get_hospital_departments(self, hospital_id: Union[str, UUID]) -> List[HospitalDepartment]:
+        """Get departments for a hospital from the many-to-many relationship table."""
+        try:
+            # Use the existing query method instead of trying to use raw SQL
+            result = self.query(HospitalDepartment, hospital_id=str(hospital_id))
+            return result
+        except Exception as e:
+            print(f"Error in get_hospital_departments: {str(e)}")
+            return []  # Return empty list instead of raising exception
+
     # Appointment-specific operations
 
     def get_appointments_by_patient(self, patient_id: Union[str, UUID]) -> List[Appointment]:
         """Get all appointments for a patient."""
-        return self.query(Appointment, patient_id=str(patient_id))
+        try:
+            # Use the query method instead of raw SQL
+            return self.query(Appointment, patient_id=str(patient_id))
+        except Exception as e:
+            print(f"Error in get_appointments_by_patient: {str(e)}")
+            return []
 
     def get_appointments_by_doctor(self, doctor_id: Union[str, UUID]) -> List[Appointment]:
         """Get all appointments for a doctor."""
@@ -433,25 +499,223 @@ class Database:
 
         return []
 
+    def get_appointments_by_doctor_date(self, doctor_id, appointment_date):
+        """Get all appointments for a doctor on a specific date."""
+        try:
+            table_name = self._get_table_name(Appointment)
+
+            # Use the Supabase client directly with proper filters
+            response = self.client.table(table_name).select("*")\
+                .eq("doctor_id", str(doctor_id))\
+                .eq("date", str(appointment_date))\
+                .execute()
+
+            if response.data:
+                return [Appointment.from_dict(item) for item in response.data]
+            return []
+        except Exception as e:
+            print(f"Error in get_appointments_by_doctor_date: {str(e)}")
+            return []
+
     # Availability-specific operations
 
     def get_availability_by_doctor(self, doctor_id: Union[str, UUID]) -> List[DoctorAvailabilitySlot]:
         """Get all availability slots for a doctor."""
-        return self.query(DoctorAvailabilitySlot, doctor_id=str(doctor_id))
+        try:
+            # Use the query method instead of raw SQL
+            return self.query(DoctorAvailabilitySlot, doctor_id=str(doctor_id))
+        except Exception as e:
+            print(f"Error in get_availability_by_doctor: {str(e)}")
+            return []
 
     def get_availability_by_day(self, doctor_id: Union[str, UUID], day_of_week: int) -> List[DoctorAvailabilitySlot]:
-        """Get all availability slots for a doctor on a specific day."""
+        """Get availability slots for a doctor on a specific day."""
         table_name = self._get_table_name(DoctorAvailabilitySlot)
 
-        response = self.client.table(table_name).select("*")\
-            .eq("doctor_id", str(doctor_id))\
-            .eq("day_of_week", day_of_week)\
-            .execute()
+        try:
+            response = self.client.table(table_name).select("*")\
+                .eq("doctor_id", str(doctor_id))\
+                .eq("day_of_week", day_of_week)\
+                .execute()
 
-        if response.data:
-            return [DoctorAvailabilitySlot.from_dict(item) for item in response.data]
+            if response.data:
+                return [DoctorAvailabilitySlot.from_dict(item) for item in response.data]
+            return []
+        except Exception as e:
+            print(f"Error fetching availability by day: {str(e)}")
+            return []
 
-        return []
+    def add_doctor_availability_slot(self, slot: DoctorAvailabilitySlot) -> Optional[DoctorAvailabilitySlot]:
+        """Add a new availability slot for a doctor."""
+        try:
+            print(f"Adding availability slot: day={slot.day_of_week}, start={slot.start_time}, end={slot.end_time}")
+
+            # First validate the data
+            if not slot.doctor_id:
+                print("Error: doctor_id is required for availability slot")
+                return None
+
+            if not isinstance(slot.doctor_id, UUID):
+                try:
+                    slot.doctor_id = UUID(slot.doctor_id)
+                except (ValueError, TypeError) as e:
+                    print(f"Error converting doctor_id to UUID: {e}")
+                    return None
+
+            # Create the slot using our general create method
+            created_slot = self.create(slot)
+
+            if created_slot:
+                print(f"Successfully created availability slot with ID: {created_slot.id}")
+            else:
+                print("Failed to create availability slot")
+
+            return created_slot
+        except Exception as e:
+            print(f"Error in add_doctor_availability_slot: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            return None
+
+    def update_doctor_availability_slot(self, slot: DoctorAvailabilitySlot) -> bool:
+        """Update an existing availability slot."""
+        try:
+            print(f"Updating availability slot ID: {slot.id}, day={slot.day_of_week}, start={slot.start_time}, end={slot.end_time}")
+
+            # Validate that the slot has an ID
+            if not slot.id:
+                print("Error: Cannot update slot without ID")
+                return False
+
+            # Ensure doctor_id is a UUID
+            if not isinstance(slot.doctor_id, UUID):
+                try:
+                    slot.doctor_id = UUID(slot.doctor_id)
+                except (ValueError, TypeError) as e:
+                    print(f"Error converting doctor_id to UUID: {e}")
+                    return False
+
+            # Update the slot using our general update method
+            updated_slot = self.update(slot)
+
+            if updated_slot:
+                print(f"Successfully updated availability slot ID: {updated_slot.id}")
+                return True
+            else:
+                print(f"Failed to update availability slot ID: {slot.id}")
+                return False
+        except Exception as e:
+            print(f"Error in update_doctor_availability_slot: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            return False
+
+    def delete_doctor_availability_slot(self, slot_id: Union[str, UUID]) -> bool:
+        """Delete an availability slot by ID."""
+        try:
+            return self.delete(DoctorAvailabilitySlot, slot_id)
+        except Exception as e:
+            print(f"Error deleting availability slot: {str(e)}")
+            return False
+
+    def bulk_update_doctor_availability(self, slots: List[DoctorAvailabilitySlot]) -> bool:
+        """Update multiple availability slots in a transaction.
+
+        Args:
+            slots: List of DoctorAvailabilitySlot objects to update
+
+        Returns:
+            bool: True if all updates were successful, False otherwise
+        """
+        all_successful = True
+
+        for slot in slots:
+            result = self.update_doctor_availability_slot(slot)
+            if not result:
+                all_successful = False
+                print(f"Failed to update slot: {slot.id}")
+
+        return all_successful
+
+    def get_available_slots_for_booking(self, doctor_id: Union[str, UUID], date_str: str) -> List[Dict[str, Any]]:
+        """Get available time slots for booking on a specific date.
+
+        Args:
+            doctor_id: ID of the doctor
+            date_str: Date string in ISO format (YYYY-MM-DD)
+
+        Returns:
+            List of available time slots with start and end times
+        """
+        from datetime import datetime, timedelta
+
+        # Parse the date string to get the day of week (0=Monday, 6=Sunday)
+        date_obj = datetime.fromisoformat(date_str)
+        day_of_week = date_obj.weekday()  # Monday is 0
+
+        # Get availability for this day
+        slots = self.get_availability_by_day(doctor_id, day_of_week)
+
+        # Get any existing appointments for this date to check for conflicts
+        appointments = self.get_appointments_by_date(doctor_id, date_str)
+
+        available_slots = []
+
+        for slot in slots:
+            if slot.is_available:
+                # Check slot duration, default to 30 min if not specified
+                duration_minutes = slot.slot_duration_minutes or 30
+
+                # Create time slots within the available period
+                slot_time = datetime.combine(date_obj.date(), slot.start_time)
+                end_time = datetime.combine(date_obj.date(), slot.end_time)
+
+                while slot_time + timedelta(minutes=duration_minutes) <= end_time:
+                    # Check if this slot conflicts with any appointments
+                    slot_end = slot_time + timedelta(minutes=duration_minutes)
+                    is_available = True
+
+                    for appt in appointments:
+                        # Check if appointment overlaps with this slot
+                        # Assuming appointment time_slot is stored as a range like [start, end)
+                        appt_start = appt.get('start_time')
+                        appt_end = appt.get('end_time')
+
+                        if (appt_start and appt_end and
+                            ((slot_time >= appt_start and slot_time < appt_end) or
+                             (slot_end > appt_start and slot_end <= appt_end) or
+                             (slot_time <= appt_start and slot_end >= appt_end))):
+                            is_available = False
+                            break
+
+                    if is_available:
+                        available_slots.append({
+                            'start_time': slot_time.strftime('%H:%M'),
+                            'end_time': slot_end.strftime('%H:%M'),
+                            'duration_minutes': duration_minutes
+                        })
+
+                    # Move to next slot
+                    slot_time += timedelta(minutes=duration_minutes)
+
+        return available_slots
+
+    def get_appointments_by_date(self, doctor_id: Union[str, UUID], date_str: str) -> List[Dict[str, Any]]:
+        """Get all appointments for a doctor on a specific date."""
+        table_name = self._get_table_name(Appointment)
+
+        try:
+            response = self.client.table(table_name).select("*")\
+                .eq("doctor_id", str(doctor_id))\
+                .eq("date", date_str)\
+                .execute()
+
+            if response.data:
+                return response.data
+            return []
+        except Exception as e:
+            print(f"Error fetching appointments by date: {str(e)}")
+            return []
 
     # EHR-specific operations
 
@@ -603,6 +867,79 @@ class Database:
     def get_doctor_notes(self, doctor_id: Union[str, UUID]) -> List[DoctorNote]:
         """Get all notes for a doctor."""
         return self.query(DoctorNote, doctor_id=str(doctor_id))
+
+    # Add missing fetch_all method after the query method
+    def fetch_all(self, query: str, params: tuple = None) -> List[Any]:
+        """Execute a raw SQL query and return all results.
+
+        Args:
+            query: SQL query string with %s placeholders
+            params: Tuple of parameter values
+
+        Returns:
+            List of model objects from the results
+        """
+        try:
+            print(f"Executing SQL query: {query} with params: {params}")
+
+            # Extract table name from the query
+            import re
+            table_match = re.search(r'FROM\s+(\w+)', query, re.IGNORECASE)
+            if not table_match:
+                raise ValueError(f"Cannot extract table name from query: {query}")
+
+            table_name = table_match.group(1).strip()
+            print(f"Extracted table name: {table_name}")
+
+            # Map table name to model class
+            table_to_model = {
+                "users": User,
+                "hospitals": Hospital,
+                "departments": Department,
+                "patients": Patient,
+                "doctors": Doctor,
+                "doctor_availability": DoctorAvailabilitySlot,
+                "doctor_availability_slots": DoctorAvailabilitySlot,
+                "appointments": Appointment,
+                "hospital_departments": HospitalDepartment
+                # Add other mappings as needed
+            }
+
+            if table_name not in table_to_model:
+                raise ValueError(f"Unknown table name: {table_name}")
+
+            model_class = table_to_model[table_name]
+
+            # Build RPC call
+            # Note: This is a simplified approach and might need adjustments for complex queries
+            if params:
+                # Replace SQL placeholders with named parameters
+                param_dict = {}
+                modified_query = query
+                for i, param in enumerate(params):
+                    param_name = f"p{i}"
+                    param_dict[param_name] = param
+                    modified_query = modified_query.replace("%s", f":{param_name}", 1)
+
+                response = self.client.rpc('run_query', {"query": modified_query, "params": param_dict}).execute()
+            else:
+                response = self.client.rpc('run_query', {"query": query}).execute()
+
+            if response.error:
+                print(f"Error executing query: {response.error}")
+                return []
+
+            # Convert results to model objects
+            if response.data:
+                return [model_class.from_dict(item) for item in response.data]
+
+            return []
+
+        except Exception as e:
+            print(f"Error in fetch_all: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            return []
 
 # Singleton instance for easy access
 db = Database()

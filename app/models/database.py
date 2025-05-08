@@ -459,6 +459,9 @@ class DoctorAvailabilitySlot:
         start_time: time = None,
         end_time: time = None,
         is_available: bool = True,
+        slot_duration_minutes: int = 30,  # Default to 30-minute slots
+        valid_from: date = None,  # Optional date range for seasonal/temporary availability
+        valid_until: date = None,
         created_at: datetime = None,
         updated_at: datetime = None
     ):
@@ -468,25 +471,68 @@ class DoctorAvailabilitySlot:
         self.start_time = start_time
         self.end_time = end_time
         self.is_available = is_available
+        self.slot_duration_minutes = slot_duration_minutes
+        self.valid_from = valid_from
+        self.valid_until = valid_until
         self.created_at = created_at or datetime.now()
         self.updated_at = updated_at or datetime.now()
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'DoctorAvailabilitySlot':
         """Create a DoctorAvailabilitySlot instance from a dictionary."""
+        # Parse times from ISO format strings if they are strings
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+
+        if isinstance(start_time, str):
+            try:
+                # Try to parse the time string (could be HH:MM:SS or HH:MM)
+                # This handles the format coming from Postgres
+                start_time = time.fromisoformat(start_time.split('+')[0])
+            except ValueError:
+                print(f"Could not parse start_time: {start_time}")
+                start_time = None
+
+        if isinstance(end_time, str):
+            try:
+                # Try to parse the time string (could be HH:MM:SS or HH:MM)
+                # This handles the format coming from Postgres
+                end_time = time.fromisoformat(end_time.split('+')[0])
+            except ValueError:
+                print(f"Could not parse end_time: {end_time}")
+                end_time = None
+
         return cls(
             id=data.get('id'),
             doctor_id=data.get('doctor_id'),
             day_of_week=data.get('day_of_week'),
-            start_time=data.get('start_time'),
-            end_time=data.get('end_time'),
+            start_time=start_time,
+            end_time=end_time,
             is_available=data.get('is_available', True),
-            created_at=data.get('created_at'),
-            updated_at=data.get('updated_at')
+            slot_duration_minutes=data.get('slot_duration_minutes', 30),
+            valid_from=parse_iso_date(data.get('valid_from')),
+            valid_until=parse_iso_date(data.get('valid_until')),
+            created_at=parse_iso_datetime(data.get('created_at')),
+            updated_at=parse_iso_datetime(data.get('updated_at'))
         )
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert instance to a dictionary."""
+        # Ensure created_at and updated_at are properly formatted
+        created_at_iso = None
+        if self.created_at:
+            if isinstance(self.created_at, str):
+                created_at_iso = self.created_at
+            else:
+                created_at_iso = self.created_at.isoformat()
+
+        updated_at_iso = None
+        if self.updated_at:
+            if isinstance(self.updated_at, str):
+                updated_at_iso = self.updated_at
+            else:
+                updated_at_iso = self.updated_at.isoformat()
+
         return {
             'id': str(self.id),
             'doctor_id': str(self.doctor_id) if self.doctor_id else None,
@@ -494,8 +540,11 @@ class DoctorAvailabilitySlot:
             'start_time': self.start_time.isoformat() if self.start_time else None,
             'end_time': self.end_time.isoformat() if self.end_time else None,
             'is_available': self.is_available,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'slot_duration_minutes': self.slot_duration_minutes,
+            'valid_from': self.valid_from.isoformat() if self.valid_from else None,
+            'valid_until': self.valid_until.isoformat() if self.valid_until else None,
+            'created_at': created_at_iso,
+            'updated_at': updated_at_iso
         }
 
 
@@ -532,16 +581,30 @@ class Appointment:
         time_slot = None
         if 'time_slot' in data and data['time_slot']:
             # Parse the time_slot range from Postgres
-            # Expected format: "[2023-01-01 10:00:00+00,2023-01-01 11:00:00+00)"
-            # Convert to a tuple of datetime objects
-            time_slot_str = data['time_slot'].strip('[]()').split(',')
-            if len(time_slot_str) == 2:
-                start_str, end_str = time_slot_str
-                try:
-                    # This is a simplification - actual parsing would be more complex
-                    time_slot = (datetime.fromisoformat(start_str), datetime.fromisoformat(end_str))
-                except ValueError:
-                    pass
+            # Expected format: ["2023-01-01 10:00:00+00","2023-01-01 11:00:00+00")
+            # Store it as a string for compatibility with Postgres tstzrange
+            time_slot = data['time_slot']
+
+        # Parse date if it's a string
+        appointment_date = data.get('date')
+        if isinstance(appointment_date, str):
+            try:
+                appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
+            except ValueError:
+                appointment_date = None
+
+        # Handle status
+        status = data.get('status')
+        if status and isinstance(status, str):
+            try:
+                status = AppointmentStatus(status)
+            except ValueError:
+                # If it's not a valid enum value, use scheduled as default
+                status = AppointmentStatus.SCHEDULED
+
+        # Parse timestamps
+        created_at = parse_iso_datetime(data.get('created_at')) if isinstance(data.get('created_at'), str) else data.get('created_at')
+        updated_at = parse_iso_datetime(data.get('updated_at')) if isinstance(data.get('updated_at'), str) else data.get('updated_at')
 
         return cls(
             id=data.get('id'),
@@ -549,23 +612,25 @@ class Appointment:
             doctor_id=data.get('doctor_id'),
             hospital_id=data.get('hospital_id'),
             department_id=data.get('department_id'),
-            date=data.get('date'),
+            date=appointment_date,
             time_slot=time_slot,
-            status=AppointmentStatus(data.get('status')) if data.get('status') else AppointmentStatus.SCHEDULED,
-            created_at=data.get('created_at'),
-            updated_at=data.get('updated_at')
+            status=status,
+            created_at=created_at,
+            updated_at=updated_at
         )
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert instance to a dictionary."""
-        time_slot_dict = None
-        if self.time_slot and len(self.time_slot) == 2:
-            start_time, end_time = self.time_slot
-            if isinstance(start_time, datetime) and isinstance(end_time, datetime):
-                time_slot_dict = {
-                    'start': start_time.isoformat(),
-                    'end': end_time.isoformat()
-                }
+        # Handle status field that could be either an enum or a string
+        status_value = None
+        if self.status:
+            if isinstance(self.status, str):
+                status_value = self.status  # Already a string value
+            else:
+                status_value = self.status.value  # Enum, get its value
+
+        # For time_slot, just pass it through as is - PostgreSQL expects a string in tstzrange format
+        # The time_slot could be a simple string, a tuple of datetimes, or already a formatted tstzrange
 
         return {
             'id': str(self.id),
@@ -574,8 +639,8 @@ class Appointment:
             'hospital_id': str(self.hospital_id) if self.hospital_id else None,
             'department_id': str(self.department_id) if self.department_id else None,
             'date': self.date.isoformat() if self.date else None,
-            'time_slot': time_slot_dict,
-            'status': self.status.value if self.status else None,
+            'time_slot': self.time_slot, # Pass through directly - should be in tstzrange format already
+            'status': status_value,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
