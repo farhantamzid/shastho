@@ -14,7 +14,7 @@ from app.services.doctor_service import (
     update_doctor_profile, update_doctor_profile_picture,
     get_doctor_hospital_info, add_availability_slot,
     delete_availability_slot, update_availability_slot, # Corrected names
-    bulk_update_availability
+    bulk_update_availability, get_doctor_stats
 )
 from app.forms.ehr_forms import DiagnosisForm, MedicationForm, PrescriptionForm, AllergyForm, VitalSignsForm, ProviderNoteForm, TestResultForm, ProcedureForm, ImmunizationForm
 from datetime import datetime, date
@@ -63,15 +63,62 @@ def dashboard():
     """
     user_id = session.get('user_id')
 
-    # Placeholder for stats data (in a real app, this would be queried from DB)
-    stats = {
-        'today_appointments': 0,
-        'patient_count': 0,
-        'pending_records': 0
-    }
+    # Get doctor record
+    doctor = get_doctor_by_user_id(user_id)
 
-    # Placeholder for upcoming appointments (in a real app, this would be queried from DB)
-    upcoming_appointments = []
+    if doctor:
+        # Get stats from service
+        stats = get_doctor_stats(doctor.id)
+    else:
+        # Fallback to dummy data if doctor record not found
+        stats = {
+            'today_appointments': 8,
+            'patient_count': 146
+        }
+
+    # Dummy data for upcoming appointments
+    upcoming_appointments = [
+        {
+            'id': 1,
+            'patient_name': 'Abdur Rahman',
+            'time': '10:00 AM',
+            'date': 'Today',
+            'reason': 'Follow-up',
+            'status': 'confirmed'
+        },
+        {
+            'id': 2,
+            'patient_name': 'Farzana Akter',
+            'time': '11:30 AM',
+            'date': 'Today',
+            'reason': 'Consultation',
+            'status': 'confirmed'
+        },
+        {
+            'id': 3,
+            'patient_name': 'Mohammed Islam',
+            'time': '2:15 PM',
+            'date': 'Today',
+            'reason': 'Annual checkup',
+            'status': 'confirmed'
+        },
+        {
+            'id': 4,
+            'patient_name': 'Nusrat Jahan',
+            'time': '9:00 AM',
+            'date': 'Tomorrow',
+            'reason': 'New patient',
+            'status': 'pending'
+        },
+        {
+            'id': 5,
+            'patient_name': 'Kamal Hossain',
+            'time': '3:45 PM',
+            'date': 'Tomorrow',
+            'reason': 'Test results',
+            'status': 'confirmed'
+        }
+    ]
 
     return render_template('doctor/dashboard.html',
                            stats=stats,
@@ -1217,3 +1264,237 @@ def get_doctor_booking_slots():
         "success": True,
         "slots": slots
     })
+
+@doctor_bp.route('/all-patients')
+@login_required
+@role_required(UserRole.DOCTOR)
+def all_patients():
+    """
+    Page showing all patients for the doctor
+    """
+    # Dummy data for all patients
+    patients = [
+        {
+            'id': 'P-10045',
+            'name': 'Abdur Rahman',
+            'age': 45,
+            'gender': 'Male',
+            'contact': '+880 1712-345678',
+            'last_visit': 'Today',
+            'conditions': 'Hypertension, Diabetes'
+        },
+        {
+            'id': 'P-10089',
+            'name': 'Farzana Akter',
+            'age': 32,
+            'gender': 'Female',
+            'contact': '+880 1815-678901',
+            'last_visit': 'Today',
+            'conditions': 'Migraine'
+        },
+        {
+            'id': 'P-10027',
+            'name': 'Mohammed Islam',
+            'age': 56,
+            'gender': 'Male',
+            'contact': '+880 1912-345678',
+            'last_visit': 'Today',
+            'conditions': 'Arthritis, COPD'
+        },
+        {
+            'id': 'P-10112',
+            'name': 'Nusrat Jahan',
+            'age': 28,
+            'gender': 'Female',
+            'contact': '+880 1687-123456',
+            'last_visit': 'New Patient',
+            'conditions': 'None'
+        },
+        {
+            'id': 'P-10058',
+            'name': 'Kamal Hossain',
+            'age': 42,
+            'gender': 'Male',
+            'contact': '+880 1511-234567',
+            'last_visit': '2 days ago',
+            'conditions': 'Asthma'
+        },
+        {
+            'id': 'P-10067',
+            'name': 'Tahmina Begum',
+            'age': 35,
+            'gender': 'Female',
+            'contact': '+880 1611-890123',
+            'last_visit': '1 week ago',
+            'conditions': 'Hypothyroidism'
+        },
+        {
+            'id': 'P-10093',
+            'name': 'Arif Khan',
+            'age': 60,
+            'gender': 'Male',
+            'contact': '+880 1711-567890',
+            'last_visit': '2 weeks ago',
+            'conditions': 'Coronary Artery Disease'
+        },
+        {
+            'id': 'P-10119',
+            'name': 'Sabina Yasmin',
+            'age': 38,
+            'gender': 'Female',
+            'contact': '+880 1912-678901',
+            'last_visit': '1 month ago',
+            'conditions': 'Depression, Anxiety'
+        },
+        {
+            'id': 'P-10152',
+            'name': 'Zahir Uddin',
+            'age': 50,
+            'gender': 'Male',
+            'contact': '+880 1511-345678',
+            'last_visit': '2 months ago',
+            'conditions': 'Gout'
+        },
+        {
+            'id': 'P-10173',
+            'name': 'Laila Rahman',
+            'age': 44,
+            'gender': 'Female',
+            'contact': '+880 1812-901234',
+            'last_visit': '3 months ago',
+            'conditions': 'Fibromyalgia'
+        },
+        {
+            'id': 'P-10187',
+            'name': 'Rafiqul Islam',
+            'age': 62,
+            'gender': 'Male',
+            'contact': '+880 1511-789012',
+            'last_visit': '4 months ago',
+            'conditions': 'Chronic Kidney Disease'
+        },
+        {
+            'id': 'P-10204',
+            'name': 'Nasreen Akhtar',
+            'age': 30,
+            'gender': 'Female',
+            'contact': '+880 1712-901234',
+            'last_visit': '6 months ago',
+            'conditions': 'Irritable Bowel Syndrome'
+        }
+    ]
+
+    return render_template('doctor/all_patients.html', patients=patients)
+
+@doctor_bp.route('/all-appointments')
+@login_required
+@role_required(UserRole.DOCTOR)
+def all_appointments():
+    """
+    Page showing all appointments for the doctor
+    """
+    # Dummy data for all appointments
+    appointments = [
+        {
+            'id': 1,
+            'patient_name': 'Abdur Rahman',
+            'patient_id': 'P-10045',
+            'time': '10:00 AM',
+            'date': 'Today',
+            'reason': 'Follow-up',
+            'status': 'confirmed',
+            'contact': '+880 1712-345678'
+        },
+        {
+            'id': 2,
+            'patient_name': 'Farzana Akter',
+            'patient_id': 'P-10089',
+            'time': '11:30 AM',
+            'date': 'Today',
+            'reason': 'Consultation',
+            'status': 'confirmed',
+            'contact': '+880 1815-678901'
+        },
+        {
+            'id': 3,
+            'patient_name': 'Mohammed Islam',
+            'patient_id': 'P-10027',
+            'time': '2:15 PM',
+            'date': 'Today',
+            'reason': 'Annual checkup',
+            'status': 'confirmed',
+            'contact': '+880 1912-345678'
+        },
+        {
+            'id': 4,
+            'patient_name': 'Nusrat Jahan',
+            'patient_id': 'P-10112',
+            'time': '9:00 AM',
+            'date': 'Tomorrow',
+            'reason': 'New patient',
+            'status': 'pending',
+            'contact': '+880 1687-123456'
+        },
+        {
+            'id': 5,
+            'patient_name': 'Kamal Hossain',
+            'patient_id': 'P-10058',
+            'time': '3:45 PM',
+            'date': 'Tomorrow',
+            'reason': 'Test results',
+            'status': 'confirmed',
+            'contact': '+880 1511-234567'
+        },
+        {
+            'id': 6,
+            'patient_name': 'Tahmina Begum',
+            'patient_id': 'P-10067',
+            'time': '1:30 PM',
+            'date': 'Aug 25, 2023',
+            'reason': 'Follow-up',
+            'status': 'completed',
+            'contact': '+880 1611-890123'
+        },
+        {
+            'id': 7,
+            'patient_name': 'Arif Khan',
+            'patient_id': 'P-10093',
+            'time': '4:15 PM',
+            'date': 'Aug 26, 2023',
+            'reason': 'Consultation',
+            'status': 'completed',
+            'contact': '+880 1711-567890'
+        },
+        {
+            'id': 8,
+            'patient_name': 'Sabina Yasmin',
+            'patient_id': 'P-10119',
+            'time': '11:00 AM',
+            'date': 'Aug 27, 2023',
+            'reason': 'Prescription renewal',
+            'status': 'completed',
+            'contact': '+880 1912-678901'
+        },
+        {
+            'id': 9,
+            'patient_name': 'Zahir Uddin',
+            'patient_id': 'P-10152',
+            'time': '2:30 PM',
+            'date': 'Aug 28, 2023',
+            'reason': 'Test results',
+            'status': 'completed',
+            'contact': '+880 1511-345678'
+        },
+        {
+            'id': 10,
+            'patient_name': 'Laila Rahman',
+            'patient_id': 'P-10173',
+            'time': '11:45 AM',
+            'date': 'Aug 30, 2023',
+            'reason': 'Annual checkup',
+            'status': 'cancelled',
+            'contact': '+880 1812-901234'
+        }
+    ]
+
+    return render_template('doctor/all_appointments.html', appointments=appointments)

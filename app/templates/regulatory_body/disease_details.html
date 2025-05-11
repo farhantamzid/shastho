@@ -1,0 +1,338 @@
+{% extends "regulatory_body/layout.html" %} {% block title %}{{ disease.name }}
+Details - Shastho{% endblock %} {% block page_title %}{{ disease.name }}
+Details{% endblock %} {% block regulatory_body_content %}
+<div class="py-4">
+  <!-- Back button -->
+  <div class="mb-4">
+    <a
+      href="{{ url_for('regulatory_body.dashboard') }}"
+      class="inline-flex items-center text-blue-600 hover:text-blue-800"
+    >
+      <svg
+        class="w-5 h-5 mr-1"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 19l-7-7m0 0l7-7m-7 7h18"
+        ></path>
+      </svg>
+      Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Disease Overview -->
+  <div class="bg-white shadow rounded-lg mb-6 p-4">
+    <div
+      class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4"
+    >
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">{{ disease.name }}</h2>
+        <div class="mt-2 flex items-center">
+          <span class="mr-2 text-sm text-gray-500">Current Status:</span>
+          <span
+            class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {% if disease.risk_level == 'high' %}bg-red-100 text-red-800 {% elif disease.risk_level == 'medium' %}bg-yellow-100 text-yellow-800 {% else %}bg-green-100 text-green-800{% endif %}"
+          >
+            {{ disease.risk_level|capitalize }} Risk
+          </span>
+          <span class="ml-4 text-sm text-gray-500">Trend:</span>
+          <span
+            class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {% if disease.trend == 'increasing' %}bg-red-100 text-red-800 {% elif disease.trend == 'stable' %}bg-yellow-100 text-yellow-800 {% else %}bg-green-100 text-green-800{% endif %}"
+          >
+            {{ disease.trend|capitalize }}
+          </span>
+        </div>
+      </div>
+      <div class="mt-4 md:mt-0">
+        <div class="text-3xl font-bold text-blue-800">{{ disease.cases }}</div>
+        <div class="text-sm text-gray-500">Total reported cases</div>
+      </div>
+    </div>
+    <div class="border-t border-gray-200 pt-4 mt-2">
+      <p class="text-gray-600">{{ disease.description }}</p>
+    </div>
+  </div>
+
+  <!-- Key Statistics and Chart -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Disease Trend Chart -->
+    <div class="lg:col-span-2 bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">
+        Monthly Case Trend
+      </h3>
+      <div class="h-64">
+        <canvas id="diseaseTrendChart"></canvas>
+      </div>
+      <div class="mt-4 text-sm text-gray-500">
+        Data shows cases reported over the last 7 months.
+      </div>
+    </div>
+
+    <!-- Age Distribution -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Age Distribution</h3>
+      <div class="h-64">
+        <canvas id="ageDistributionChart"></canvas>
+      </div>
+      <div class="mt-4 text-sm text-gray-500">
+        Percentage of cases by age group.
+      </div>
+    </div>
+  </div>
+
+  <!-- Disease Info Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <!-- Transmission -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">Transmission</h3>
+      <p class="text-gray-600">{{ disease.transmission }}</p>
+    </div>
+
+    <!-- Symptoms -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">Common Symptoms</h3>
+      <ul class="mt-2 grid grid-cols-2 gap-2">
+        {% for symptom in disease.symptoms %}
+        <li class="flex items-center">
+          <svg
+            class="w-4 h-4 mr-2 text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span class="text-sm text-gray-600">{{ symptom }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Prevention -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">
+        Prevention Measures
+      </h3>
+      <ul class="mt-2 space-y-2">
+        {% for measure in disease.prevention %}
+        <li class="flex items-start">
+          <svg
+            class="w-5 h-5 mr-2 text-green-500 mt-0.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <span class="text-sm text-gray-600">{{ measure }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Treatment -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">Treatments</h3>
+      <ul class="mt-2 space-y-2">
+        {% for treatment in disease.treatments %}
+        <li class="flex items-start">
+          <svg
+            class="w-5 h-5 mr-2 text-blue-500 mt-0.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+            ></path>
+          </svg>
+          <span class="text-sm text-gray-600">{{ treatment }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Regional Data -->
+  <div class="bg-white shadow rounded-lg mb-6 p-4">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-gray-700">Regional Analysis</h3>
+      <a href="#" class="text-sm text-blue-600 hover:text-blue-800"
+        >Export data</a
+      >
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Region
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Cases
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Trend
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for region in disease.affected_regions %}
+          <tr>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+              {{ region.name }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ region.cases }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if region.trend == 'Increasing' %}bg-red-100 text-red-800 {% elif region.trend == 'Stable' %}bg-yellow-100 text-yellow-800 {% else %}bg-green-100 text-green-800{% endif %}"
+              >
+                {{ region.trend }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <a
+                href="{{ url_for('regulatory_body.region_details', region_name=region.name) }}"
+                class="text-blue-600 hover:text-blue-900"
+              >
+                View details
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Add Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- JavaScript for charts -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Monthly trend chart
+    const trendCtx = document.getElementById('diseaseTrendChart').getContext('2d');
+    const trendChart = new Chart(trendCtx, {
+      type: 'line',
+      data: {
+        labels: {{ months|tojson }},
+        datasets: [{
+          label: 'Monthly Cases',
+          data: {{ disease.monthly_trend|tojson }},
+          borderColor: 'rgb(37, 99, 235)',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          borderWidth: 2,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of Cases'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Month'
+            }
+          }
+        }
+      }
+    });
+
+    // Age distribution chart
+    const ageCtx = document.getElementById('ageDistributionChart').getContext('2d');
+    const ageChart = new Chart(ageCtx, {
+      type: 'pie',
+      data: {
+        labels: Object.keys({{ disease.age_distribution|tojson }}),
+        datasets: [{
+          data: Object.values({{ disease.age_distribution|tojson }}),
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)'
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              boxWidth: 12,
+              font: {
+                size: 11
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,273 @@
+{% extends "doctor/layout.html" %} {% block title %}All Patients - Shastho{%
+endblock %} {% block page_title %}All Patients{% endblock %} {% block
+doctor_content %}
+
+<div class="mt-4">
+  <div class="sm:flex sm:items-center mb-6">
+    <div class="sm:flex-auto">
+      <h1 class="text-xl font-semibold text-gray-900">Patients</h1>
+      <p class="mt-2 text-sm text-gray-700">
+        A comprehensive list of all patients under your care.
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <a
+        href="{{ url_for('doctor.patient_search') }}"
+        class="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto"
+      >
+        Search Patient
+      </a>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:p-6 mb-6">
+    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+      <div class="sm:col-span-2">
+        <label for="condition" class="block text-sm font-medium text-gray-700"
+          >Condition</label
+        >
+        <select
+          id="condition"
+          name="condition"
+          class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm"
+        >
+          <option selected>All Conditions</option>
+          <option>Hypertension</option>
+          <option>Diabetes</option>
+          <option>Arthritis</option>
+          <option>Asthma</option>
+          <option>Depression</option>
+        </select>
+      </div>
+
+      <div class="sm:col-span-2">
+        <label for="age-group" class="block text-sm font-medium text-gray-700"
+          >Age Group</label
+        >
+        <select
+          id="age-group"
+          name="age-group"
+          class="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm"
+        >
+          <option selected>All Ages</option>
+          <option>0-18</option>
+          <option>19-35</option>
+          <option>36-50</option>
+          <option>51-65</option>
+          <option>65+</option>
+        </select>
+      </div>
+
+      <div class="sm:col-span-2">
+        <label for="search" class="block text-sm font-medium text-gray-700"
+          >Search</label
+        >
+        <div class="mt-1 flex rounded-md shadow-sm">
+          <input
+            type="text"
+            name="search"
+            id="search"
+            class="block w-full min-w-0 flex-1 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500 sm:text-sm"
+            placeholder="Patient name or ID"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5 flex justify-end">
+      <button
+        type="button"
+        class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+      >
+        Reset Filters
+      </button>
+      <button
+        type="button"
+        class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+      >
+        Apply Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="mt-4 flex flex-col">
+    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+        <div
+          class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg"
+        >
+          <table class="min-w-full divide-y divide-gray-300">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                >
+                  Patient
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                >
+                  Age/Gender
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                >
+                  Contact
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                >
+                  Last Visit
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                >
+                  Medical Conditions
+                </th>
+                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                  <span class="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+              {% for patient in patients %}
+              <tr>
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                  <div class="flex items-center">
+                    <div class="ml-0">
+                      <div class="font-medium text-gray-900">
+                        {{ patient.name }}
+                      </div>
+                      <div class="text-gray-500">{{ patient.id }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  <div class="text-gray-900">{{ patient.age }} years</div>
+                  <div class="text-gray-500">{{ patient.gender }}</div>
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {{ patient.contact }}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {{ patient.last_visit }}
+                </td>
+                <td class="px-3 py-4 text-sm text-gray-500">
+                  {{ patient.conditions }}
+                </td>
+                <td
+                  class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
+                >
+                  <a href="#" class="text-green-600 hover:text-green-900 mr-3"
+                    >View EHR</a
+                  >
+                  <a href="#" class="text-green-600 hover:text-green-900"
+                    >Schedule</a
+                  >
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div
+    class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4"
+  >
+    <div class="flex-1 flex justify-between sm:hidden">
+      <a
+        href="#"
+        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+      >
+        Previous
+      </a>
+      <a
+        href="#"
+        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+      >
+        Next
+      </a>
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+      <div>
+        <p class="text-sm text-gray-700">
+          Showing <span class="font-medium">1</span> to
+          <span class="font-medium">10</span> of
+          <span class="font-medium">{{ patients|length }}</span> results
+        </p>
+      </div>
+      <div>
+        <nav
+          class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+          aria-label="Pagination"
+        >
+          <a
+            href="#"
+            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+          >
+            <span class="sr-only">Previous</span>
+            <!-- Heroicon name: solid/chevron-left -->
+            <svg
+              class="h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+          <a
+            href="#"
+            aria-current="page"
+            class="z-10 bg-green-50 border-green-500 text-green-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+          >
+            1
+          </a>
+          <span
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+          >
+            ...
+          </span>
+          <a
+            href="#"
+            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+          >
+            <span class="sr-only">Next</span>
+            <!-- Heroicon name: solid/chevron-right -->
+            <svg
+              class="h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

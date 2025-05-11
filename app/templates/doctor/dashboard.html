@@ -39,7 +39,10 @@ doctor_content %}
       </div>
       <div class="bg-gray-50 px-4 py-4 sm:px-6">
         <div class="text-sm">
-          <a href="#" class="font-medium text-cyan-600 hover:text-cyan-500">
+          <a
+            href="{{ url_for('doctor.all_appointments') }}"
+            class="font-medium text-cyan-600 hover:text-cyan-500"
+          >
             View all appointments <span aria-hidden="true">&rarr;</span>
           </a>
         </div>
@@ -81,50 +84,11 @@ doctor_content %}
       </div>
       <div class="bg-gray-50 px-4 py-4 sm:px-6">
         <div class="text-sm">
-          <a href="#" class="font-medium text-green-600 hover:text-green-500">
+          <a
+            href="{{ url_for('doctor.all_patients') }}"
+            class="font-medium text-green-600 hover:text-green-500"
+          >
             View all patients <span aria-hidden="true">&rarr;</span>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pending Medical Records Card -->
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="px-4 py-5 sm:p-6">
-        <div class="flex items-center">
-          <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
-            <svg
-              class="h-6 w-6 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-          </div>
-          <div class="ml-5 w-0 flex-1">
-            <dt class="text-sm font-medium text-gray-500 truncate">
-              Pending Records
-            </dt>
-            <dd class="flex items-baseline">
-              <div class="text-2xl font-semibold text-gray-900">
-                {{ stats.pending_records if stats and stats.pending_records is
-                defined else 0 }}
-              </div>
-            </dd>
-          </div>
-        </div>
-      </div>
-      <div class="bg-gray-50 px-4 py-4 sm:px-6">
-        <div class="text-sm">
-          <a href="#" class="font-medium text-yellow-600 hover:text-yellow-500">
-            Update pending records <span aria-hidden="true">&rarr;</span>
           </a>
         </div>
       </div>
@@ -244,126 +208,94 @@ doctor_content %}
   <div class="mt-8">
     <div class="flex items-center justify-between">
       <h2 class="text-lg font-medium text-gray-900">Upcoming Appointments</h2>
-      <a href="#" class="text-sm font-medium text-cyan-600 hover:text-cyan-500"
+      <a
+        href="{{ url_for('doctor.all_appointments') }}"
+        class="text-sm font-medium text-cyan-600 hover:text-cyan-500"
         >View all</a
       >
     </div>
 
-    <div class="mt-4 bg-white shadow overflow-hidden sm:rounded-md">
-      {% if upcoming_appointments and upcoming_appointments|length > 0 %}
-      <ul role="list" class="divide-y divide-gray-200">
-        {% for appointment in upcoming_appointments %}
-        <li>
-          <div class="px-4 py-4 sm:px-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <span
-                    class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100"
-                  >
-                    <span
-                      class="text-sm font-medium leading-none text-cyan-700"
-                    >
-                      {{ appointment.patient_name[:2].upper() if
-                      appointment.patient_name else "PT" }}
-                    </span>
-                  </span>
-                </div>
-                <div class="ml-4">
-                  <p class="text-sm font-medium text-gray-900">
-                    {{ appointment.patient_name }}
-                  </p>
-                  <p class="text-sm text-gray-500">
-                    {{ appointment.appointment_type }}
-                  </p>
-                </div>
+    <div
+      class="mt-4 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg"
+    >
+      <table class="min-w-full divide-y divide-gray-300">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+            >
+              Patient
+            </th>
+            <th
+              scope="col"
+              class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+            >
+              Time
+            </th>
+            <th
+              scope="col"
+              class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+            >
+              Reason
+            </th>
+            <th
+              scope="col"
+              class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+            >
+              Status
+            </th>
+            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          {% for appointment in upcoming_appointments %}
+          <tr>
+            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+              <div class="font-medium text-gray-900">
+                {{ appointment.patient_name }}
               </div>
-              <div class="flex flex-col items-end">
-                <p class="text-sm text-gray-900">
-                  {{ appointment.date.strftime('%B %d, %Y') if appointment.date
-                  else 'N/A' }}
-                </p>
-                <p class="text-sm text-gray-500">
-                  {{ appointment.time_slot.start.strftime('%I:%M %p') if
-                  appointment.time_slot and appointment.time_slot.start else
-                  'N/A' }} - {{ appointment.time_slot.end.strftime('%I:%M %p')
-                  if appointment.time_slot and appointment.time_slot.end else
-                  'N/A' }}
-                </p>
-              </div>
-            </div>
-            <div class="mt-2 sm:flex sm:justify-between">
-              <div class="sm:flex">
-                <p class="flex items-center text-sm text-gray-500">
-                  <svg
-                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-10a2 2 0 100-4 2 2 0 000 4z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  {{ appointment.patient_age }} years old
-                </p>
-                <p
-                  class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6"
-                >
-                  <svg
-                    class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                  {{ appointment.reason_for_visit }}
-                </p>
-              </div>
-              <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                <a
-                  href="#"
-                  class="text-cyan-600 hover:text-cyan-500 font-medium"
-                  >View details</a
-                >
-              </div>
-            </div>
-          </div>
-        </li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <div class="px-4 py-8 text-center text-gray-500">
-        <svg
-          class="mx-auto h-12 w-12 text-gray-400"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">
-          No upcoming appointments
-        </h3>
-        <p class="mt-1 text-sm text-gray-500">
-          You don't have any appointments scheduled.
-        </p>
-      </div>
-      {% endif %}
+            </td>
+            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+              <div class="text-gray-900">{{ appointment.date }}</div>
+              <div class="text-gray-500">{{ appointment.time }}</div>
+            </td>
+            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+              {{ appointment.reason }}
+            </td>
+            <td class="whitespace-nowrap px-3 py-4 text-sm">
+              {% if appointment.status == 'confirmed' %}
+              <span
+                class="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800"
+                >Confirmed</span
+              >
+              {% elif appointment.status == 'pending' %}
+              <span
+                class="inline-flex rounded-full bg-yellow-100 px-2 text-xs font-semibold leading-5 text-yellow-800"
+                >Pending</span
+              >
+              {% endif %}
+            </td>
+            <td
+              class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
+            >
+              <a href="#" class="text-cyan-600 hover:text-cyan-900">View</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td
+              colspan="5"
+              class="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-center text-gray-500 sm:pl-6"
+            >
+              No upcoming appointments
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

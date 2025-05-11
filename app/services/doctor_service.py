@@ -237,19 +237,16 @@ def get_doctor_stats(doctor_id: UUID) -> Dict[str, int]:
         # This is just a placeholder
         today_appointments = db.count_today_appointments(doctor_id)
         patient_count = db.count_doctor_patients(doctor_id)
-        pending_records = db.count_pending_records(doctor_id)
 
         return {
             'today_appointments': today_appointments,
-            'patient_count': patient_count,
-            'pending_records': pending_records
+            'patient_count': patient_count
         }
     except Exception as e:
         print(f"Error retrieving doctor stats: {str(e)}")
         return {
             'today_appointments': 0,
-            'patient_count': 0,
-            'pending_records': 0
+            'patient_count': 0
         }
 
 def get_upcoming_appointments(doctor_id: UUID, limit: int = 5) -> List[Dict[str, Any]]:

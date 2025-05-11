@@ -1,0 +1,372 @@
+{% extends "regulatory_body/layout.html" %} {% block title %}{{ outbreak.disease
+}} Outbreak Details - Shastho{% endblock %} {% block page_title %}Outbreak
+Details: {{ outbreak.disease }}{% endblock %} {% block regulatory_body_content
+%}
+<div class="py-4">
+  <!-- Back button -->
+  <div class="mb-4">
+    <a
+      href="{{ url_for('regulatory_body.dashboard') }}"
+      class="inline-flex items-center text-blue-600 hover:text-blue-800"
+    >
+      <svg
+        class="w-5 h-5 mr-1"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 19l-7-7m0 0l7-7m-7 7h18"
+        ></path>
+      </svg>
+      Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Outbreak Overview -->
+  <div class="bg-white shadow rounded-lg mb-6 p-4">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">
+          {{ outbreak.disease }} Outbreak
+        </h2>
+        <p class="text-gray-600 mt-1">
+          {{ outbreak.region }} | Started on {{ outbreak.start_date }}
+        </p>
+      </div>
+      <div class="flex space-x-2">
+        <span
+          class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full {% if outbreak.status == 'Active' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}"
+        >
+          {{ outbreak.status }}
+        </span>
+        <span
+          class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full {% if outbreak.severity == 'High' %}bg-red-100 text-red-800 {% elif outbreak.severity == 'Medium' %}bg-yellow-100 text-yellow-800 {% else %}bg-green-100 text-green-800{% endif %}"
+        >
+          {{ outbreak.severity }} Severity
+        </span>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+      <div class="bg-blue-50 rounded-lg p-4 text-center">
+        <span class="text-sm text-gray-600">Total Cases</span>
+        <div class="text-3xl font-bold text-blue-800 mt-1">
+          {{ outbreak.cases }}
+        </div>
+      </div>
+      <div class="bg-red-50 rounded-lg p-4 text-center">
+        <span class="text-sm text-gray-600">Deaths</span>
+        <div class="text-3xl font-bold text-red-800 mt-1">
+          {{ outbreak.deaths }}
+        </div>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-4 text-center">
+        <span class="text-sm text-gray-600">Fatality Rate</span>
+        <div class="text-3xl font-bold text-gray-800 mt-1">
+          {{ (outbreak.deaths / outbreak.cases * 100)|round(1) }}%
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 border-t border-gray-200 pt-4">
+      <p class="text-gray-600">{{ outbreak.description }}</p>
+    </div>
+  </div>
+
+  <!-- Outbreak Trend and Age Distribution -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Outbreak Trend Chart -->
+    <div class="lg:col-span-2 bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Daily Case Trend</h3>
+      <div class="h-64">
+        <canvas id="outbreakTrendChart"></canvas>
+      </div>
+      <div class="mt-4 text-sm text-gray-500">
+        New cases reported daily since the outbreak began.
+      </div>
+    </div>
+
+    <!-- Age Distribution -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Age Distribution</h3>
+      <div class="h-64">
+        <canvas id="ageDistributionChart"></canvas>
+      </div>
+      <div class="mt-4 text-sm text-gray-500">
+        Percentage of cases by age group.
+      </div>
+    </div>
+  </div>
+
+  <!-- Response Measures and Affected Areas -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <!-- Response Measures -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-700">Response Measures</h3>
+        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+          >{{ outbreak.response_measures|length }} Active</span
+        >
+      </div>
+      <ul class="space-y-3">
+        {% for measure in outbreak.response_measures %}
+        <li class="flex items-start">
+          <svg
+            class="flex-shrink-0 h-6 w-6 text-green-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span class="ml-3 text-gray-700">{{ measure }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Affected Areas -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-700">Affected Areas</h3>
+        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full"
+          >{{ outbreak.affected_areas|length }} Districts</span
+        >
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                District
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Cases
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Trend
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for area in outbreak.affected_areas %}
+            <tr>
+              <td
+                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+              >
+                {{ area.district }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ area.cases }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if area.trend == 'Increasing' %}bg-red-100 text-red-800 {% elif area.trend == 'Stable' %}bg-yellow-100 text-yellow-800 {% else %}bg-green-100 text-green-800{% endif %}"
+                >
+                  {{ area.trend }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Panel -->
+  <div class="bg-white shadow rounded-lg mb-6 p-4">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">
+      Emergency Response Actions
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <button
+        type="button"
+        class="inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none"
+      >
+        <svg
+          class="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          />
+        </svg>
+        Issue Health Alert
+      </button>
+      <button
+        type="button"
+        class="inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+      >
+        <svg
+          class="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+          />
+        </svg>
+        Generate Report
+      </button>
+      <button
+        type="button"
+        class="inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none"
+      >
+        <svg
+          class="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg>
+        Deploy Response Team
+      </button>
+      <button
+        type="button"
+        class="inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none"
+      >
+        <svg
+          class="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+          />
+        </svg>
+        Contact Local Authorities
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- JavaScript for charts -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Outbreak trend chart
+    const trendCtx = document.getElementById('outbreakTrendChart').getContext('2d');
+    const trendChart = new Chart(trendCtx, {
+      type: 'line',
+      data: {
+        labels: {{ days|tojson }},
+        datasets: [{
+          label: 'Daily New Cases',
+          data: {{ outbreak.daily_cases|tojson }},
+          borderColor: 'rgb(220, 38, 38)',
+          backgroundColor: 'rgba(220, 38, 38, 0.1)',
+          borderWidth: 2,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of New Cases'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Day'
+            }
+          }
+        }
+      }
+    });
+
+    // Age distribution chart
+    const ageCtx = document.getElementById('ageDistributionChart').getContext('2d');
+    const ageChart = new Chart(ageCtx, {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys({{ outbreak.age_distribution|tojson }}),
+        datasets: [{
+          data: Object.values({{ outbreak.age_distribution|tojson }}),
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)'
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              boxWidth: 12,
+              font: {
+                size: 11
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,92 +1,9 @@
-{% extends "patient/layout.html" %} {% block title %}My Health Records -
-Shastho{% endblock %} {% block content %}
-<div class="container mx-auto px-4 py-8">
-  <div class="flex items-center mb-6">
-    <a
-      href="{{ url_for('patient.dashboard') }}"
-      class="flex items-center text-gray-600 hover:text-gray-900 mr-4"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-5 w-5 mr-1"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-          clip-rule="evenodd"
-        />
-      </svg>
-      Back to Dashboard
-    </a>
-    <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
-      <ol class="list-none p-0 inline-flex">
-        <li class="flex items-center">
-          <a
-            href="{{ url_for('patient.dashboard') }}"
-            class="hover:text-gray-900"
-            >Dashboard</a
-          >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 mx-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </li>
-        <li class="text-gray-900 font-medium">My Health Records</li>
-      </ol>
-    </nav>
-  </div>
-
-  <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-    <div class="p-6 border-b border-gray-200">
-      <div class="flex justify-between items-start">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-800">My Health Records</h1>
-          <div class="flex items-center mt-2 text-gray-600">
-            <div class="mr-6">
-              <span class="font-medium">Name:</span> {{ patient.full_name if
-              patient else 'N/A' }}
-            </div>
-            <div class="mr-6">
-              <span class="font-medium">DOB:</span> {{
-              patient.date_of_birth.strftime('%Y-%m-%d') if patient and
-              patient.date_of_birth else 'N/A' }}
-            </div>
-          </div>
-        </div>
-        <div class="flex">
-          <button
-            onclick="window.print()"
-            class="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 mr-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            Print
-          </button>
-        </div>
-      </div>
-    </div>
+{% extends "patient/layout.html" %} {% block title %}Medical Records - Shastho{%
+endblock %} {% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
+  <!-- Page header -->
+  <div class="pb-5 border-b border-gray-200 mb-6">
+    <h1 class="text-2xl font-medium text-gray-900">Medical Records</h1>
   </div>
 
   {% if not has_ehr %}
@@ -94,8 +11,8 @@ Shastho{% endblock %} {% block content %}
     <div class="flex">
       <div class="flex-shrink-0">
         <svg
-          xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5 text-yellow-400"
+          xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -115,536 +32,638 @@ Shastho{% endblock %} {% block content %}
     </div>
   </div>
   {% else %}
-  <!-- Tabs -->
-  <div class="mb-8">
-    <div class="border-b border-gray-200">
-      <nav class="-mb-px flex space-x-8 overflow-x-auto" aria-label="Tabs">
-        <button
-          onclick="showTab('summary')"
-          class="tab-btn active whitespace-nowrap py-4 px-1 border-b-2 border-cyan-500 font-medium text-sm text-cyan-600"
-          aria-current="page"
-        >
-          Summary
-        </button>
-        <button
-          onclick="showTab('visits')"
-          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
-        >
-          Visit History
-        </button>
-        <button
-          onclick="showTab('allergies')"
-          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
-        >
-          Allergies
-        </button>
-        <button
-          onclick="showTab('medications')"
-          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
-        >
-          Medications
-        </button>
-        <button
-          onclick="showTab('immunizations')"
-          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
-        >
-          Immunizations
-        </button>
-        <button
-          onclick="showTab('test-results')"
-          class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300"
-        >
-          Test Results
-        </button>
-      </nav>
-    </div>
-  </div>
 
-  <!-- Tab Content -->
-  <div>
-    <!-- Summary Tab -->
-    <div id="summary" class="tab-content">
-      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">Health Summary</h2>
-
-        <!-- Vitals -->
-        <div class="mb-8">
-          <h3 class="text-lg font-medium text-gray-700 mb-4 border-b pb-2">
-            My Vitals
-            <span class="text-sm font-normal text-gray-500 ml-2">
-              Last updated: {{ vitals.last_updated.strftime('%Y-%m-%d') }}
-            </span>
-          </h3>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-sm text-gray-500">Height</p>
-              <p class="text-lg font-medium">{{ vitals.height }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-sm text-gray-500">Weight</p>
-              <p class="text-lg font-medium">{{ vitals.weight }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-sm text-gray-500">BMI</p>
-              <p class="text-lg font-medium">{{ vitals.bmi }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-sm text-gray-500">Blood Pressure</p>
-              <p class="text-lg font-medium">{{ vitals.blood_pressure }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-sm text-gray-500">Heart Rate</p>
-              <p class="text-lg font-medium">{{ vitals.heart_rate }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-sm text-gray-500">Temperature</p>
-              <p class="text-lg font-medium">{{ vitals.temperature }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recent Diagnoses -->
-        <div class="mb-8">
-          <h3 class="text-lg font-medium text-gray-700 mb-4 border-b pb-2">
-            Recent Diagnoses
-          </h3>
-
-          {% if visits|length > 0 %} {% for visit in visits[:3] %} {% for
-          diagnosis in visit.diagnoses %}
-          <div class="mb-4 bg-gray-50 p-4 rounded-lg">
-            <div class="flex flex-wrap justify-between items-start">
-              <div>
-                <p class="font-medium text-gray-800">{{ diagnosis.name }}</p>
-                <p class="text-sm text-gray-500">
-                  Diagnosed on {{ visit.date.strftime('%Y-%m-%d') }} by {{
-                  visit.doctor }}
-                </p>
-                {% if diagnosis.notes %}
-                <p class="mt-2 text-sm text-gray-600">{{ diagnosis.notes }}</p>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-          {% endfor %} {% endfor %} {% else %}
-          <p class="text-gray-500 italic">No recent diagnoses available.</p>
-          {% endif %}
-        </div>
-
-        <!-- Current Medications -->
-        <div>
-          <h3 class="text-lg font-medium text-gray-700 mb-4 border-b pb-2">
-            Current Medications
-          </h3>
-
-          {% set current_meds_found = false %} {% for visit in visits %} {% for
-          medication in visit.medications %} {% if medication.end_date >=
-          vitals.last_updated %} {% set current_meds_found = true %}
-          <div class="mb-4 bg-gray-50 p-4 rounded-lg">
-            <div class="flex flex-wrap justify-between items-start">
-              <div>
-                <p class="font-medium text-gray-800">
-                  {{ medication.name }} ({{ medication.dosage }})
-                </p>
-                <p class="text-sm text-gray-500">{{ medication.frequency }}</p>
-                <p class="text-sm text-gray-500">
-                  {{ medication.start_date.strftime('%Y-%m-%d') }} to {{
-                  medication.end_date.strftime('%Y-%m-%d') }}
-                </p>
-              </div>
-            </div>
-          </div>
-          {% endif %} {% endfor %} {% endfor %} {% if not current_meds_found %}
-          <p class="text-gray-500 italic">No current medications.</p>
-          {% endif %}
-        </div>
-      </div>
+  <div class="bg-white shadow rounded-lg">
+    <!-- Tab Navigation -->
+    <div class="flex border-b border-gray-200 px-6">
+      <button
+        id="tab-all"
+        class="tab-btn active px-4 py-3 text-sm font-medium border-b-2 border-blue-500 text-blue-600"
+      >
+        All Records
+      </button>
+      <button
+        id="tab-diagnoses"
+        class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+      >
+        Diagnoses
+      </button>
+      <button
+        id="tab-prescriptions"
+        class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+      >
+        Prescriptions
+      </button>
+      <button
+        id="tab-lab"
+        class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+      >
+        Lab Results
+      </button>
+      <button
+        id="tab-imaging"
+        class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+      >
+        Imaging
+      </button>
     </div>
 
-    <!-- Visits History Tab -->
-    <div id="visits" class="tab-content hidden">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-6">Visit History</h2>
-
-        {% if visits|length > 0 %}
-        <div class="space-y-8">
-          {% for visit in visits %}
-          <div class="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
-            <div class="flex flex-wrap items-center justify-between mb-4">
-              <h3 class="text-lg font-medium text-gray-800">
-                Visit on {{ visit.date.strftime('%B %d, %Y') }}
+    <div class="flex">
+      <!-- Sidebar with medical records list -->
+      <div class="w-1/3 border-r border-gray-200 p-4 bg-white">
+        <!-- Record item 1 -->
+        <div
+          id="record-hypertension-diagnosis"
+          class="record-item mb-4 p-3 border-l-4 border-blue-500 bg-blue-50 hover:bg-blue-100 rounded-r-md cursor-pointer"
+        >
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mt-1">
+              <svg
+                class="h-5 w-5 text-blue-500"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-gray-900">
+                Hypertension Diagnosis
               </h3>
-              <span class="text-sm text-gray-500">
-                {{ visit.doctor }} - {{ visit.department }}
-              </span>
+              <p class="text-xs text-gray-500">Dr. Farida Rahman</p>
+              <p class="text-xs text-gray-400">2023-09-15</p>
             </div>
+          </div>
+        </div>
 
-            {% if visit.diagnoses|length > 0 %}
-            <div class="mb-4">
-              <h4 class="text-md font-medium text-gray-700 mb-2">Diagnoses</h4>
-              <ul class="list-disc pl-5 space-y-1">
-                {% for diagnosis in visit.diagnoses %}
-                <li>
-                  <span class="font-medium">{{ diagnosis.name }}</span>
-                  {% if diagnosis.notes %}
-                  <p class="text-sm text-gray-600 mt-1">
-                    {{ diagnosis.notes }}
-                  </p>
-                  {% endif %}
-                </li>
-                {% endfor %}
-              </ul>
+        <!-- Record item 2 -->
+        <div
+          id="record-hypertension-medication"
+          class="record-item mb-4 p-3 border-l-4 border-green-500 bg-gray-50 hover:bg-gray-100 rounded-r-md cursor-pointer"
+        >
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mt-1">
+              <svg
+                class="h-5 w-5 text-green-500"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
+                  clip-rule="evenodd"
+                />
+              </svg>
             </div>
-            {% endif %} {% if visit.medications|length > 0 %}
-            <div class="mb-4">
-              <h4 class="text-md font-medium text-gray-700 mb-2">
-                Medications
-              </h4>
-              <ul class="list-disc pl-5 space-y-1">
-                {% for medication in visit.medications %}
-                <li>
-                  <span class="font-medium">{{ medication.name }}</span> ({{
-                  medication.dosage }}) - {{ medication.frequency }}
-                  <p class="text-sm text-gray-500">
-                    {{ medication.start_date.strftime('%Y-%m-%d') }} to {{
-                    medication.end_date.strftime('%Y-%m-%d') }}
-                  </p>
-                </li>
-                {% endfor %}
-              </ul>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-gray-900">
+                Hypertension Medication
+              </h3>
+              <p class="text-xs text-gray-500">Dr. Farida Rahman</p>
+              <p class="text-xs text-gray-400">2023-09-15</p>
             </div>
-            {% endif %} {% if visit.notes %}
+          </div>
+        </div>
+
+        <!-- Record item 3 -->
+        <div
+          id="record-blood-work"
+          class="record-item mb-4 p-3 border-l-4 border-purple-500 bg-gray-50 hover:bg-gray-100 rounded-r-md cursor-pointer"
+        >
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mt-1">
+              <svg
+                class="h-5 w-5 text-purple-500"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-gray-900">
+                Comprehensive Blood Work
+              </h3>
+              <p class="text-xs text-gray-500">Dr. Mahmud Ahmed</p>
+              <p class="text-xs text-gray-400">2023-08-10</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Record item 4 -->
+        <div
+          id="record-chest-xray"
+          class="record-item mb-4 p-3 border-l-4 border-red-500 bg-gray-50 hover:bg-gray-100 rounded-r-md cursor-pointer"
+        >
+          <div class="flex items-start">
+            <div class="flex-shrink-0 mt-1">
+              <svg
+                class="h-5 w-5 text-red-500"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-gray-900">Chest X-Ray</h3>
+              <p class="text-xs text-gray-500">Dr. Nusrat Khan</p>
+              <p class="text-xs text-gray-400">2023-07-05</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content area -->
+      <div class="w-2/3 p-6 bg-white record-content">
+        <!-- Hypertension Diagnosis Content -->
+        <div id="content-hypertension-diagnosis" class="record-content-item">
+          <h2 class="text-xl font-medium text-gray-900 mb-6">
+            Hypertension Diagnosis
+          </h2>
+
+          <div class="grid grid-cols-3 gap-8 mb-6">
             <div>
-              <h4 class="text-md font-medium text-gray-700 mb-2">Notes</h4>
-              <p class="text-gray-600">{{ visit.notes }}</p>
+              <p class="text-sm text-gray-500 mb-1">Doctor</p>
+              <p class="text-sm font-medium">Dr. Farida Rahman</p>
             </div>
-            {% endif %}
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Date</p>
+              <p class="text-sm font-medium">2023-09-15</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Hospital</p>
+              <p class="text-sm font-medium">Dhaka Medical College Hospital</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Department</p>
+              <p class="text-sm font-medium">Cardiology</p>
+            </div>
           </div>
-          {% endfor %}
-        </div>
-        {% else %}
-        <p class="text-gray-500 italic">No visit history available.</p>
-        {% endif %}
-      </div>
-    </div>
 
-    <!-- Allergies Tab -->
-    <div id="allergies" class="tab-content hidden">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-6">Allergies</h2>
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">Symptoms</h3>
+          <p class="text-sm text-gray-700 mb-4">
+            Patient presents with persistent headaches, dizziness, and elevated
+            blood pressure readings over the past month.
+          </p>
 
-        {% if allergies|length > 0 %}
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Allergy
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Severity
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Reaction
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              {% for allergy in allergies %}
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ allergy.name }}
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">
-                    {{ allergy.severity }}
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ allergy.reaction }}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <p class="text-gray-500 italic">No allergies recorded.</p>
-        {% endif %}
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">Diagnosis</h3>
+          <p class="text-sm text-gray-700 mb-4">
+            Essential Hypertension (Stage 1)
+          </p>
 
-        <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">
+            Treatment Plan
+          </h3>
+          <p class="text-sm text-gray-700 mb-4">
+            Prescribed Amlodipine 5mg once daily. Recommended lifestyle
+            modifications including reduced sodium intake, regular exercise, and
+            stress management techniques.
+          </p>
+
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">Follow-up</h3>
+          <p class="text-sm text-gray-700 mb-4">
+            Follow-up appointment scheduled in 4 weeks for blood pressure
+            monitoring and medication adjustment if necessary.
+          </p>
+
+          <div class="mt-8 pt-4 border-t border-gray-200">
+            <button
+              class="inline-flex items-center rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500"
+            >
               <svg
-                class="h-5 w-5 text-blue-400"
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
               >
                 <path
-                  fill-rule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clip-rule="evenodd"
-                />
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                ></path>
               </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-blue-700">
-                If you have allergies that are not listed here, please inform
-                your healthcare provider during your next visit.
-              </p>
-            </div>
+              Download Record
+            </button>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Medications Tab -->
-    <div id="medications" class="tab-content hidden">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-6">Medications</h2>
+        <!-- Hypertension Medication Content -->
+        <div
+          id="content-hypertension-medication"
+          class="record-content-item hidden"
+        >
+          <h2 class="text-xl font-medium text-gray-900 mb-6">
+            Hypertension Medication
+          </h2>
 
-        {% set medications_found = false %} {% for visit in visits %} {% for
-        medication in visit.medications %} {% set medications_found = true %} {%
-        endfor %} {% endfor %} {% if medications_found %}
-        <div class="space-y-6">
-          <h3 class="text-lg font-medium text-gray-700 mb-4 border-b pb-2">
-            Current Medications
+          <div class="grid grid-cols-3 gap-8 mb-6">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Doctor</p>
+              <p class="text-sm font-medium">Dr. Farida Rahman</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Date</p>
+              <p class="text-sm font-medium">2023-09-15</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Hospital</p>
+              <p class="text-sm font-medium">Dhaka Medical College Hospital</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Department</p>
+              <p class="text-sm font-medium">Cardiology</p>
+            </div>
+          </div>
+
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">
+            Prescribed Medications
           </h3>
 
-          {% set current_meds_found = false %} {% for visit in visits %} {% for
-          medication in visit.medications %} {% if medication.end_date >=
-          vitals.last_updated %} {% set current_meds_found = true %}
-          <div class="bg-gray-50 p-4 rounded-lg mb-4">
-            <div class="flex flex-wrap justify-between">
+          <div class="bg-gray-50 p-4 rounded mb-4">
+            <div class="flex justify-between items-center">
               <div>
-                <p class="font-medium text-gray-800">{{ medication.name }}</p>
-                <p class="text-sm text-gray-600">
-                  {{ medication.dosage }} - {{ medication.frequency }}
-                </p>
-                <p class="text-xs text-gray-500 mt-1">
-                  Prescribed on {{ medication.start_date.strftime('%b %d, %Y')
-                  }} until {{ medication.end_date.strftime('%b %d, %Y') }}
-                </p>
+                <h4 class="text-base font-medium">Amlodipine</h4>
+                <p class="text-sm text-gray-600">5mg tablets</p>
               </div>
-              <div class="text-right text-xs text-gray-500">
-                Prescribed by {{ visit.doctor }}
+              <div
+                class="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-800"
+              >
+                Once daily
               </div>
             </div>
+            <p class="text-sm text-gray-500 mt-2">
+              Take in the morning with or without food. Do not crush or chew
+              tablets.
+            </p>
           </div>
-          {% endif %} {% endfor %} {% endfor %} {% if not current_meds_found %}
-          <p class="text-gray-500 italic">No current medications.</p>
-          {% endif %}
 
-          <h3 class="text-lg font-medium text-gray-700 mb-4 border-b pb-2 mt-8">
-            Medication History
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">
+            Special Instructions
+          </h3>
+          <p class="text-sm text-gray-700 mb-4">
+            Continue medication for at least 3 months. Monitor blood pressure
+            twice weekly and maintain a log. Report any side effects
+            immediately. Avoid grapefruit juice as it may interact with the
+            medication.
+          </p>
+
+          <div class="mt-8 pt-4 border-t border-gray-200">
+            <button
+              class="inline-flex items-center rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500"
+            >
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                ></path>
+              </svg>
+              Download Record
+            </button>
+          </div>
+        </div>
+
+        <!-- Comprehensive Blood Work Content -->
+        <div id="content-blood-work" class="record-content-item hidden">
+          <h2 class="text-xl font-medium text-gray-900 mb-6">
+            Comprehensive Blood Work
+          </h2>
+
+          <div class="grid grid-cols-3 gap-8 mb-6">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Doctor</p>
+              <p class="text-sm font-medium">Dr. Mahmud Ahmed</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Date</p>
+              <p class="text-sm font-medium">2023-08-10</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Hospital</p>
+              <p class="text-sm font-medium">
+                Bangabandhu Sheikh Mujib Medical University
+              </p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Department</p>
+              <p class="text-sm font-medium">General Medicine</p>
+            </div>
+          </div>
+
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">
+            Lab Results
           </h3>
 
-          {% set past_meds_found = false %} {% for visit in visits %} {% for
-          medication in visit.medications %} {% if medication.end_date <
-          vitals.last_updated %} {% set past_meds_found = true %}
-          <div class="bg-gray-50 p-4 rounded-lg mb-4">
-            <div class="flex flex-wrap justify-between">
-              <div>
-                <p class="font-medium text-gray-800">{{ medication.name }}</p>
-                <p class="text-sm text-gray-600">
-                  {{ medication.dosage }} - {{ medication.frequency }}
-                </p>
-                <p class="text-xs text-gray-500 mt-1">
-                  Prescribed on {{ medication.start_date.strftime('%b %d, %Y')
-                  }} until {{ medication.end_date.strftime('%b %d, %Y') }}
-                </p>
-              </div>
-              <div class="text-right text-xs text-gray-500">
-                Prescribed by {{ visit.doctor }}
-              </div>
-            </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Test
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Result
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Reference Range
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                  >
+                    Hemoglobin
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    14.2 g/dL
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    13.0-17.0
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                      >Normal</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                  >
+                    White Blood Cell Count
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    7.5 K/μL
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    4.5-11.0
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                      >Normal</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                  >
+                    Total Cholesterol
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    210 mg/dL
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    &lt;200
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                      >Abnormal</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                  >
+                    HDL Cholesterol
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    42 mg/dL
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    &gt;40
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                      >Normal</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                  >
+                    LDL Cholesterol
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    135 mg/dL
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    &lt;100
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                      >Abnormal</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                  >
+                    Triglycerides
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    165 mg/dL
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    &lt;150
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
+                      >Abnormal</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                  >
+                    Fasting Blood Glucose
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    98 mg/dL
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    70-100
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                      >Normal</span
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          {% endif %} {% endfor %} {% endfor %} {% if not past_meds_found %}
-          <p class="text-gray-500 italic">No past medication history.</p>
-          {% endif %}
-        </div>
-        {% else %}
-        <p class="text-gray-500 italic">No medications recorded.</p>
-        {% endif %}
 
-        <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg
-                class="h-5 w-5 text-blue-400"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clip-rule="evenodd"
-                />
-              </svg>
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">Notes</h3>
+          <!-- Notes would go here -->
+        </div>
+
+        <!-- Chest X-Ray Content -->
+        <div id="content-chest-xray" class="record-content-item hidden">
+          <h2 class="text-xl font-medium text-gray-900 mb-6">Chest X-Ray</h2>
+
+          <div class="grid grid-cols-3 gap-8 mb-6">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Doctor</p>
+              <p class="text-sm font-medium">Dr. Nusrat Khan</p>
             </div>
-            <div class="ml-3">
-              <p class="text-sm text-blue-700">
-                Always take medications as prescribed. Contact your healthcare
-                provider if you experience any adverse effects.
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Date</p>
+              <p class="text-sm font-medium">2023-07-05</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Hospital</p>
+              <p class="text-sm font-medium">
+                Chittagong Medical College Hospital
               </p>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Immunizations Tab -->
-    <div id="immunizations" class="tab-content hidden">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-6">Immunizations</h2>
-
-        {% if immunizations|length > 0 %}
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Immunization
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Date
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Administered By
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              {% for immunization in immunizations %}
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ immunization.name }}
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">
-                    {{ immunization.date.strftime('%Y-%m-%d') }}
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ immunization.administered_by }}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <p class="text-gray-500 italic">No immunization records available.</p>
-        {% endif %}
-
-        <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg
-                class="h-5 w-5 text-blue-400"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clip-rule="evenodd"
-                />
-              </svg>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Department</p>
+              <p class="text-sm font-medium">Radiology</p>
             </div>
-            <div class="ml-3">
-              <p class="text-sm text-blue-700">
-                Staying up-to-date with immunizations is important for your
-                health. Talk to your healthcare provider about which
-                vaccinations are recommended for you.
+          </div>
+
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">
+            Imaging Results
+          </h3>
+          <p class="text-sm text-gray-700 mb-4">
+            Chest X-ray reveals normal heart size and clear lung fields. No
+            evidence of pulmonary congestion, infiltrates, or masses. Bony
+            structures appear intact without fractures or lesions.
+          </p>
+
+          <div class="grid grid-cols-2 gap-6 my-6">
+            <div>
+              <div class="bg-gray-100 p-10 flex items-center justify-center">
+                <svg
+                  class="h-16 w-16 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  ></path>
+                </svg>
+              </div>
+              <p class="text-xs text-gray-500 mt-2">
+                X-Ray<br />Anterior-Posterior (AP) View
               </p>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Test Results Tab -->
-    <div id="test-results" class="tab-content hidden">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-semibold text-gray-800 mb-6">Test Results</h2>
-
-        {% if test_results|length > 0 %}
-        <div class="space-y-6">
-          {% for test in test_results %}
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <div class="flex flex-wrap justify-between items-start">
-              <div>
-                <p class="font-medium text-gray-800">{{ test.name }}</p>
-                <p class="text-sm text-gray-500">
-                  {{ test.date.strftime('%Y-%m-%d') }}
-                </p>
-              </div>
-              <div>
-                <span
-                  class="px-2 py-1 text-sm rounded-full {% if test.result == 'Normal' %}bg-green-100 text-green-800{% elif test.result == 'Abnormal' %}bg-yellow-100 text-yellow-800{% else %}bg-gray-100 text-gray-800{% endif %}"
+            <div>
+              <div class="bg-gray-100 p-10 flex items-center justify-center">
+                <svg
+                  class="h-16 w-16 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  {{ test.result }}
-                </span>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  ></path>
+                </svg>
               </div>
+              <p class="text-xs text-gray-500 mt-2">X-Ray<br />Lateral View</p>
             </div>
-            {% if test.notes %}
-            <p class="mt-2 text-sm text-gray-600">{{ test.notes }}</p>
-            {% endif %}
           </div>
-          {% endfor %}
-        </div>
-        {% else %}
-        <p class="text-gray-500 italic">No test results available.</p>
-        {% endif %}
 
-        <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">
+            Conclusion
+          </h3>
+          <p class="text-sm text-gray-700 mb-4">
+            Normal chest radiograph with no acute cardiopulmonary disease.
+          </p>
+
+          <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">
+            Recommendations
+          </h3>
+          <p class="text-sm text-gray-700 mb-4">
+            No follow-up imaging required at this time. Recommend routine
+            age-appropriate screenings as per guidelines.
+          </p>
+
+          <div class="mt-8 pt-4 border-t border-gray-200">
+            <button
+              class="inline-flex items-center rounded-md bg-cyan-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-cyan-500"
+            >
               <svg
-                class="h-5 w-5 text-blue-400"
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
               >
                 <path
-                  fill-rule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                  clip-rule="evenodd"
-                />
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                ></path>
               </svg>
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-blue-700">
-                If you have questions about your test results, please schedule
-                an appointment with your healthcare provider to discuss them.
-              </p>
-            </div>
+              Download Record
+            </button>
           </div>
         </div>
       </div>
@@ -654,32 +673,53 @@ Shastho{% endblock %} {% block content %}
 </div>
 
 <script>
-  function showTab(tabId) {
-    // Hide all tab contents
-    document.querySelectorAll(".tab-content").forEach((content) => {
-      content.classList.add("hidden");
+  // JavaScript to handle the tab navigation and record item display
+  document.addEventListener("DOMContentLoaded", function () {
+    // Tab switching functionality
+    const tabs = document.querySelectorAll(".tab-btn");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        // Remove active class from all tabs
+        tabs.forEach((t) => {
+          t.classList.remove("active", "border-blue-500", "text-blue-600");
+          t.classList.add("border-transparent", "text-gray-500");
+        });
+
+        // Add active class to clicked tab
+        tab.classList.add("active", "border-blue-500", "text-blue-600");
+        tab.classList.remove("border-transparent", "text-gray-500");
+      });
     });
 
-    // Show the selected tab content
-    document.getElementById(tabId).classList.remove("hidden");
+    // Record item click functionality
+    const recordItems = document.querySelectorAll(".record-item");
+    const contentItems = document.querySelectorAll(".record-content-item");
 
-    // Update active tab button styling
-    document.querySelectorAll(".tab-btn").forEach((btn) => {
-      btn.classList.remove("active");
-      btn.classList.remove("border-cyan-500");
-      btn.classList.remove("text-cyan-600");
-      btn.classList.add("border-transparent");
-      btn.classList.add("text-gray-500");
+    recordItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        // Get the corresponding content ID
+        const contentId = "content-" + item.id.split("record-")[1];
+
+        // Hide all content items
+        contentItems.forEach((content) => {
+          content.classList.add("hidden");
+        });
+
+        // Show the selected content item
+        document.getElementById(contentId).classList.remove("hidden");
+
+        // Update styling of record items
+        recordItems.forEach((record) => {
+          if (record.id === item.id) {
+            record.classList.add("bg-blue-50");
+            record.classList.remove("bg-gray-50");
+          } else {
+            record.classList.remove("bg-blue-50");
+            record.classList.add("bg-gray-50");
+          }
+        });
+      });
     });
-
-    const activeBtn = document.querySelector(
-      `.tab-btn[onclick="showTab('${tabId}')"]`
-    );
-    activeBtn.classList.add("active");
-    activeBtn.classList.add("border-cyan-500");
-    activeBtn.classList.add("text-cyan-600");
-    activeBtn.classList.remove("border-transparent");
-    activeBtn.classList.remove("text-gray-500");
-  }
+  });
 </script>
 {% endblock %}

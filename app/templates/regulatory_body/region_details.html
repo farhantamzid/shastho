@@ -1,0 +1,415 @@
+{% extends "regulatory_body/layout.html" %} {% block title %}{{ region.name }}
+Details - Shastho{% endblock %} {% block page_title %}{{ region.name }}
+Details{% endblock %} {% block regulatory_body_content %}
+<div class="py-4">
+  <!-- Back button -->
+  <div class="mb-4">
+    <a
+      href="{{ url_for('regulatory_body.dashboard') }}"
+      class="inline-flex items-center text-blue-600 hover:text-blue-800"
+    >
+      <svg
+        class="w-5 h-5 mr-1"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 19l-7-7m0 0l7-7m-7 7h18"
+        ></path>
+      </svg>
+      Back to Dashboard
+    </a>
+  </div>
+
+  <!-- Region Overview -->
+  <div class="bg-white shadow rounded-lg mb-6 p-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="col-span-1 md:col-span-2">
+        <h2 class="text-2xl font-bold text-gray-900">{{ region.name }}</h2>
+        <p class="text-sm text-gray-500 mt-1">
+          Population: {{ region.population }}
+        </p>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-blue-800">
+          {{ region.total_cases }}
+        </div>
+        <div class="text-sm text-gray-500">Total Cases</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl font-bold text-red-600">
+          {{ region.active_outbreaks }}
+        </div>
+        <div class="text-sm text-gray-500">Active Outbreaks</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Health Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-sm font-medium text-gray-500">Population Affected</h3>
+      <div class="mt-1 text-xl font-semibold text-gray-900">
+        {{ region.population_affected }}
+      </div>
+    </div>
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-sm font-medium text-gray-500">Hospital Capacity</h3>
+      <div class="mt-1 text-xl font-semibold text-gray-900">
+        {{ region.hospital_capacity }}
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+        <div
+          class="{% if region.hospital_capacity|float < 50 %}bg-green-600{% elif region.hospital_capacity|float < 75 %}bg-yellow-600{% else %}bg-red-600{% endif %} h-2.5 rounded-full"
+          style="width: {{ region.hospital_capacity }}%"
+        ></div>
+      </div>
+    </div>
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-sm font-medium text-gray-500">Hospitals</h3>
+      <div class="mt-1 text-xl font-semibold text-gray-900">
+        {{ region.hospitals }}
+      </div>
+    </div>
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-sm font-medium text-gray-500">Healthcare Workers</h3>
+      <div class="mt-1 text-xl font-semibold text-gray-900">
+        {{ region.healthcare_workers }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Disease Trend Chart and Primary Diseases -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Regional Trend Chart -->
+    <div class="lg:col-span-2 bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">
+        Monthly Case Trend
+      </h3>
+      <div class="h-64">
+        <canvas id="regionTrendChart"></canvas>
+      </div>
+      <div class="mt-4 text-sm text-gray-500">
+        Total reported cases across all diseases over the last 7 months.
+      </div>
+    </div>
+
+    <!-- Primary Diseases -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Primary Diseases</h3>
+      <div class="space-y-4">
+        {% for disease in region.primary_diseases %}
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-medium text-gray-800">{{ disease.name }}</div>
+            <div class="text-sm text-gray-500">{{ disease.cases }} cases</div>
+          </div>
+          <span
+            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if disease.trend == 'Increasing' %}bg-red-100 text-red-800 {% elif disease.trend == 'Stable' %}bg-yellow-100 text-yellow-800 {% else %}bg-green-100 text-green-800{% endif %}"
+          >
+            {{ disease.trend }}
+          </span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-1.5">
+          <div
+            class="{% if disease.trend == 'Increasing' %}bg-red-600{% elif disease.trend == 'Stable' %}bg-yellow-600{% else %}bg-green-600{% endif %} h-1.5 rounded-full"
+            style="width: {{ (disease.cases / region.total_cases * 100)|int }}%"
+          ></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- District Analysis -->
+  <div class="bg-white shadow rounded-lg mb-6 p-4">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-gray-700">District Analysis</h3>
+      <div>
+        <button
+          type="button"
+          class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Export Data
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Districts Table -->
+      <div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  District
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Cases
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Hospital Capacity
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for district in region.districts %}
+              <tr>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                >
+                  {{ district.name }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ district.cases }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      class="{% if district.hospital_capacity|float < 50 %}bg-green-600{% elif district.hospital_capacity|float < 75 %}bg-yellow-600{% else %}bg-red-600{% endif %} h-2 rounded-full"
+                      style="width: {{ district.hospital_capacity }}%"
+                    ></div>
+                  </div>
+                  <span class="text-xs text-gray-500"
+                    >{{ district.hospital_capacity }}</span
+                  >
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Districts Chart -->
+      <div>
+        <div class="h-80">
+          <canvas id="districtsChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Panel -->
+  <div class="bg-white shadow rounded-lg mb-6 p-4">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">
+      Recommended Actions
+    </h3>
+    <div class="space-y-4">
+      {% if region.active_outbreaks > 0 %}
+      <div class="bg-red-50 border-l-4 border-red-400 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-5 w-5 text-red-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-red-700">
+              Deploy emergency response teams to control active disease
+              outbreaks
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endif %} {% if region.hospital_capacity|float > 75 %}
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-5 w-5 text-yellow-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-yellow-700">
+              Increase hospital capacity and deploy additional healthcare
+              resources
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-5 w-5 text-blue-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-700">
+              Launch public health awareness campaign focusing on prevention
+              measures
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-green-50 border-l-4 border-green-400 p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-5 w-5 text-green-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-green-700">
+              Coordinate with local authorities to implement vector control
+              measures
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- JavaScript for charts -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Monthly trend chart
+    const trendCtx = document.getElementById('regionTrendChart').getContext('2d');
+    const trendChart = new Chart(trendCtx, {
+      type: 'line',
+      data: {
+        labels: {{ months|tojson }},
+        datasets: [{
+          label: 'Monthly Cases',
+          data: {{ region.monthly_trend|tojson }},
+          borderColor: 'rgb(37, 99, 235)',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          borderWidth: 2,
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of Cases'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Month'
+            }
+          }
+        }
+      }
+    });
+
+    // Districts chart
+    const districtsCtx = document.getElementById('districtsChart').getContext('2d');
+    const districtsChart = new Chart(districtsCtx, {
+      type: 'bar',
+      data: {
+        labels: {{ region.districts|map(attribute='name')|list|tojson }},
+        datasets: [{
+          label: 'Cases by District',
+          data: {{ region.districts|map(attribute='cases')|list|tojson }},
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+          ],
+          borderColor: [
+            'rgb(255, 99, 132)',
+            'rgb(54, 162, 235)',
+            'rgb(255, 206, 86)',
+            'rgb(75, 192, 192)',
+            'rgb(153, 102, 255)',
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of Cases'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'District'
+            }
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

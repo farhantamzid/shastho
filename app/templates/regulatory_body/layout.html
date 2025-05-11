@@ -33,6 +33,27 @@ endblock %} {% block content %}
             </a>
 
             <a
+              href="#"
+              class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
+            >
+              <svg
+                class="text-gray-400 group-hover:text-gray-500 mr-3 h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                />
+              </svg>
+              Disease Surveillance
+            </a>
+
+            <a
               href="{{ url_for('regulatory_body.profile') }}"
               class="{% if request.endpoint == 'regulatory_body.profile' %}bg-blue-50 text-blue-800{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} group flex items-center px-2 py-2 text-sm font-medium rounded-md"
             >
@@ -51,70 +72,6 @@ endblock %} {% block content %}
                 />
               </svg>
               My Profile
-            </a>
-
-            <!-- Additional navigation items can be added here -->
-            <a
-              href="#"
-              class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
-            >
-              <svg
-                class="text-gray-400 group-hover:text-gray-500 mr-3 h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              Inspection Reports
-            </a>
-
-            <a
-              href="#"
-              class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
-            >
-              <svg
-                class="text-gray-400 group-hover:text-gray-500 mr-3 h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                />
-              </svg>
-              Approval Requests
-            </a>
-
-            <a
-              href="#"
-              class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"
-            >
-              <svg
-                class="text-gray-400 group-hover:text-gray-500 mr-3 h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                />
-              </svg>
-              Compliance Metrics
             </a>
           </nav>
         </div>
@@ -199,28 +156,16 @@ endblock %} {% block content %}
           Dashboard
         </a>
         <a
+          href="#"
+          class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
+        >
+          Disease Surveillance
+        </a>
+        <a
           href="{{ url_for('regulatory_body.profile') }}"
           class="{% if request.endpoint == 'regulatory_body.profile' %}bg-blue-50 text-blue-800{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %} block px-3 py-2 rounded-md text-base font-medium"
         >
           My Profile
-        </a>
-        <a
-          href="#"
-          class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
-        >
-          Inspection Reports
-        </a>
-        <a
-          href="#"
-          class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
-        >
-          Approval Requests
-        </a>
-        <a
-          href="#"
-          class="text-gray-600 hover:bg-gray-50 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
-        >
-          Compliance Metrics
         </a>
       </div>
     </div>
