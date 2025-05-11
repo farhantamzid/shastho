@@ -32,6 +32,7 @@ class UserRole(str, Enum):
     STAFF = 'staff'
     HOSPITAL_ADMIN = 'hospital_admin'
     TEST_ADMIN = 'test_admin'
+    REGULATORY_BODY = 'regulatory_body'
 
 
 class UserStatus(str, Enum):
@@ -970,7 +971,7 @@ class DoctorNote:
             note_type=data.get('note_type'),
             content=data.get('content'),
             created_by=data.get('created_by'),
-            created_at=data.get('created_at')
+            created_at=parse_iso_datetime(data.get('created_at'))
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -982,4 +983,63 @@ class DoctorNote:
             'content': self.content,
             'created_by': str(self.created_by) if self.created_by else None,
             'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class RegulatoryBody:
+    """Model representing a government regulatory body official."""
+
+    def __init__(
+        self,
+        id: Optional[UUID] = None,
+        user_id: UUID = None,
+        full_name: str = None,
+        agency: str = None,
+        role: str = None,
+        jurisdiction: str = None,
+        badge_number: str = None,
+        contact_number: str = None,
+        created_at: datetime = None,
+        updated_at: datetime = None
+    ):
+        self.id = id or uuid4()
+        self.user_id = user_id
+        self.full_name = full_name
+        self.agency = agency
+        self.role = role
+        self.jurisdiction = jurisdiction
+        self.badge_number = badge_number
+        self.contact_number = contact_number
+        self.created_at = created_at or datetime.now()
+        self.updated_at = updated_at or datetime.now()
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'RegulatoryBody':
+        """Create a RegulatoryBody instance from a dictionary."""
+        return cls(
+            id=data.get('id'),
+            user_id=data.get('user_id'),
+            full_name=data.get('full_name'),
+            agency=data.get('agency'),
+            role=data.get('role'),
+            jurisdiction=data.get('jurisdiction'),
+            badge_number=data.get('badge_number'),
+            contact_number=data.get('contact_number'),
+            created_at=parse_iso_datetime(data.get('created_at')),
+            updated_at=parse_iso_datetime(data.get('updated_at'))
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert instance to a dictionary."""
+        return {
+            'id': str(self.id),
+            'user_id': str(self.user_id) if self.user_id else None,
+            'full_name': self.full_name,
+            'agency': self.agency,
+            'role': self.role,
+            'jurisdiction': self.jurisdiction,
+            'badge_number': self.badge_number,
+            'contact_number': self.contact_number,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

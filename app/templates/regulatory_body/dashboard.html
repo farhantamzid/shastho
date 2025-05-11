@@ -1,0 +1,442 @@
+{% extends "regulatory_body/layout.html" %} {% block page_title %}Dashboard{%
+endblock %} {% block regulatory_body_content %}
+<div class="py-4">
+  <!-- Welcome message -->
+  <div class="bg-white shadow rounded-lg mb-6 p-4">
+    <h2 class="text-xl font-semibold mb-2">Welcome, {{ user_name }}</h2>
+    <p class="text-gray-600">
+      This dashboard provides an overview of healthcare facility oversight,
+      compliance monitoring, and regulatory activities.
+    </p>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Hospitals Stats -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-semibold text-gray-700">Hospitals</h3>
+        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
+          >Total</span
+        >
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-3xl font-bold text-blue-800"
+          >{{ stats.total_hospitals }}</span
+        >
+        <span class="text-sm text-gray-500 ml-2">Registered facilities</span>
+      </div>
+      <div class="flex mt-4 items-center">
+        <div class="bg-gray-200 h-2 rounded flex-grow">
+          <div
+            class="bg-blue-500 h-2 rounded"
+            style="width: {{ (stats.hospitals_inspected / stats.total_hospitals) * 100 }}%;"
+          ></div>
+        </div>
+        <span class="text-sm text-gray-600 ml-2"
+          >{{ stats.hospitals_inspected }} Inspected</span
+        >
+      </div>
+    </div>
+
+    <!-- Compliance Rate -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-semibold text-gray-700">Compliance Rate</h3>
+        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full"
+          >Overall</span
+        >
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-3xl font-bold text-green-600"
+          >{{ stats.compliance_rate }}</span
+        >
+        <span class="text-sm text-gray-500 ml-2">Pass rate</span>
+      </div>
+      <div class="flex mt-4 items-center text-sm">
+        <span class="text-gray-600">Target: 95%</span>
+        <span class="flex-grow"></span>
+        <span class="text-gray-600">Last month: 89%</span>
+      </div>
+    </div>
+
+    <!-- Pending Approvals -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-semibold text-gray-700">Pending Approvals</h3>
+        <span
+          class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full"
+          >Action Required</span
+        >
+      </div>
+      <div class="flex items-baseline">
+        <span class="text-3xl font-bold text-orange-500"
+          >{{ stats.pending_approvals }}</span
+        >
+        <span class="text-sm text-gray-500 ml-2">Requests</span>
+      </div>
+      <div class="mt-4">
+        <a
+          href="#"
+          class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
+        >
+          View pending items
+          <svg class="ml-1 w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity and Alerts -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Recent Activity -->
+    <div class="lg:col-span-2 bg-white shadow rounded-lg p-4">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-700">Recent Activity</h3>
+        <a href="#" class="text-sm text-blue-600 hover:text-blue-800"
+          >View all</a
+        >
+      </div>
+      <div class="space-y-4">
+        {% for activity in recent_activities %}
+        <div
+          class="flex border-b border-gray-100 pb-4 {% if loop.last %}border-0{% endif %}"
+        >
+          <div class="mr-4">
+            {% if activity.action == 'Hospital Inspection' %}
+            <div class="bg-blue-100 p-2 rounded-full">
+              <svg
+                class="h-6 w-6 text-blue-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+            </div>
+            {% elif activity.action == 'License Approval' %}
+            <div class="bg-green-100 p-2 rounded-full">
+              <svg
+                class="h-6 w-6 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            {% elif activity.action == 'Compliance Warning' %}
+            <div class="bg-red-100 p-2 rounded-full">
+              <svg
+                class="h-6 w-6 text-red-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+            {% else %}
+            <div class="bg-gray-100 p-2 rounded-full">
+              <svg
+                class="h-6 w-6 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+            </div>
+            {% endif %}
+          </div>
+          <div class="flex-grow">
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm font-semibold text-gray-800">
+                {{ activity.action }}
+              </h4>
+              <span class="text-xs text-gray-500">{{ activity.date }}</span>
+            </div>
+            <p class="text-sm text-gray-600">{{ activity.target }}</p>
+            <div class="flex items-center mt-1">
+              <span
+                class="{% if activity.status == 'Completed' or activity.status == 'Approved' %} text-green-600 bg-green-100 {% elif activity.status == 'Pending' %} text-yellow-600 bg-yellow-100 {% elif activity.status == 'In Progress' %} text-blue-600 bg-blue-100 {% else %} text-gray-600 bg-gray-100 {% endif %} text-xs px-2 py-1 rounded-full"
+              >
+                {{ activity.status }}
+              </span>
+              <span class="text-xs text-gray-500 ml-2"
+                >{{ activity.details }}</span
+              >
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Alerts and Notifications -->
+    <div class="bg-white shadow rounded-lg p-4">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-700">Alerts</h3>
+        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full"
+          >{{ stats.alerts }} New</span
+        >
+      </div>
+      <div class="space-y-4">
+        <div class="border-l-4 border-red-500 bg-red-50 p-3">
+          <div class="flex items-center">
+            <div class="text-red-500 mr-2">
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+            <h4 class="text-sm font-semibold text-gray-800">
+              Critical Safety Violation
+            </h4>
+          </div>
+          <p class="text-sm text-gray-600 mt-1">
+            Southside Medical Center has reported multiple safety failures
+            during last inspection.
+          </p>
+          <a
+            href="#"
+            class="text-xs text-blue-600 hover:text-blue-800 mt-1 inline-block"
+            >View details</a
+          >
+        </div>
+
+        <div class="border-l-4 border-yellow-500 bg-yellow-50 p-3">
+          <div class="flex items-center">
+            <div class="text-yellow-500 mr-2">
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h4 class="text-sm font-semibold text-gray-800">
+              Certification Expiring
+            </h4>
+          </div>
+          <p class="text-sm text-gray-600 mt-1">
+            3 healthcare facilities have certifications expiring in the next 30
+            days.
+          </p>
+          <a
+            href="#"
+            class="text-xs text-blue-600 hover:text-blue-800 mt-1 inline-block"
+            >Send reminders</a
+          >
+        </div>
+
+        <div class="border-l-4 border-blue-500 bg-blue-50 p-3">
+          <div class="flex items-center">
+            <div class="text-blue-500 mr-2">
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h4 class="text-sm font-semibold text-gray-800">
+              New Regulations Published
+            </h4>
+          </div>
+          <p class="text-sm text-gray-600 mt-1">
+            Updated patient data privacy regulations have been published and
+            require facility compliance.
+          </p>
+          <a
+            href="#"
+            class="text-xs text-blue-600 hover:text-blue-800 mt-1 inline-block"
+            >Review changes</a
+          >
+        </div>
+
+        <div class="text-center mt-4">
+          <a
+            href="#"
+            class="text-sm text-blue-600 hover:text-blue-800 inline-flex items-center"
+          >
+            View all alerts
+            <svg class="ml-1 w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary section -->
+  <div class="bg-white shadow rounded-lg mt-6 p-4">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-gray-700">Recent Reports</h3>
+      <span class="text-sm text-gray-500"
+        >{{ stats.recent_reports }} reports in the last month</span
+      >
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Facility
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Report Type
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Date
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Status
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+              Metro General Hospital
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              Compliance
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              2023-07-15
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                >Completed</span
+              >
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <a href="#" class="text-blue-600 hover:text-blue-900">View</a>
+            </td>
+          </tr>
+          <tr>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+              City Medical Center
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              License
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              2023-07-12
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                >Approved</span
+              >
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <a href="#" class="text-blue-600 hover:text-blue-900">View</a>
+            </td>
+          </tr>
+          <tr>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+            >
+              Riverside Clinic
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              Safety
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              2023-07-10
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                >Pending</span
+              >
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <a href="#" class="text-blue-600 hover:text-blue-900">Review</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

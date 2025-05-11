@@ -1,0 +1,249 @@
+{% extends "regulatory_body/layout.html" %} {% block page_title %}My Profile{%
+endblock %} {% block regulatory_body_content %}
+<div class="py-4">
+  <!-- Profile information -->
+  <div class="bg-white shadow rounded-lg mb-6">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">
+        Regulatory Official Profile
+      </h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">
+        Personal details and information.
+      </p>
+    </div>
+    <div class="px-4 py-5 sm:p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-500">Full Name</h4>
+            <div class="mt-1">
+              <p class="text-base text-gray-900">{{ profile.name }}</p>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-500">Email Address</h4>
+            <div class="mt-1">
+              <p class="text-base text-gray-900">{{ profile.email }}</p>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-500">Agency</h4>
+            <div class="mt-1">
+              <p class="text-base text-gray-900">{{ profile.agency }}</p>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-500">Role/Position</h4>
+            <div class="mt-1">
+              <p class="text-base text-gray-900">{{ profile.role }}</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-500">Jurisdiction</h4>
+            <div class="mt-1">
+              <p class="text-base text-gray-900">{{ profile.jurisdiction }}</p>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-500">Badge/ID Number</h4>
+            <div class="mt-1">
+              <p class="text-base text-gray-900">{{ profile.badge_number }}</p>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-500">Contact Number</h4>
+            <div class="mt-1">
+              <p class="text-base text-gray-900">{{ profile.contact }}</p>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h4 class="text-sm font-medium text-gray-500">Account Status</h4>
+            <div class="mt-1">
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+              >
+                Active
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security settings -->
+  <div class="bg-white shadow rounded-lg mb-6">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">
+        Security Settings
+      </h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">
+        Manage your account security and access.
+      </p>
+    </div>
+    <div class="px-4 py-5 sm:p-6">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h4 class="text-sm font-medium text-gray-900">Change Password</h4>
+            <p class="text-sm text-gray-500">
+              Update your password regularly for enhanced security.
+            </p>
+          </div>
+          <button
+            type="button"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Update
+          </button>
+        </div>
+        <div class="pt-4 border-t border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-sm font-medium text-gray-900">
+                Two-Factor Authentication
+              </h4>
+              <p class="text-sm text-gray-500">
+                Add an extra layer of security to your account.
+              </p>
+            </div>
+            <button
+              type="button"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Enable
+            </button>
+          </div>
+        </div>
+        <div class="pt-4 border-t border-gray-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-sm font-medium text-gray-900">Access Log</h4>
+              <p class="text-sm text-gray-500">
+                View a record of your account access history.
+              </p>
+            </div>
+            <button
+              type="button"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              View Log
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification preferences -->
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">
+        Notification Preferences
+      </h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">
+        Manage how you receive alerts and notifications.
+      </p>
+    </div>
+    <div class="px-4 py-5 sm:p-6">
+      <div class="space-y-4">
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="notifications_email"
+              name="notifications_email"
+              type="checkbox"
+              class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+              checked
+            />
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="notifications_email" class="font-medium text-gray-700"
+              >Email Notifications</label
+            >
+            <p class="text-gray-500">
+              Receive notifications about compliance issues, approvals, and
+              reports via email.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="notifications_sms"
+              name="notifications_sms"
+              type="checkbox"
+              class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+              checked
+            />
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="notifications_sms" class="font-medium text-gray-700"
+              >SMS Notifications</label
+            >
+            <p class="text-gray-500">
+              Receive text message alerts for urgent regulatory matters.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="notifications_app"
+              name="notifications_app"
+              type="checkbox"
+              class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+              checked
+            />
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="notifications_app" class="font-medium text-gray-700"
+              >In-App Notifications</label
+            >
+            <p class="text-gray-500">
+              Receive notifications within the system when logged in.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input
+              id="notifications_weekly"
+              name="notifications_weekly"
+              type="checkbox"
+              class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+            />
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="notifications_weekly" class="font-medium text-gray-700"
+              >Weekly Summary Reports</label
+            >
+            <p class="text-gray-500">
+              Receive a weekly digest of all activity and compliance status
+              across your jurisdiction.
+            </p>
+          </div>
+        </div>
+        <div class="pt-5">
+          <div class="flex justify-end">
+            <button
+              type="button"
+              class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

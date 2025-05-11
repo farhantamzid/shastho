@@ -46,6 +46,7 @@ def create_app(config_class=Config):
     from app.routes.patient import patient_bp
     from app.routes.hospital_admin import hospital_admin_bp
     from app.routes.api import api_bp
+    from app.routes.regulatory_body import regulatory_body_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
@@ -54,6 +55,7 @@ def create_app(config_class=Config):
     app.register_blueprint(patient_bp, url_prefix='/patient')
     app.register_blueprint(hospital_admin_bp, url_prefix='/hospital-admin')
     app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(regulatory_body_bp, url_prefix='/regulatory')
 
     # Setup Jinja environment
     @app.context_processor
