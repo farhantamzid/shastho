@@ -1,6 +1,7 @@
-{% extends "patient/layout.html" %} {% block title %}My Appointments{% endblock
-%} {% block page_title %}My Appointments{% endblock %} {% block patient_content
-%}
+{% extends "patient/layout.html" %} {% set hide_footer = true %} {% block title
+%}My Appointments - Shastho{% endblock %} {% block page_title %}My
+Appointments{% endblock %} {% block patient_content %}
+<!-- Original my_appointments content starts here -->
 <div class="mb-6">
   <div class="flex justify-between items-center">
     <nav aria-label="breadcrumb">
@@ -165,36 +166,7 @@
       </table>
     </div>
     {% else %}
-    <div class="rounded-md bg-blue-50 p-4">
-      <div class="flex">
-        <div class="flex-shrink-0">
-          <svg
-            class="h-5 w-5 text-blue-400"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm text-blue-700">
-            You don't have any upcoming appointments.
-            <a
-              href="{{ url_for('patient.book_appointment') }}"
-              class="font-medium underline text-blue-700 hover:text-blue-600"
-            >
-              Book an appointment now
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
+    <!-- Removed the "No upcoming appointments" message -->
     {% endif %}
   </div>
 
@@ -270,7 +242,7 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if appointment.status == 'completed' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}"
+                class="px-2 inline-flex text-xs leading-5 font-semibold {% if appointment.status == 'completed' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}"
               >
                 {{ appointment.status|capitalize }}
               </span>
@@ -674,7 +646,8 @@
             </h3>
             <div class="mt-2">
               <p class="text-sm text-gray-500">
-                Are you sure you want to cancel this appointment? This action cannot be undone.
+                Are you sure you want to cancel this appointment? This action
+                cannot be undone.
               </p>
             </div>
           </div>
@@ -756,12 +729,18 @@
   </div>
 </div>
 
-{% endblock %} {% block scripts %}
 <script>
+  // Toggle mobile sidebar
+  function toggleSidebar() {
+    const sidebar = document.getElementById("mobile-sidebar");
+    sidebar.classList.toggle("hidden");
+  }
+
+  // Original appointment page scripts
+  // Tab switching logic
   document.addEventListener("DOMContentLoaded", function () {
-    // Tab switching logic
     const tabs = document.querySelectorAll('[role="tab"]');
-    const panels = document.querySelectorAll('[role="tabpanel"]');
+    const panels = document.querySelectorAll(".tab-panel");
 
     tabs.forEach((tab) => {
       tab.addEventListener("click", (event) => {
@@ -905,11 +884,13 @@
 
   function showCancelConfirmation(appointmentId) {
     currentAppointmentId = appointmentId;
-    document.getElementById('cancelConfirmationModal').classList.remove('hidden');
+    document
+      .getElementById("cancelConfirmationModal")
+      .classList.remove("hidden");
   }
 
   function closeCancelConfirmation() {
-    document.getElementById('cancelConfirmationModal').classList.add('hidden');
+    document.getElementById("cancelConfirmationModal").classList.add("hidden");
     currentAppointmentId = null;
   }
 
@@ -925,10 +906,12 @@
 
     appointmentRows.forEach((row) => {
       // Find the row containing the button for this appointment ID
-      const buttons = row.querySelectorAll('button');
-      buttons.forEach(button => {
-        if (button.getAttribute('onclick') &&
-            button.getAttribute('onclick').includes(appointmentId)) {
+      const buttons = row.querySelectorAll("button");
+      buttons.forEach((button) => {
+        if (
+          button.getAttribute("onclick") &&
+          button.getAttribute("onclick").includes(appointmentId)
+        ) {
           appointmentRow = row;
         }
       });
@@ -939,8 +922,10 @@
       const date = appointmentRow.querySelector("td:nth-child(1)").innerText;
       const time = appointmentRow.querySelector("td:nth-child(2)").innerText;
       const doctor = appointmentRow.querySelector("td:nth-child(3)").innerText;
-      const department = appointmentRow.querySelector("td:nth-child(4)").innerText;
-      const hospital = appointmentRow.querySelector("td:nth-child(5)").innerText;
+      const department =
+        appointmentRow.querySelector("td:nth-child(4)").innerText;
+      const hospital =
+        appointmentRow.querySelector("td:nth-child(5)").innerText;
 
       // Remove from upcoming tab
       appointmentRow.remove();

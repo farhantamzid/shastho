@@ -1,3 +1,9 @@
+"""
+Authentication models and helpers for the Shastho Flask application.
+-------------------------------------------------------------------
+This file defines user authentication models and helper functions, such as User class and user lookup utilities.
+Used for login, registration, and session management.
+"""
 import bcrypt
 from uuid import uuid4
 import secrets

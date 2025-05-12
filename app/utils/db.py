@@ -1,3 +1,9 @@
+"""
+Database utility functions for the Shastho Flask application.
+-----------------------------------------------------------
+This file contains helper functions for database operations, such as connecting, querying, and managing transactions.
+Used throughout the app for low-level DB access.
+"""
 import os
 from typing import List, Dict, Any, Optional, Union, Type, TypeVar
 from uuid import UUID

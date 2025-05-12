@@ -1,3 +1,9 @@
+<!--
+Base template for the Shastho Flask application.
+-----------------------------------------------
+Defines the main HTML structure, including header, footer, and blocks for child templates to extend.
+All other templates inherit from this file.
+-->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -56,24 +62,11 @@
 
         <!-- Main Nav Links - center -->
         <div class="hidden md:flex items-center justify-center space-x-8">
+          {% if not session.get('user_id') %}
           <a
             href="{{ url_for('main.index') }}"
             class="font-medium text-gray-700 hover:text-cyan-600"
             >{{ 'Home'|t }}</a
-          >
-          {% if session.get('user_id') %} {% set dashboard_url =
-          url_for('main.dashboard') %} {# Default/Fallback #} {% if
-          session.get('user_role') == 'doctor' %} {% set dashboard_url =
-          url_for('doctor.dashboard') %} {% elif session.get('user_role') ==
-          'patient' %} {% set dashboard_url = url_for('patient.dashboard') %} {%
-          elif session.get('user_role') == 'hospital_admin' %} {% set
-          dashboard_url = url_for('hospital_admin.dashboard') %} {% elif
-          session.get('user_role') == 'system_admin' %} {% set dashboard_url =
-          url_for('admin.dashboard') %} {% endif %}
-          <a
-            href="{{ dashboard_url }}"
-            class="font-medium text-gray-700 hover:text-cyan-600"
-            >{{ 'Dashboard'|t }}</a
           >
           {% endif %}
         </div>
@@ -157,24 +150,11 @@
       <!-- Mobile Menu (hidden by default) -->
       <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
         <div class="flex flex-col space-y-2">
+          {% if not session.get('user_id') %}
           <a
             href="{{ url_for('main.index') }}"
             class="font-medium text-gray-700 hover:text-cyan-600 py-2"
             >{{ 'Home'|t }}</a
-          >
-          {% if session.get('user_id') %} {% set dashboard_url =
-          url_for('main.dashboard') %} {# Default/Fallback #} {% if
-          session.get('user_role') == 'doctor' %} {% set dashboard_url =
-          url_for('doctor.dashboard') %} {% elif session.get('user_role') ==
-          'patient' %} {% set dashboard_url = url_for('patient.dashboard') %} {%
-          elif session.get('user_role') == 'hospital_admin' %} {% set
-          dashboard_url = url_for('hospital_admin.dashboard') %} {% elif
-          session.get('user_role') == 'system_admin' %} {% set dashboard_url =
-          url_for('admin.dashboard') %} {% endif %}
-          <a
-            href="{{ dashboard_url }}"
-            class="font-medium text-gray-700 hover:text-cyan-600 py-2"
-            >{{ 'Dashboard'|t }}</a
           >
           {% endif %} {% if session.get('user_id') %}
           <div class="flex items-center pt-2">
@@ -259,6 +239,7 @@
     <div class="flex-grow">{% block content %}{% endblock %}</div>
 
     <!-- Footer -->
+    {% if hide_footer is not defined or not hide_footer %}
     <footer class="bg-gray-800 text-white py-8 mt-auto">
       <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -310,6 +291,7 @@
         </div>
       </div>
     </footer>
+    {% endif %}
 
     <!-- Lucide Icons (Just the ones we need) -->
     <script src="https://unpkg.com/lucide@latest"></script>

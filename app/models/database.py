@@ -1,3 +1,11 @@
+"""
+Database models for the Shastho Flask application.
+-------------------------------------------------
+This file defines the main database models (tables) for the app, such as users, hospitals, appointments, EHR, etc.
+Each class typically represents a table in the database and includes fields and relationships.
+Used throughout the app for querying and updating data.
+"""
+
 from datetime import datetime, date, time
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union
@@ -6,6 +14,14 @@ from dateutil.parser import isoparse
 
 # Helper function to parse ISO dates safely
 def parse_iso_datetime(date_string: Optional[str]) -> Optional[datetime]:
+    """Parse an ISO format datetime string to a datetime object.
+
+    Args:
+        date_string: ISO format datetime string or None
+
+    Returns:
+        datetime object or None if parsing fails
+    """
     if date_string:
         try:
             return isoparse(date_string)
@@ -14,7 +30,14 @@ def parse_iso_datetime(date_string: Optional[str]) -> Optional[datetime]:
     return None
 
 def parse_iso_date(date_string: Optional[str]) -> Optional[date]:
-    """Helper function to parse ISO date strings safely."""
+    """Helper function to parse ISO date strings safely.
+
+    Args:
+        date_string: ISO format date string or None
+
+    Returns:
+        date object or None if parsing fails
+    """
     if date_string:
         try:
             # Parse as datetime first, then get the date part
@@ -25,42 +48,67 @@ def parse_iso_date(date_string: Optional[str]) -> Optional[date]:
 
 
 class UserRole(str, Enum):
-    """User roles in the system."""
-    ADMIN = 'admin'
-    DOCTOR = 'doctor'
-    PATIENT = 'patient'
-    STAFF = 'staff'
-    HOSPITAL_ADMIN = 'hospital_admin'
-    TEST_ADMIN = 'test_admin'
-    REGULATORY_BODY = 'regulatory_body'
+    """User roles in the system.
+
+    Defines the possible roles that users can have in the application,
+    controlling access permissions and available features.
+    """
+    ADMIN = 'admin'               # System administrator
+    DOCTOR = 'doctor'             # Medical professional
+    PATIENT = 'patient'           # Healthcare recipient
+    STAFF = 'staff'               # Hospital staff
+    HOSPITAL_ADMIN = 'hospital_admin'  # Hospital administrator
+    TEST_ADMIN = 'test_admin'     # Test laboratory administrator
+    REGULATORY_BODY = 'regulatory_body'  # Government/regulatory official
 
 
 class UserStatus(str, Enum):
-    ACTIVE = 'active'
-    INACTIVE = 'inactive'
-    SUSPENDED = 'suspended'
+    """Status values for a user account.
+
+    Defines the possible states of a user account in the system.
+    """
+    ACTIVE = 'active'       # Account is active and can be used
+    INACTIVE = 'inactive'   # Account is temporarily inactive
+    SUSPENDED = 'suspended' # Account is suspended due to policy violation
 
 
 class Gender(str, Enum):
+    """Gender options for users.
+
+    Defines the possible gender values for patients and healthcare providers.
+    """
     MALE = 'male'
     FEMALE = 'female'
     OTHER = 'other'
 
 
 class Language(str, Enum):
+    """Supported languages for the application.
+
+    Defines the languages that users can select for the application interface.
+    """
     ENGLISH = 'english'
     BANGLA = 'bangla'
 
 
 class AppointmentStatus(str, Enum):
-    SCHEDULED = 'scheduled'
-    COMPLETED = 'completed'
-    CANCELLED = 'cancelled'
-    NO_SHOW = 'no-show'
+    """Status values for medical appointments.
+
+    Defines the possible states of an appointment in the system.
+    """
+    SCHEDULED = 'scheduled'   # Appointment is confirmed and scheduled
+    COMPLETED = 'completed'   # Appointment has been completed
+    CANCELLED = 'cancelled'   # Appointment was cancelled
+    NO_SHOW = 'no-show'       # Patient did not attend the appointment
 
 
 class User:
-    """Model representing a user in the system."""
+    """Model representing a user in the system.
+
+    This is the base user model that contains common attributes for all users.
+    Specific user types (doctor, patient, etc.) are linked to this model
+    through the user_id field.
+    """
 
     def __init__(
         self,
@@ -74,6 +122,19 @@ class User:
         profile_picture_url: str = None,
         language_preference: Language = Language.ENGLISH
     ):
+        """Initialize a new User instance.
+
+        Args:
+            id: Unique identifier (UUID), auto-generated if not provided
+            username: Username for login
+            password_hash: Hashed password for security
+            role: Role of the user (admin, doctor, patient, etc.)
+            status: Account status (active, inactive, suspended)
+            created_at: Timestamp of creation
+            updated_at: Timestamp of last update
+            profile_picture_url: URL to the user's profile picture
+            language_preference: Preferred language for the interface
+        """
         self.id = id or uuid4()
         self.username = username
         self.password_hash = password_hash
@@ -86,7 +147,17 @@ class User:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'User':
-        """Create a User instance from a dictionary."""
+        """Create a User instance from a dictionary.
+
+        This method is used to convert data from the database into
+        a User object.
+
+        Args:
+            data: Dictionary containing user data
+
+        Returns:
+            A new User instance populated with the dictionary data
+        """
         return cls(
             id=data.get('id'),
             username=data.get('username'),
@@ -100,7 +171,14 @@ class User:
         )
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert instance to a dictionary."""
+        """Convert instance to a dictionary.
+
+        This method is used to convert a User object into a dictionary
+        that can be stored in the database.
+
+        Returns:
+            Dictionary representation of the User object
+        """
         return {
             'id': str(self.id),
             'username': self.username,
@@ -115,7 +193,11 @@ class User:
 
 
 class Hospital:
-    """Model representing a hospital in the system."""
+    """Model representing a hospital in the system.
+
+    This model contains information about medical facilities registered
+    in the application.
+    """
 
     def __init__(
         self,
@@ -127,6 +209,17 @@ class Hospital:
         created_at: datetime = None,
         updated_at: datetime = None
     ):
+        """Initialize a new Hospital instance.
+
+        Args:
+            id: Unique identifier (UUID), auto-generated if not provided
+            name: Name of the hospital
+            location: General location/area of the hospital
+            address: Full address of the hospital
+            contact_number: Main contact phone number
+            created_at: Timestamp of creation
+            updated_at: Timestamp of last update
+        """
         self.id = id or uuid4()
         self.name = name
         self.location = location
@@ -137,7 +230,14 @@ class Hospital:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Hospital':
-        """Create a Hospital instance from a dictionary."""
+        """Create a Hospital instance from a dictionary.
+
+        Args:
+            data: Dictionary containing hospital data
+
+        Returns:
+            A new Hospital instance populated with the dictionary data
+        """
         return cls(
             id=data.get('id'),
             name=data.get('name'),
@@ -149,7 +249,11 @@ class Hospital:
         )
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert instance to a dictionary."""
+        """Convert instance to a dictionary.
+
+        Returns:
+            Dictionary representation of the Hospital object
+        """
         # Ensure created_at and updated_at are properly formatted
         created_at_iso = None
         if self.created_at:
@@ -177,7 +281,11 @@ class Hospital:
 
 
 class Department:
-    """Model representing a department in the system."""
+    """Model representing a department in the system.
+
+    This model contains information about medical departments that can
+    exist within hospitals (e.g., Cardiology, Neurology, etc.).
+    """
 
     def __init__(
         self,
@@ -186,6 +294,14 @@ class Department:
         created_at: datetime = None,
         updated_at: datetime = None
     ):
+        """Initialize a new Department instance.
+
+        Args:
+            id: Unique identifier (UUID), auto-generated if not provided
+            name: Name of the department (e.g., "Cardiology")
+            created_at: Timestamp of creation
+            updated_at: Timestamp of last update
+        """
         self.id = id or uuid4()
         self.name = name
         self.created_at = created_at or datetime.now()
@@ -193,7 +309,14 @@ class Department:
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Department':
-        """Create a Department instance from a dictionary."""
+        """Create a Department instance from a dictionary.
+
+        Args:
+            data: Dictionary containing department data
+
+        Returns:
+            A new Department instance populated with the dictionary data
+        """
         return cls(
             id=data.get('id'),
             name=data.get('name'),

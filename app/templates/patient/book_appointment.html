@@ -624,14 +624,16 @@ patient_content %}
         doctorNextBtn.disabled = false;
       });
 
+      // Default placeholder image
+      const placeholderImage = "/static/images/placeholders/doctor-icon.svg";
+
       const cardContent = `
         <div class="p-3 flex items-center">
           <div class="flex-shrink-0 mr-3">
-            <img src="${
-              doctor.profile_picture || "/static/images/default-doctor.png"
-            }"
+            <img src="${doctor.profile_picture || placeholderImage}"
                  alt="${doctor.name}"
-                 class="h-12 w-12 rounded-full object-cover">
+                 class="h-12 w-12 rounded-full object-cover bg-cyan-50"
+                 onerror="this.onerror=null; this.src='${placeholderImage}';">
           </div>
           <div class="flex-1">
             <h4 class="font-medium text-gray-900 text-sm md:text-base">${

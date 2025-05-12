@@ -468,11 +468,11 @@
 
         <div class="flex flex-col sm:flex-row gap-4 mt-6">
           <a
-            href="{{ url_for('main.index') }}"
+            href="{% if session.get('user_role') == 'admin' %}{{ url_for('admin.dashboard') }}{% elif session.get('user_role') == 'hospital_admin' %}{{ url_for('hospital_admin.dashboard') }}{% elif session.get('user_role') == 'doctor' %}{{ url_for('doctor.dashboard') }}{% elif session.get('user_role') == 'patient' %}{{ url_for('patient.dashboard') }}{% else %}{{ url_for('main.dashboard') }}{% endif %}"
             class="inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
           >
-            <i data-lucide="home" class="h-5 w-5 mr-2"></i>
-            Back to Home
+            <i data-lucide="layout-dashboard" class="h-5 w-5 mr-2"></i>
+            Back to Dashboard
           </a>
           <a
             href="{{ url_for('auth.logout') }}"

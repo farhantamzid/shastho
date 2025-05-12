@@ -1,3 +1,8 @@
+"""
+Patient-specific models for the Shastho Flask application.
+---------------------------------------------------------
+This file defines models related to patient-specific data and logic.
+"""
 from app.models.database import Patient
 from uuid import UUID
 from app.utils.db import db

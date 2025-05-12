@@ -1,3 +1,9 @@
+"""
+Admin routes for the Shastho Flask application.
+----------------------------------------------
+This file defines all routes related to the admin dashboard and admin management features.
+Each route is registered as part of the 'admin_bp' blueprint in app/__init__.py.
+"""
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
 from app.routes.auth import role_required, login_required
 from app.utils.db import Database

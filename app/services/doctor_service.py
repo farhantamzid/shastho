@@ -1,3 +1,24 @@
+"""
+Doctor Service Module
+-------------------
+This module provides service functions for doctor-related operations.
+It abstracts the business logic for doctor management, including:
+- Retrieving doctor information
+- Managing doctor profiles
+- Handling doctor availability slots
+- Managing doctor appointments
+- Generating doctor statistics
+
+These services act as an intermediary layer between the routes
+and the database models, ensuring separation of concerns and
+reusable business logic.
+
+Doctor service logic for the Shastho Flask application.
+------------------------------------------------------
+This file contains business logic and helper functions related to doctor operations, such as managing patients, appointments, and EHR.
+Called by doctor routes to perform complex operations.
+"""
+
 from app.models.database import Doctor, Hospital, Department, DoctorAvailabilitySlot
 from app.utils.db import db
 from uuid import UUID, uuid4
@@ -6,13 +27,19 @@ from typing import List, Tuple, Optional, Dict, Any
 
 def get_doctor_by_user_id(user_id: str) -> Optional[Doctor]:
     """
-    Retrieve a doctor record by user ID
+    Retrieve a doctor record by user ID.
+
+    This function searches the database for a doctor record
+    associated with the specified user ID.
 
     Args:
         user_id: The user ID linked to the doctor
 
     Returns:
-        Doctor object or None if not found
+        Doctor object if found, None otherwise
+
+    Raises:
+        Exception: If there's a database error, which is caught and logged
     """
     try:
         doctor_records = db.query(Doctor, user_id=user_id)
@@ -25,14 +52,20 @@ def get_doctor_by_user_id(user_id: str) -> Optional[Doctor]:
 
 def get_doctor_hospital_info(hospital_id: Optional[UUID], department_id: Optional[UUID]) -> Tuple[str, str]:
     """
-    Get the hospital and department names for a doctor
+    Get the hospital and department names for a doctor.
+
+    This function fetches the names of the hospital and department
+    associated with a doctor, based on their IDs.
 
     Args:
         hospital_id: The hospital ID
         department_id: The department ID
 
     Returns:
-        Tuple of (hospital_name, department_name)
+        Tuple of (hospital_name, department_name) with default values if not found
+
+    Raises:
+        Exception: If there's a database error, which is caught and logged
     """
     hospital_name = "No Hospital Assigned"
     department_name = "No Department Assigned"
@@ -54,13 +87,19 @@ def get_doctor_hospital_info(hospital_id: Optional[UUID], department_id: Optiona
 
 def get_doctor_availability_slots(doctor_id: UUID) -> List[DoctorAvailabilitySlot]:
     """
-    Get all availability slots for a doctor
+    Get all availability slots for a doctor.
+
+    This function retrieves all the time slots when a doctor
+    is available for appointments.
 
     Args:
         doctor_id: The doctor's ID
 
     Returns:
         List of availability slot objects
+
+    Raises:
+        Exception: If there's a database error, which is caught and logged
     """
     try:
         return db.get_availability_by_doctor(doctor_id)
@@ -71,7 +110,11 @@ def get_doctor_availability_slots(doctor_id: UUID) -> List[DoctorAvailabilitySlo
 def update_doctor_profile(user_id: str, full_name: str, specialization: str,
                          credentials: str, contact_number: str) -> bool:
     """
-    Update doctor profile information
+    Update doctor profile information.
+
+    This function updates the basic profile information for a doctor.
+    It first retrieves the doctor record by user ID, then updates the
+    specified fields.
 
     Args:
         user_id: The user ID
@@ -81,7 +124,10 @@ def update_doctor_profile(user_id: str, full_name: str, specialization: str,
         contact_number: The doctor's contact number
 
     Returns:
-        True if successful, False otherwise
+        True if update was successful, False otherwise
+
+    Raises:
+        Exception: If there's a database error, which is caught and logged
     """
     try:
         doctor = get_doctor_by_user_id(user_id)
@@ -104,14 +150,21 @@ def update_doctor_profile(user_id: str, full_name: str, specialization: str,
 
 def update_doctor_profile_picture(user_id: str, picture_url: str) -> bool:
     """
-    Update doctor's profile picture URL
+    Update doctor's profile picture URL.
+
+    This function updates the profile picture URL associated with a doctor.
+    The actual profile picture is stored elsewhere (like a CDN or file system),
+    and only the URL reference is stored in the database.
 
     Args:
         user_id: The user ID
         picture_url: The URL to the profile picture
 
     Returns:
-        True if successful, False otherwise
+        True if update was successful, False otherwise
+
+    Raises:
+        Exception: If there's a database error, which is caught and logged
     """
     try:
         doctor = get_doctor_by_user_id(user_id)
@@ -133,7 +186,10 @@ def add_availability_slot(doctor_id: UUID, day_of_week: int,
                         start_time: time, end_time: time,
                         slot_duration_minutes: int = 30) -> Optional[DoctorAvailabilitySlot]:
     """
-    Add a new availability slot for a doctor
+    Add a new availability slot for a doctor.
+
+    This function creates a new time slot when a doctor is available
+    for appointments. The slot specifies a day of the week and a time range.
 
     Args:
         doctor_id: The doctor's ID
@@ -144,6 +200,9 @@ def add_availability_slot(doctor_id: UUID, day_of_week: int,
 
     Returns:
         Created slot object if successful, None otherwise
+
+    Raises:
+        Exception: If there's a database error, which is caught and logged
     """
     try:
         # Create new slot
@@ -170,7 +229,10 @@ def update_availability_slot(slot_id: UUID, day_of_week: int,
                             is_available: bool,
                             slot_duration_minutes: int = None) -> bool:
     """
-    Update an existing availability slot
+    Update an existing availability slot.
+
+    This function modifies the properties of an existing doctor
+    availability slot.
 
     Args:
         slot_id: The slot ID to update
@@ -181,7 +243,10 @@ def update_availability_slot(slot_id: UUID, day_of_week: int,
         slot_duration_minutes: Optional duration in minutes for appointment slots
 
     Returns:
-        True if successful, False otherwise
+        True if update was successful, False otherwise
+
+    Raises:
+        Exception: If there's a database error, which is caught and logged
     """
     try:
         # Get the slot
@@ -200,8 +265,9 @@ def update_availability_slot(slot_id: UUID, day_of_week: int,
         if slot_duration_minutes is not None:
             slot.slot_duration_minutes = slot_duration_minutes
 
-        # Save to database using enhanced method
-        return db.update_doctor_availability_slot(slot)
+        # Save to database
+        db.update(slot)
+        return True
     except Exception as e:
         print(f"Error updating availability slot: {str(e)}")
         return False

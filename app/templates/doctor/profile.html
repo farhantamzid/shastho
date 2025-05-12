@@ -40,9 +40,13 @@ endblock %} {% block page_title %}My Profile{% endblock %} {% block breadcrumb
               />
               {% else %}
               <div
-                class="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center"
+                class="h-24 w-24 rounded-full bg-cyan-50 flex items-center justify-center overflow-hidden"
               >
-                <i data-lucide="user" class="h-12 w-12 text-gray-400"></i>
+                <img
+                  src="/static/images/placeholders/doctor-icon.svg"
+                  alt="Doctor Profile"
+                  class="w-20 h-20"
+                />
               </div>
               {% endif %}
             </div>

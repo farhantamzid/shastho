@@ -1,3 +1,9 @@
+"""
+Hospital admin routes for the Shastho Flask application.
+------------------------------------------------------
+This file defines all routes related to the hospital admin dashboard and admin requests.
+Each route is registered as part of the 'hospital_admin_bp' blueprint in app/__init__.py.
+"""
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField

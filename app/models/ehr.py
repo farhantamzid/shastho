@@ -1,3 +1,9 @@
+"""
+EHR (Electronic Health Record) models for the Shastho Flask application.
+-----------------------------------------------------------------------
+This file defines all models related to EHR, such as allergies, diagnoses, medications, immunizations, and test results.
+Each class represents a table or entity in the EHR system.
+"""
 from datetime import datetime, date, time
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union

@@ -1,3 +1,8 @@
+"""
+Audit logging models for the Shastho Flask application.
+------------------------------------------------------
+This file defines models for audit logging, tracking changes and actions in the system for security and compliance.
+"""
 from datetime import datetime
 from uuid import UUID, uuid4
 from typing import Optional, Dict, Any, List

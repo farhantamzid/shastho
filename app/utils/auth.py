@@ -1,3 +1,9 @@
+"""
+Authentication utility functions for the Shastho Flask application.
+---------------------------------------------------------------
+This file contains helper functions for authentication, such as login-required and role-required decorators.
+Used throughout the app to protect routes.
+"""
 from functools import wraps
 from flask import session, redirect, url_for, flash, current_app
 

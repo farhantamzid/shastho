@@ -1,3 +1,9 @@
+"""
+Regulatory body routes for the Shastho Flask application.
+-------------------------------------------------------
+This file defines all routes related to the regulatory dashboard, outbreak, and disease management.
+Each route is registered as part of the 'regulatory_body_bp' blueprint in app/__init__.py.
+"""
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.utils.auth import login_required, role_required
 from app.models.database import UserRole

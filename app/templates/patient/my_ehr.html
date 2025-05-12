@@ -36,37 +36,37 @@ endblock %} {% block content %}
   <div class="bg-white shadow rounded-lg">
     <!-- Tab Navigation -->
     <div class="flex border-b border-gray-200 px-6">
-      <button
+        <button
         id="tab-all"
         class="tab-btn active px-4 py-3 text-sm font-medium border-b-2 border-blue-500 text-blue-600"
-      >
+        >
         All Records
-      </button>
-      <button
+        </button>
+        <button
         id="tab-diagnoses"
         class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-      >
+        >
         Diagnoses
-      </button>
-      <button
+        </button>
+        <button
         id="tab-prescriptions"
         class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-      >
+        >
         Prescriptions
-      </button>
-      <button
+        </button>
+        <button
         id="tab-lab"
         class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-      >
+        >
         Lab Results
-      </button>
-      <button
+        </button>
+        <button
         id="tab-imaging"
         class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
       >
         Imaging
-      </button>
-    </div>
+        </button>
+  </div>
 
     <div class="flex">
       <!-- Sidebar with medical records list -->
@@ -124,7 +124,7 @@ endblock %} {% block content %}
             <div class="ml-3">
               <h3 class="text-sm font-medium text-gray-900">
                 Hypertension Medication
-              </h3>
+          </h3>
               <p class="text-xs text-gray-500">Dr. Farida Rahman</p>
               <p class="text-xs text-gray-400">2023-09-15</p>
             </div>
@@ -158,8 +158,8 @@ endblock %} {% block content %}
               <p class="text-xs text-gray-500">Dr. Mahmud Ahmed</p>
               <p class="text-xs text-gray-400">2023-08-10</p>
             </div>
-          </div>
-        </div>
+      </div>
+    </div>
 
         <!-- Record item 4 -->
         <div
@@ -214,8 +214,8 @@ endblock %} {% block content %}
             <div>
               <p class="text-sm text-gray-500 mb-1">Department</p>
               <p class="text-sm font-medium">Cardiology</p>
-            </div>
-          </div>
+      </div>
+    </div>
 
           <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">Symptoms</h3>
           <p class="text-sm text-gray-700 mb-4">
@@ -283,11 +283,11 @@ endblock %} {% block content %}
             <div>
               <p class="text-sm text-gray-500 mb-1">Date</p>
               <p class="text-sm font-medium">2023-09-15</p>
-            </div>
+              </div>
             <div>
               <p class="text-sm text-gray-500 mb-1">Hospital</p>
               <p class="text-sm font-medium">Dhaka Medical College Hospital</p>
-            </div>
+              </div>
             <div>
               <p class="text-sm text-gray-500 mb-1">Department</p>
               <p class="text-sm font-medium">Cardiology</p>
@@ -373,21 +373,21 @@ endblock %} {% block content %}
             <div>
               <p class="text-sm text-gray-500 mb-1">Department</p>
               <p class="text-sm font-medium">General Medicine</p>
-            </div>
-          </div>
+      </div>
+    </div>
 
           <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">
             Lab Results
           </h3>
 
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                     Test
                   </th>
                   <th
@@ -395,22 +395,22 @@ endblock %} {% block content %}
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Result
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                     Reference Range
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                     Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
                 <tr>
                   <td
                     class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
@@ -499,7 +499,7 @@ endblock %} {% block content %}
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     &lt;100
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-6 py-4 whitespace-nowrap">
                     <span
                       class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
                       >Abnormal</span
@@ -517,8 +517,8 @@ endblock %} {% block content %}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     &lt;150
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
                     <span
                       class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
                       >Abnormal</span
@@ -533,8 +533,8 @@ endblock %} {% block content %}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     98 mg/dL
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     70-100
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
@@ -542,10 +542,10 @@ endblock %} {% block content %}
                       class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
                       >Normal</span
                     >
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
           </div>
 
           <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">Notes</h3>
@@ -574,8 +574,8 @@ endblock %} {% block content %}
             <div>
               <p class="text-sm text-gray-500 mb-1">Department</p>
               <p class="text-sm font-medium">Radiology</p>
-            </div>
-          </div>
+      </div>
+    </div>
 
           <h3 class="text-md font-medium text-gray-700 mt-6 mb-3">
             Imaging Results
@@ -587,7 +587,7 @@ endblock %} {% block content %}
           </p>
 
           <div class="grid grid-cols-2 gap-6 my-6">
-            <div>
+              <div>
               <div class="bg-gray-100 p-10 flex items-center justify-center">
                 <svg
                   class="h-16 w-16 text-gray-400"
@@ -607,8 +607,8 @@ endblock %} {% block content %}
               <p class="text-xs text-gray-500 mt-2">
                 X-Ray<br />Anterior-Posterior (AP) View
               </p>
-            </div>
-            <div>
+              </div>
+              <div>
               <div class="bg-gray-100 p-10 flex items-center justify-center">
                 <svg
                   class="h-16 w-16 text-gray-400"

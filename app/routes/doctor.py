@@ -1,3 +1,9 @@
+"""
+Doctor routes for the Shastho Flask application.
+-----------------------------------------------
+This file defines all routes related to the doctor dashboard, patient management, and EHR access.
+Each route is registered as part of the 'doctor_bp' blueprint in app/__init__.py.
+"""
 from flask import Blueprint, render_template, redirect, url_for, request, session, flash, jsonify
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
@@ -73,7 +79,8 @@ def dashboard():
         # Fallback to dummy data if doctor record not found
         stats = {
             'today_appointments': 8,
-            'patient_count': 146
+            'patient_count': 146,
+            'pending_records': 12
         }
 
     # Dummy data for upcoming appointments

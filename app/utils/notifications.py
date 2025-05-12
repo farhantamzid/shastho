@@ -1,3 +1,9 @@
+"""
+Notification utility functions for the Shastho Flask application.
+---------------------------------------------------------------
+This file contains helper functions for sending notifications (email, SMS, etc.) to users.
+Used throughout the app to notify users of important events.
+"""
 import os
 import smtplib
 from email.mime.text import MIMEText

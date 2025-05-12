@@ -1,3 +1,11 @@
+"""
+Authentication routes for the Shastho Flask application.
+------------------------------------------------------
+This file defines all routes related to user authentication:
+- Login, logout, registration (for all user types)
+- Password reset and profile management
+Each route is registered as part of the 'auth_bp' blueprint in app/__init__.py.
+"""
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed

@@ -1,3 +1,9 @@
+"""
+EHR-related forms for the Shastho Flask application.
+---------------------------------------------------
+This file defines WTForms classes for handling and validating user input related to EHR (diagnosis, medication, etc.).
+Used in EHR-related routes and templates.
+"""
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, DateField, TimeField, SelectField, HiddenField, BooleanField, FileField, MultipleFileField
 from wtforms.validators import DataRequired, Length, Optional

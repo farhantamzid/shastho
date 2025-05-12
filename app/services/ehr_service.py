@@ -1,3 +1,9 @@
+"""
+EHR service logic for the Shastho Flask application.
+---------------------------------------------------
+This file contains business logic and helper functions related to EHR operations, such as adding, editing, and retrieving EHR data.
+Called by EHR-related routes to perform complex operations.
+"""
 from uuid import UUID
 from typing import List, Dict, Any, Optional, Tuple
 from datetime import datetime, date

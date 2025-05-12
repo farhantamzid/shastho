@@ -1,3 +1,9 @@
+"""
+Validation utility functions for the Shastho Flask application.
+-------------------------------------------------------------
+This file contains helper functions for validating user input and data throughout the app.
+Used in forms, routes, and services to ensure data integrity.
+"""
 from typing import List, Dict, Any, Optional, Union, Callable, TypeVar
 from datetime import datetime, date
 import re
