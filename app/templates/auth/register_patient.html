@@ -297,6 +297,163 @@ endblock %} {% block content %}
         {% endif %}
       </div>
 
+      <!-- Health Information Section - New section for additional fields -->
+      <h3
+        class="text-lg font-medium text-gray-800 border-b border-gray-200 pb-2 mb-4 mt-8"
+      >
+        Health Information
+      </h3>
+
+      <!-- Height Field -->
+      <div>
+        <label for="height" class="block text-sm font-medium text-gray-700 mb-1"
+          >Height (cm)</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="ruler" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          <input
+            type="number"
+            id="height"
+            name="height"
+            placeholder="Enter height in cm"
+            class="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+          />
+        </div>
+      </div>
+
+      <!-- Weight Field -->
+      <div>
+        <label for="weight" class="block text-sm font-medium text-gray-700 mb-1"
+          >Weight (kg)</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="weight" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          <input
+            type="number"
+            id="weight"
+            name="weight"
+            step="0.1"
+            placeholder="Enter weight in kg"
+            class="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+          />
+        </div>
+      </div>
+
+      <!-- Blood Type Field -->
+      <div>
+        <label
+          for="blood_type"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Blood Type</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="droplet" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          <select
+            id="blood_type"
+            name="blood_type"
+            class="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+          >
+            <option value="">Select Blood Type</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Allergies Field -->
+      <div>
+        <label
+          for="allergies"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Allergies</label
+        >
+        <div class="relative">
+          <div
+            class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none"
+          >
+            <i data-lucide="alert-circle" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          <textarea
+            id="allergies"
+            name="allergies"
+            rows="2"
+            placeholder="List any allergies you have"
+            class="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Chronic Conditions Field -->
+      <div>
+        <label
+          for="chronic_conditions"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Chronic Conditions</label
+        >
+        <div class="relative">
+          <div
+            class="absolute top-3 left-0 pl-3 flex items-start pointer-events-none"
+          >
+            <i data-lucide="stethoscope" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          <textarea
+            id="chronic_conditions"
+            name="chronic_conditions"
+            rows="2"
+            placeholder="List any chronic conditions you have"
+            class="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Occupation Field -->
+      <div>
+        <label
+          for="occupation"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Occupation</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <i data-lucide="briefcase" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          <input
+            type="text"
+            id="occupation"
+            name="occupation"
+            placeholder="Enter your occupation"
+            class="appearance-none block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500"
+          />
+        </div>
+      </div>
+
+      <!-- Note about additional fields -->
+      <p class="text-xs text-gray-500 italic">
+        Note: Health information fields are optional and help us provide better
+        care
+      </p>
+
       <div class="mt-8">
         <button
           type="submit"

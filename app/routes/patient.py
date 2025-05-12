@@ -892,3 +892,13 @@ def my_ehr():
                           vitals=vitals)
 
 # Add other routes like view_patient, add_patient, edit_patient etc.
+
+@patient_bp.route('/feedback')
+@login_required
+@role_required(UserRole.PATIENT)
+def feedback():
+    """
+    Render the patient feedback form.
+    This is a frontend-only implementation with no backend processing.
+    """
+    return render_template('patient/feedback.html')

@@ -1,0 +1,385 @@
+{% extends "base.html" %} {% block title %}Submit Feedback - shastho{% endblock
+%} {% block content %}
+<div class="flex h-screen bg-gray-50">
+  <!-- Content area -->
+  <div class="flex flex-col flex-1 overflow-hidden">
+    <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8">
+      <div class="max-w-3xl mx-auto">
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div class="px-6 py-5 border-b border-gray-200">
+            <div class="flex items-center">
+              <i
+                data-lucide="message-square"
+                class="h-5 w-5 text-cyan-600 mr-2"
+              ></i>
+              <h3 class="text-lg font-medium text-gray-900">Submit Feedback</h3>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <p class="text-sm text-gray-500 mb-6">
+              Your feedback helps us improve our services. All feedback is
+              reviewed by our quality improvement team.
+            </p>
+
+            <form method="POST" action="#">
+              {{ form.csrf_token if form }}
+
+              <!-- Feedback Type Selection -->
+              <div class="mb-6">
+                <label
+                  for="feedback-type"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  What would you like to give feedback on?
+                </label>
+                <select
+                  id="feedback-type"
+                  name="feedback-type"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                >
+                  <option value="">Select type</option>
+                  <option value="doctor">Doctor</option>
+                  <option value="hospital">Hospital/Facility</option>
+                  <option value="appointment">Appointment Experience</option>
+                  <option value="test">Test/Procedure</option>
+                  <option value="staff">Staff/Administration</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <!-- Previous Interaction Selection -->
+              <div class="mb-6">
+                <label
+                  for="interaction"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Select Related Appointment/Visit
+                </label>
+                <select
+                  id="interaction"
+                  name="interaction"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                >
+                  <option value="">Select an appointment</option>
+                  <option value="1">
+                    Cardiology Appointment - Dr. Farida Rahman (15 May 2025)
+                  </option>
+                  <option value="2">
+                    General Medicine - Dr. Mahmud Ahmed (24 April 2025)
+                  </option>
+                  <option value="3">
+                    Comprehensive Blood Work - Bangabandhu Sheikh Mujib Medical
+                    (10 Aug 2023)
+                  </option>
+                  <option value="4">
+                    Orthopedics - Dr. Nusrat Khan (10 April 2025)
+                  </option>
+                </select>
+              </div>
+
+              <!-- Hospital Selection -->
+              <div class="mb-6">
+                <label
+                  for="hospital"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Hospital/Facility
+                </label>
+                <select
+                  id="hospital"
+                  name="hospital"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                >
+                  <option value="">Select a hospital/facility</option>
+                  <option value="dhaka-medical">
+                    Dhaka Medical College Hospital
+                  </option>
+                  <option value="bangabandhu">
+                    Bangabandhu Sheikh Mujib Medical University
+                  </option>
+                  <option value="chittagong">
+                    Chittagong Medical College Hospital
+                  </option>
+                  <option value="square">Square Hospitals Ltd</option>
+                  <option value="popular">Popular Diagnostic Centre</option>
+                </select>
+              </div>
+
+              <!-- Rating Section -->
+              <div class="mb-6">
+                <h4 class="text-sm font-medium text-gray-700 mb-4">Ratings</h4>
+
+                <div class="space-y-4">
+                  <!-- Overall Rating -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Overall Experience
+                    </label>
+                    <div class="flex items-center">
+                      <div class="flex space-x-1">
+                        <button
+                          type="button"
+                          class="p-1 text-gray-300 hover:text-yellow-400 focus:outline-none star-btn"
+                          data-rating="1"
+                        >
+                          <i data-lucide="star" class="h-6 w-6"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="p-1 text-gray-300 hover:text-yellow-400 focus:outline-none star-btn"
+                          data-rating="2"
+                        >
+                          <i data-lucide="star" class="h-6 w-6"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="p-1 text-gray-300 hover:text-yellow-400 focus:outline-none star-btn"
+                          data-rating="3"
+                        >
+                          <i data-lucide="star" class="h-6 w-6"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="p-1 text-gray-300 hover:text-yellow-400 focus:outline-none star-btn"
+                          data-rating="4"
+                        >
+                          <i data-lucide="star" class="h-6 w-6"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="p-1 text-gray-300 hover:text-yellow-400 focus:outline-none star-btn"
+                          data-rating="5"
+                        >
+                          <i data-lucide="star" class="h-6 w-6"></i>
+                        </button>
+                      </div>
+                      <span
+                        class="ml-2 text-sm text-gray-500"
+                        id="rating-display"
+                        >0/5</span
+                      >
+                      <input
+                        type="hidden"
+                        name="overall_rating"
+                        id="overall_rating"
+                        value="0"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Specific Ratings -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Cleanliness -->
+                    <div>
+                      <label
+                        for="cleanliness"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Cleanliness
+                      </label>
+                      <select
+                        id="cleanliness"
+                        name="cleanliness"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                      >
+                        <option value="5">Excellent (5)</option>
+                        <option value="4">Good (4)</option>
+                        <option value="3" selected>Average (3)</option>
+                        <option value="2">Poor (2)</option>
+                        <option value="1">Very Poor (1)</option>
+                      </select>
+                    </div>
+
+                    <!-- Staff Behavior -->
+                    <div>
+                      <label
+                        for="staff"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Staff Behavior
+                      </label>
+                      <select
+                        id="staff"
+                        name="staff"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                      >
+                        <option value="5">Excellent (5)</option>
+                        <option value="4">Good (4)</option>
+                        <option value="3" selected>Average (3)</option>
+                        <option value="2">Poor (2)</option>
+                        <option value="1">Very Poor (1)</option>
+                      </select>
+                    </div>
+
+                    <!-- Waiting Time -->
+                    <div>
+                      <label
+                        for="waiting"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Waiting Time
+                      </label>
+                      <select
+                        id="waiting"
+                        name="waiting"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                      >
+                        <option value="5">Excellent (5)</option>
+                        <option value="4">Good (4)</option>
+                        <option value="3" selected>Average (3)</option>
+                        <option value="2">Poor (2)</option>
+                        <option value="1">Very Poor (1)</option>
+                      </select>
+                    </div>
+
+                    <!-- Facilities & Amenities -->
+                    <div>
+                      <label
+                        for="facilities"
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Facilities & Amenities
+                      </label>
+                      <select
+                        id="facilities"
+                        name="facilities"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm"
+                      >
+                        <option value="5">Excellent (5)</option>
+                        <option value="4">Good (4)</option>
+                        <option value="3" selected>Average (3)</option>
+                        <option value="2">Poor (2)</option>
+                        <option value="1">Very Poor (1)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Comments -->
+              <div class="mb-6">
+                <label
+                  for="comments"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Detailed Feedback
+                </label>
+                <textarea
+                  id="comments"
+                  name="comments"
+                  rows="4"
+                  placeholder="Please share your experience, suggestions, or any concerns you had..."
+                  class="shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                ></textarea>
+              </div>
+
+              <!-- Anonymous Option -->
+              <div class="mb-6">
+                <div class="flex items-start">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="anonymous"
+                      name="anonymous"
+                      type="checkbox"
+                      class="focus:ring-cyan-500 h-4 w-4 text-cyan-600 border-gray-300 rounded"
+                    />
+                  </div>
+                  <div class="ml-3 text-sm">
+                    <label for="anonymous" class="font-medium text-gray-700"
+                      >Submit anonymously</label
+                    >
+                    <p class="text-gray-500">
+                      Your name and personal information will not be shared with
+                      the hospital or staff.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Acknowledgement and Submission -->
+              <div class="mb-6">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <i data-lucide="info" class="h-5 w-5 text-cyan-500"></i>
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm text-gray-700">
+                        By submitting this feedback, you consent to it being
+                        reviewed by our quality improvement team. We may contact
+                        you for further details.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end space-x-3">
+                <a
+                  href="{{ url_for('patient.dashboard') }}"
+                  class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                >
+                  Cancel
+                </a>
+                <button
+                  type="submit"
+                  class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                >
+                  Submit Feedback
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Star rating functionality
+    const starButtons = document.querySelectorAll(".star-btn");
+    const ratingDisplay = document.getElementById("rating-display");
+    const ratingInput = document.getElementById("overall_rating");
+
+    starButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const rating = parseInt(this.getAttribute("data-rating"), 10);
+        ratingInput.value = rating;
+        ratingDisplay.textContent = `${rating}/5`;
+
+        // Update star colors
+        starButtons.forEach((btn) => {
+          const btnRating = parseInt(btn.getAttribute("data-rating"), 10);
+          if (btnRating <= rating) {
+            btn.classList.remove("text-gray-300");
+            btn.classList.add("text-yellow-400");
+            btn.querySelector("i").classList.add("fill-current");
+          } else {
+            btn.classList.add("text-gray-300");
+            btn.classList.remove("text-yellow-400");
+            btn.querySelector("i").classList.remove("fill-current");
+          }
+        });
+      });
+    });
+
+    // Feedback type change handling
+    const feedbackTypeSelect = document.getElementById("feedback-type");
+    const hospitalFieldDiv = document.querySelector("div:has(#hospital)");
+
+    feedbackTypeSelect.addEventListener("change", function () {
+      if (this.value === "hospital") {
+        hospitalFieldDiv.style.display = "block";
+      } else {
+        hospitalFieldDiv.style.display = "none";
+      }
+    });
+  });
+</script>
+{% endblock %}
