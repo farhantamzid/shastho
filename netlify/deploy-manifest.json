@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api": {
+      "path": "netlify/functions/api.py",
+      "runtime": "python3.10",
+      "allowedOrigins": ["*"],
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    }
+  }
+}
