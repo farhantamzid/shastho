@@ -27,14 +27,26 @@ def dashboard():
     # Get the user ID from session (unused now but kept for consistency)
     user_id = session.get('user_id')
 
-    # Fetch data from MySQL
-    data = get_dashboard_data()
+    # Read filters from query string
+    region = request.args.get('region', 'all')
+    disease = request.args.get('disease', 'all')
+    trend = request.args.get('trend', 'all')
+
+    # Fetch data from MySQL with filters
+    data = get_dashboard_data({
+        'region': region,
+        'disease': disease,
+        'trend': trend,
+    })
 
     user_name = session.get('user_name', 'Regulatory Official')
 
     return render_template(
         'regulatory_body/dashboard.html',
         user_name=user_name,
+        selected_region=region,
+        selected_disease=disease,
+        selected_trend=trend,
         **data
     )
 

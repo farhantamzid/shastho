@@ -3,12 +3,12 @@ Service to fetch regulatory dashboard data from MySQL.
 This isolates MySQL access from Flask routes and templates.
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 from app.utils.mysql_db import get_mysql_connection
 
 
-def get_dashboard_data() -> Dict[str, Any]:
+def get_dashboard_data(filters: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
     conn = get_mysql_connection()
     cur = conn.cursor(dictionary=True)
 
@@ -24,25 +24,62 @@ def get_dashboard_data() -> Dict[str, Any]:
         'alerts': stats_row.get('alerts', 0),
     }
 
-    # Regions list
+    # Regions list (for dropdown)
     cur.execute("SELECT name FROM regions ORDER BY name ASC")
     regions = [r['name'] for r in cur.fetchall()]  # type: ignore
 
-    # Diseases summary
-    cur.execute("SELECT name, cases, trend, risk_level FROM diseases ORDER BY cases DESC")
+    # Diseases summary (supports name + trend filters)
+    diseases_where: List[str] = []
+    diseases_params: List[Any] = []
+    if filters:
+        disease_name = filters.get('disease')
+        trend = filters.get('trend')
+        if disease_name and disease_name != 'all':
+            diseases_where.append("name = %s")
+            diseases_params.append(disease_name)
+        if trend and trend != 'all':
+            diseases_where.append("trend = %s")
+            diseases_params.append(trend)
+    diseases_sql = "SELECT name, cases, trend, risk_level FROM diseases"
+    if diseases_where:
+        diseases_sql += " WHERE " + " AND ".join(diseases_where)
+    diseases_sql += " ORDER BY cases DESC"
+    cur.execute(diseases_sql, tuple(diseases_params))
     diseases = cur.fetchall()  # type: ignore
 
     # Recent outbreaks
-    cur.execute("""
-        SELECT id, disease, region, cases, status, trend, DATE_FORMAT(start_date, '%Y-%m-%d') as start_date, severity
-        FROM outbreaks
-        ORDER BY id ASC
-        LIMIT 5
-    """)
+    outbreaks_where: List[str] = []
+    outbreaks_params: List[Any] = []
+    if filters:
+        region = filters.get('region')
+        disease_name = filters.get('disease')
+        trend = filters.get('trend')
+        if region and region != 'all':
+            outbreaks_where.append("region = %s")
+            outbreaks_params.append(region)
+        if disease_name and disease_name != 'all':
+            outbreaks_where.append("disease = %s")
+            outbreaks_params.append(disease_name)
+        if trend and trend != 'all':
+            outbreaks_where.append("trend = %s")
+            outbreaks_params.append('Increasing' if trend == 'increasing' else ('Stable' if trend == 'stable' else 'Decreasing'))
+    outbreaks_sql = (
+        "SELECT id, disease, region, cases, status, trend, DATE_FORMAT(start_date, '%Y-%m-%d') as start_date, severity "
+        "FROM outbreaks"
+    )
+    if outbreaks_where:
+        outbreaks_sql += " WHERE " + " AND ".join(outbreaks_where)
+    outbreaks_sql += " ORDER BY id ASC LIMIT 5"
+    cur.execute(outbreaks_sql, tuple(outbreaks_params))
     recent_outbreaks = cur.fetchall()  # type: ignore
 
-    # Region summaries
-    cur.execute("SELECT region, total_cases, active_outbreaks, population_affected, hospital_capacity FROM region_summary")
+    # Region summaries (supports region filter)
+    region_sql = "SELECT region, total_cases, active_outbreaks, population_affected, hospital_capacity FROM region_summary"
+    region_params: Tuple[Any, ...] = ()
+    if filters and filters.get('region') and filters.get('region') != 'all':
+        region_sql += " WHERE region = %s"
+        region_params = (filters.get('region'),)
+    cur.execute(region_sql, region_params)
     region_rows = cur.fetchall()  # type: ignore
 
     # Attach primary diseases per region
