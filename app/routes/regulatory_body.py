@@ -8,6 +8,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.utils.auth import login_required, role_required
 from app.models.database import UserRole
 from app.utils.db import Database
+from app.services.regulatory_service import get_dashboard_data
 
 # Create Blueprint for regulatory body routes
 regulatory_body_bp = Blueprint('regulatory_body', __name__, url_prefix='/regulatory')
@@ -23,161 +24,19 @@ def dashboard():
     Regulatory Body Dashboard - Entry point for government regulatory users
     Shows aggregated health data for monitoring disease outbreaks
     """
-    # Get the user ID from session
+    # Get the user ID from session (unused now but kept for consistency)
     user_id = session.get('user_id')
 
-    # Dummy data for the dashboard
-    stats = {
-        'total_cases': 12784,
-        'new_cases_today': 238,
-        'active_outbreaks': 7,
-        'regions_affected': 14,
-        'hospitals_reporting': 142,
-        'alerts': 5
-    }
-
-    # Dummy data for different regions
-    regions = [
-        'Dhaka Division',
-        'Chittagong Division',
-        'Khulna Division',
-        'Rajshahi Division',
-        'Barisal Division',
-        'Sylhet Division',
-        'Rangpur Division',
-        'Mymensingh Division'
-    ]
-
-    # Dummy data for diseases being tracked
-    diseases = [
-        {'name': 'Dengue Fever', 'cases': 4582, 'trend': 'increasing', 'risk_level': 'high'},
-        {'name': 'Cholera', 'cases': 1237, 'trend': 'stable', 'risk_level': 'medium'},
-        {'name': 'Tuberculosis', 'cases': 3456, 'trend': 'decreasing', 'risk_level': 'medium'},
-        {'name': 'Malaria', 'cases': 876, 'trend': 'increasing', 'risk_level': 'high'},
-        {'name': 'Typhoid', 'cases': 1324, 'trend': 'stable', 'risk_level': 'low'},
-        {'name': 'Hepatitis A', 'cases': 645, 'trend': 'decreasing', 'risk_level': 'low'},
-        {'name': 'COVID-19', 'cases': 542, 'trend': 'increasing', 'risk_level': 'medium'},
-        {'name': 'Influenza', 'cases': 2897, 'trend': 'increasing', 'risk_level': 'medium'}
-    ]
-
-    # Dummy data for recent outbreaks
-    recent_outbreaks = [
-        {
-            'id': 1,
-            'disease': 'Dengue Fever',
-            'region': 'Dhaka Division',
-            'cases': 278,
-            'status': 'Active',
-            'trend': 'Increasing',
-            'start_date': '2023-07-01',
-            'severity': 'High'
-        },
-        {
-            'id': 2,
-            'disease': 'Cholera',
-            'region': 'Barisal Division',
-            'cases': 156,
-            'status': 'Active',
-            'trend': 'Stable',
-            'start_date': '2023-06-15',
-            'severity': 'Medium'
-        },
-        {
-            'id': 3,
-            'disease': 'Malaria',
-            'region': 'Chittagong Division',
-            'cases': 124,
-            'status': 'Active',
-            'trend': 'Increasing',
-            'start_date': '2023-06-25',
-            'severity': 'High'
-        },
-        {
-            'id': 4,
-            'disease': 'COVID-19',
-            'region': 'Dhaka Division',
-            'cases': 87,
-            'status': 'Active',
-            'trend': 'Increasing',
-            'start_date': '2023-07-10',
-            'severity': 'Medium'
-        },
-        {
-            'id': 5,
-            'disease': 'Influenza',
-            'region': 'Sylhet Division',
-            'cases': 203,
-            'status': 'Active',
-            'trend': 'Decreasing',
-            'start_date': '2023-06-10',
-            'severity': 'Medium'
-        }
-    ]
-
-    # Dummy data for region-specific disease data
-    region_data = [
-        {
-            'region': 'Dhaka Division',
-            'total_cases': 4125,
-            'active_outbreaks': 3,
-            'primary_diseases': ['Dengue Fever', 'COVID-19', 'Tuberculosis'],
-            'population_affected': '0.82%',
-            'hospital_capacity': '76%'
-        },
-        {
-            'region': 'Chittagong Division',
-            'total_cases': 2784,
-            'active_outbreaks': 2,
-            'primary_diseases': ['Malaria', 'Typhoid', 'Dengue Fever'],
-            'population_affected': '0.54%',
-            'hospital_capacity': '65%'
-        },
-        {
-            'region': 'Khulna Division',
-            'total_cases': 1653,
-            'active_outbreaks': 1,
-            'primary_diseases': ['Cholera', 'Typhoid'],
-            'population_affected': '0.48%',
-            'hospital_capacity': '52%'
-        },
-        {
-            'region': 'Rajshahi Division',
-            'total_cases': 945,
-            'active_outbreaks': 0,
-            'primary_diseases': ['Tuberculosis', 'Influenza'],
-            'population_affected': '0.31%',
-            'hospital_capacity': '40%'
-        },
-        {
-            'region': 'Barisal Division',
-            'total_cases': 1241,
-            'active_outbreaks': 1,
-            'primary_diseases': ['Cholera', 'Hepatitis A'],
-            'population_affected': '0.58%',
-            'hospital_capacity': '59%'
-        }
-    ]
-
-    # Dummy data for monthly trend data (for charts)
-    monthly_trends = {
-        'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-        'dengue': [125, 156, 243, 375, 456, 678, 892],
-        'malaria': [223, 198, 210, 227, 252, 286, 312],
-        'cholera': [342, 287, 265, 301, 285, 312, 345],
-        'covid': [556, 423, 378, 402, 435, 489, 542],
-        'influenza': [675, 789, 856, 945, 1023, 1287, 1543]
-    }
+    # Fetch data from MySQL
+    data = get_dashboard_data()
 
     user_name = session.get('user_name', 'Regulatory Official')
 
-    return render_template('regulatory_body/dashboard.html',
-                          user_name=user_name,
-                          stats=stats,
-                          regions=regions,
-                          diseases=diseases,
-                          recent_outbreaks=recent_outbreaks,
-                          region_data=region_data,
-                          monthly_trends=monthly_trends)
+    return render_template(
+        'regulatory_body/dashboard.html',
+        user_name=user_name,
+        **data
+    )
 
 # Disease Details route
 @regulatory_body_bp.route('/disease/<disease_name>')

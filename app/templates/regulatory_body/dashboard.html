@@ -487,15 +487,8 @@ Surveillance Dashboard{% endblock %} {% block regulatory_body_content %}
 <!-- JavaScript for interactive elements -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // Chart data from the backend
-    const monthlyTrends = {
-      months: ["January", "February", "March", "April", "May", "June", "July"],
-      dengue: [125, 156, 243, 375, 456, 678, 892],
-      malaria: [223, 198, 210, 227, 252, 286, 312],
-      cholera: [342, 287, 265, 301, 285, 312, 345],
-      covid: [556, 423, 378, 402, 435, 489, 542],
-      influenza: [675, 789, 856, 945, 1023, 1287, 1543],
-    };
+    // Chart data from the backend (injected by Flask)
+    const monthlyTrends = {{ monthly_trends | tojson }};
 
     // Initialize chart
     const ctx = document.getElementById("diseaseChart").getContext("2d");
